@@ -105,7 +105,6 @@
   // Hamburger Menu
   const hamburger = document.getElementById('hamburger');
   const navLinks = document.getElementById('navLinks');
-
   hamburger.addEventListener('click', () => {
     if(navLinks.style.display === 'flex') {
       navLinks.style.display = 'none';
@@ -131,6 +130,7 @@
   // Filters
   let currentCategory = 'all';
   let currentBrand = 'all';
+  let currentSearch = '';
 
   function filterProducts(category){
     currentCategory = category;
@@ -142,11 +142,22 @@
     applyFilters();
   }
 
+  document.getElementById('productSearch').addEventListener('keyup', function(){
+    currentSearch = this.value.toLowerCase();
+    applyFilters();
+  });
+
   function applyFilters(){
-    document.querySelectorAll('.product-card').forEach(card=>{
-      const matchCategory = (currentCategory==='all' || card.dataset.category===currentCategory);
-      const matchBrand = (currentBrand==='all' || card.dataset.brand===currentBrand);
-      card.style.display = (matchCategory && matchBrand) ? 'block' : 'none';
+    document.querySelectorAll('.product-card').forEach(card => {
+      const matchCategory = (currentCategory === 'all' || card.dataset.category === currentCategory);
+      const matchBrand = (currentBrand === 'all' || card.dataset.brand === currentBrand);
+
+      const name = card.querySelector('h3').textContent.toLowerCase();
+      const brandText = card.querySelector('.brand').textContent.toLowerCase();
+      const details = card.querySelector('.details').textContent.toLowerCase();
+      const matchSearch = (name.includes(currentSearch) || brandText.includes(currentSearch) || details.includes(currentSearch));
+
+      card.style.display = (matchCategory && matchBrand && matchSearch) ? 'block' : 'none';
     });
   }
 
@@ -175,17 +186,6 @@
       clearInterval(card.hoverInterval);
       imgs.forEach((img,i)=>img.style.opacity=i===0?1:0);
       index=0;
-    });
-  });
-
-  // Search Function
-  document.getElementById('productSearch').addEventListener('keyup',function(){
-    const searchTerm=this.value.toLowerCase();
-    document.querySelectorAll('.product-card').forEach(card=>{
-      const name = card.querySelector('h3').textContent.toLowerCase();
-      const brand = card.querySelector('.brand').textContent.toLowerCase();
-      const details = card.querySelector('.details').textContent.toLowerCase();
-      card.style.display = (name.includes(searchTerm) || brand.includes(searchTerm) || details.includes(searchTerm)) ? 'block' : 'none';
     });
   });
 </script>
