@@ -29,18 +29,27 @@
 
   <!-- Category Filter -->
   <div class="filter-bar">
+    <strong>Filter by Category:</strong>
     <button onclick="filterProducts('all')">All</button>
+    <button onclick="filterProducts('Luxury')">Luxury</button>
     <button onclick="filterProducts('Men')">Men</button>
-    <button onclick="filterProducts('Women')">Women</button>
     <button onclick="filterProducts('Couple')">Couple</button>
-    <button onclick="filterProducts('defect/promo')">defect/promo</button>
+  </div>
+
+  <!-- Brand Filter -->
+  <div class="filter-bar">
+    <strong>Filter by Brand:</strong>
+    <button onclick="filterBrand('all')">All</button>
+    <button onclick="filterBrand('Omega')">Omega</button>
+    <button onclick="filterBrand('Rolex')">Rolex</button>
+    <button onclick="filterBrand('Casio')">Casio</button>
   </div>
 
   <!-- Product Grid -->
   <div class="product-grid">
 
     <!-- Product Card 1 -->
-    <div class="product-card" data-category="Luxury">
+    <div class="product-card" data-category="Luxury" data-brand="Omega">
       <span class="badge new">New Arrival</span>
       <div class="product-images">
         <img src="images/chrono-1.jpg" alt="Classic Chrono 1">
@@ -55,7 +64,7 @@
     </div>
 
     <!-- Product Card 2 -->
-    <div class="product-card" data-category="Men">
+    <div class="product-card" data-category="Men" data-brand="Rolex">
       <span class="badge best">Best Seller</span>
       <div class="product-images">
         <img src="images/blackgold-1.jpg" alt="Luxury Black Gold 1">
@@ -71,7 +80,7 @@
     </div>
 
     <!-- Product Card 3 -->
-    <div class="product-card" data-category="Couple">
+    <div class="product-card" data-category="Couple" data-brand="Casio">
       <span class="badge new">New Arrival</span>
       <div class="product-images">
         <img src="images/couple-1.jpg" alt="Couple Set 1">
@@ -119,10 +128,25 @@
     }
   });
 
-  // Category Filter
+  // Filters
+  let currentCategory = 'all';
+  let currentBrand = 'all';
+
   function filterProducts(category){
+    currentCategory = category;
+    applyFilters();
+  }
+
+  function filterBrand(brand){
+    currentBrand = brand;
+    applyFilters();
+  }
+
+  function applyFilters(){
     document.querySelectorAll('.product-card').forEach(card=>{
-      card.style.display = (category==='all'||card.dataset.category===category) ? 'block' : 'none';
+      const matchCategory = (currentCategory==='all' || card.dataset.category===currentCategory);
+      const matchBrand = (currentBrand==='all' || card.dataset.brand===currentBrand);
+      card.style.display = (matchCategory && matchBrand) ? 'block' : 'none';
     });
   }
 
