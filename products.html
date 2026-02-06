@@ -1,1 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Products | Midbn Timepieces</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<header>
+  <h1>MIDBN_TIMEPIECES</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="products.html">Products</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<section>
+  <div class="filter-bar">
+    <button onclick="filterProducts('all')">All</button>
+    <button onclick="filterProducts('Luxury')">Luxury</button>
+    <button onclick="filterProducts('Men')">Men</button>
+    <button onclick="filterProducts('Couple')">Couple</button>
+  </div>
+
+  <div class="product-grid">
+
+    <div class="product-card" data-category="Luxury">
+      <span class="badge new">New Arrival</span>
+      <h3>Classic Chrono</h3>
+      <p>Price: $XX</p>
+      <p class="stock" data-stock="2"></p>
+      <a class="buy-btn whatsapp-product" data-product="Classic Chrono">Buy via WhatsApp</a>
+    </div>
+
+    <div class="product-card" data-category="Men">
+      <span class="badge best">Best Seller</span>
+      <h3>Luxury Black Gold</h3>
+      <p>Price: $XX</p>
+      <p class="stock" data-stock="5"></p>
+      <a class="buy-btn whatsapp-product" data-product="Luxury Black Gold">Buy via WhatsApp</a>
+    </div>
+
+  </div>
+</section>
+
+<a href="https://wa.me/6738908960?text=Hi%20Midbn%20Timepieces,%20I'm%20interested%20in%20your%20watches."
+   class="whatsapp-float" target="_blank">WhatsApp</a>
+
+<script>
+  document.querySelectorAll('.stock').forEach(el => {
+    const stock = parseInt(el.dataset.stock);
+    if (stock <= 0) {
+      el.textContent = "Out of stock";
+      el.classList.add('out-stock');
+    } else if (stock <= 3) {
+      el.textContent = `Only ${stock} left`;
+      el.classList.add('low-stock');
+    } else {
+      el.textContent = `Stock: ${stock}`;
+    }
+  });
+
+  function filterProducts(category) {
+    document.querySelectorAll('.product-card').forEach(card => {
+      card.style.display =
+        category === 'all' || card.dataset.category === category
+        ? 'block' : 'none';
+    });
+  }
+
+  document.querySelectorAll('.whatsapp-product').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const product = btn.dataset.product;
+      const msg = `Hi Midbn Timepieces, I'm interested in the ${product}. Kindly advise on availability and pricing.`;
+      window.open(`https://wa.me/6738908960?text=${encodeURIComponent(msg)}`, '_blank');
+    });
+  });
+</script>
+
+<footer>© 2026 Midbn Timepieces</footer>
+</body>
+</html>
