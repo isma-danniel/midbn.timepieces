@@ -6,26 +6,19 @@ a { text-decoration:none; color:inherit; }
 
 /* Header (No Logo) */
 header {
-  background:#000;
-  padding:20px 40px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  border-bottom:1px solid #222;
-}
-
-.logo-container {
   display: flex;
+  justify-content: space-between; /* text left, nav right */
   align-items: center;
-  gap: 0; /* no gap since no logo */
+  padding: 20px 40px;
+  border-bottom:1px solid #222;
 }
 
 header h1 {
   font-family:'Playfair Display', serif;
+  font-size:24px;
+  color:#d4af37;
   letter-spacing:2px;
-  font-size:24px; /* slightly larger for boutique feel */
-  color: #d4af37; /* subtle gold luxury color */
-  margin-right: 20px; /* space from nav links */
+  margin:0;
 }
 
 /* Navigation */
