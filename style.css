@@ -1,1 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Poppins:wght@300;400;500&display=swap');
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0b0b0b;
+  color: #e5e5e5;
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Header */
+header {
+  background: #000;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #222;
+}
+
+header h1 {
+  font-family: 'Playfair Display', serif;
+  letter-spacing: 2px;
+  font-size: 20px;
+}
+
+nav a {
+  margin-left: 25px;
+  font-size: 14px;
+  color: #d4af37;
+}
+
+/* Sections */
+section {
+  padding: 80px 40px;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+}
+
+.luxury-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 38px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: reveal 1.5s ease forwards;
+}
+
+.fade-text {
+  margin-top: 15px;
+  color: #aaa;
+  opacity: 0;
+  animation: fadeIn 2s ease forwards;
+  animation-delay: 0.8s;
+}
+
+@keyframes reveal {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* Buttons */
+.button, .buy-btn {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 12px 30px;
+  border: 1px solid #d4af37;
+  color: #d4af37;
+  font-size: 13px;
+  letter-spacing: 1px;
+  transition: 0.3s;
+}
+
+.button:hover,
+.buy-btn:hover {
+  background: #d4af37;
+  color: #000;
+}
+
+/* Filter */
+.filter-bar {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.filter-bar button {
+  background: transparent;
+  border: 1px solid #d4af37;
+  color: #d4af37;
+  padding: 8px 20px;
+  margin: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.filter-bar button:hover {
+  background: #d4af37;
+  color: #000;
+}
+
+/* Products */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+}
+
+.product-card {
+  position: relative;
+  border: 1px solid #222;
+  padding: 30px;
+  text-align: center;
+}
+
+.product-card h3 {
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 10px;
+}
+
+/* Badges */
+.badge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  padding: 5px 12px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.badge.new {
+  border: 1px solid #d4af37;
+  color: #d4af37;
+}
+
+.badge.best {
+  background: #d4af37;
+  color: #000;
+}
+
+/* Stock */
+.stock {
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.low-stock {
+  color: #ff4d4d;
+  animation: pulse 1.5s infinite;
+}
+
+.out-stock {
+  color: #777;
+  text-decoration: line-through;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+/* Floating WhatsApp */
+.whatsapp-float {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background: #000;
+  color: #d4af37;
+  border: 1px solid #d4af37;
+  padding: 12px 20px;
+  font-size: 13px;
+  letter-spacing: 1px;
+  z-index: 999;
+  animation: floatPulse 3s infinite;
+}
+
+.whatsapp-float:hover {
+  background: #d4af37;
+  color: #000;
+}
+
+@keyframes floatPulse {
+  0% { box-shadow: 0 0 0 0 rgba(212,175,55,0.3); }
+  70% { box-shadow: 0 0 0 10px rgba(212,175,55,0); }
+  100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); }
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 30px;
+  border-top: 1px solid #222;
+  font-size: 13px;
+  color: #777;
+}
