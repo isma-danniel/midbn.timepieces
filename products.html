@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Products | Midbn Timepieces</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Midbn Timepieces - Products</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-  <div class="logo-container">
-    <img src="images/logo.png" alt="Midbn Timepieces Logo" class="logo">
-    <h1>MIDBN_TIMEPIECES</h1>
-  </div>
+  <h1>MIDBN_TIMEPIECES</h1>
   <nav>
-    <a href="index.html">Home</a>
-    <a href="products.html">Products</a>
-    <a href="contact.html">Contact</a>
+    <div class="hamburger" id="hamburger">&#9776;</div>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="contact.html">Contact</a>
+    </div>
   </nav>
 </header>
 
@@ -23,7 +24,7 @@
 
   <!-- Search Bar -->
   <div class="search-bar">
-    <input type="text" id="productSearch" placeholder="Search watches..." />
+    <input type="text" id="productSearch" placeholder="Search watches...">
   </div>
 
   <!-- Category Filter -->
@@ -91,13 +92,25 @@
    class="whatsapp-float" target="_blank">WhatsApp</a>
 
 <script>
+  // Hamburger Menu
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('navLinks');
+
+  hamburger.addEventListener('click', () => {
+    if(navLinks.style.display === 'flex') {
+      navLinks.style.display = 'none';
+    } else {
+      navLinks.style.display = 'flex';
+    }
+  });
+
   // Stock Counter
   document.querySelectorAll('.stock').forEach(el => {
     const stock = parseInt(el.dataset.stock);
-    if (stock <= 0) {
+    if(stock <= 0){
       el.textContent = "Out of stock";
       el.classList.add('out-stock');
-    } else if (stock <= 3) {
+    } else if(stock <= 3){
       el.textContent = `Only ${stock} left`;
       el.classList.add('low-stock');
     } else {
@@ -106,56 +119,48 @@
   });
 
   // Category Filter
-  function filterProducts(category) {
-    document.querySelectorAll('.product-card').forEach(card => {
-      card.style.display =
-        category === 'all' || card.dataset.category === category
-        ? 'block' : 'none';
+  function filterProducts(category){
+    document.querySelectorAll('.product-card').forEach(card=>{
+      card.style.display = (category==='all'||card.dataset.category===category) ? 'block' : 'none';
     });
   }
 
   // Dynamic WhatsApp Message
-  document.querySelectorAll('.whatsapp-product').forEach(btn => {
-    btn.addEventListener('click', () => {
+  document.querySelectorAll('.whatsapp-product').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
       const product = btn.dataset.product;
       const msg = `Hi Midbn Timepieces, I'm interested in the ${product}. Kindly advise on availability and pricing.`;
-      window.open(`https://wa.me/6738908960?text=${encodeURIComponent(msg)}`, '_blank');
+      window.open(`https://wa.me/6738908960?text=${encodeURIComponent(msg)}`,'_blank');
     });
   });
 
   // Hover Multi-Image Gallery
-  document.querySelectorAll('.product-card').forEach(card => {
+  document.querySelectorAll('.product-card').forEach(card=>{
     const imgs = card.querySelectorAll('.product-images img');
-    let index = 0;
-
-    card.addEventListener('mouseenter', () => {
-      if (imgs.length <= 1) return;
-      card.hoverInterval = setInterval(() => {
-        imgs[index].style.opacity = 0;
-        index = (index + 1) % imgs.length;
-        imgs[index].style.opacity = 1;
-      }, 1500);
+    let index=0;
+    card.addEventListener('mouseenter',()=>{
+      if(imgs.length<=1) return;
+      card.hoverInterval = setInterval(()=>{
+        imgs[index].style.opacity=0;
+        index=(index+1)%imgs.length;
+        imgs[index].style.opacity=1;
+      },1500);
     });
-
-    card.addEventListener('mouseleave', () => {
+    card.addEventListener('mouseleave',()=>{
       clearInterval(card.hoverInterval);
-      imgs.forEach((img, i) => img.style.opacity = i === 0 ? 1 : 0);
-      index = 0;
+      imgs.forEach((img,i)=>img.style.opacity=i===0?1:0);
+      index=0;
     });
   });
 
-  // Product Search
-  document.getElementById('productSearch').addEventListener('keyup', function() {
-    const searchTerm = this.value.toLowerCase();
-    document.querySelectorAll('.product-card').forEach(card => {
+  // Search Function
+  document.getElementById('productSearch').addEventListener('keyup',function(){
+    const searchTerm=this.value.toLowerCase();
+    document.querySelectorAll('.product-card').forEach(card=>{
       const name = card.querySelector('h3').textContent.toLowerCase();
       const brand = card.querySelector('.brand').textContent.toLowerCase();
       const details = card.querySelector('.details').textContent.toLowerCase();
-      if(name.includes(searchTerm) || brand.includes(searchTerm) || details.includes(searchTerm)) {
-        card.style.display = 'block';
-      } else {
-        card.style.display = 'none';
-      }
+      card.style.display = (name.includes(searchTerm) || brand.includes(searchTerm) || details.includes(searchTerm)) ? 'block' : 'none';
     });
   });
 </script>
