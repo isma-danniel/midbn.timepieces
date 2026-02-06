@@ -16,13 +16,20 @@ header {
   z-index: 100;
 }
 
-/* MIDBN Text */
+/* MIDBN Text with Luxury Glow */
 header h1 {
   font-family: 'Playfair Display', serif;
-  font-size: 24px;
+  font-size: 26px;
   color: #d4af37;
   letter-spacing: 2px;
   margin: 0;
+  animation: glowText 3s infinite alternate;
+}
+
+@keyframes glowText {
+  0% { text-shadow: 0 0 5px rgba(212,175,55,0.5); }
+  50% { text-shadow: 0 0 15px rgba(212,175,55,0.8), 0 0 20px rgba(212,175,55,0.6); }
+  100% { text-shadow: 0 0 10px rgba(212,175,55,0.7); }
 }
 
 /* Navigation */
@@ -47,10 +54,43 @@ nav a:hover { color:#fff; }
 #productSearch::placeholder { color:#aaa; font-style:italic; }
 #productSearch:focus { outline:none; border-color:#d4af37; box-shadow:0 0 8px rgba(212,175,55,0.5); }
 
-/* Filter */
+/* Filter Buttons with Animation */
 .filter-bar { text-align:center; margin-bottom:40px; }
-.filter-bar button { background:transparent; border:1px solid #d4af37; color:#d4af37; padding:8px 20px; margin:5px; cursor:pointer; font-size:13px; transition:0.3s; }
-.filter-bar button:hover { background:#d4af37; color:#000; }
+.filter-bar strong { display:block; margin-bottom:8px; font-family:'Playfair Display', serif; font-size:16px; color:#d4af37; }
+.filter-bar button { 
+  background:transparent; 
+  border:1px solid #d4af37; 
+  color:#d4af37; 
+  padding:8px 20px; 
+  margin:5px; 
+  cursor:pointer; 
+  font-size:13px; 
+  border-radius:25px;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Luxury Hover Effect */
+.filter-bar button:hover {
+  color:#000;
+  background:#d4af37;
+  box-shadow: 0 0 15px rgba(212,175,55,0.5), 0 0 25px rgba(212,175,55,0.3);
+}
+
+.filter-bar button::after {
+  content:'';
+  position:absolute;
+  top:0; left:0;
+  width:100%; height:100%;
+  background: rgba(212,175,55,0.2);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s ease;
+  z-index: -1;
+}
+
+.filter-bar button:hover::after { transform: scaleX(1); }
 
 /* Product Grid */
 .product-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:25px; }
@@ -89,19 +129,3 @@ nav a:hover { color:#fff; }
 
 /* Footer */
 footer { text-align:center; padding:30px; border-top:1px solid #222; font-size:13px; color:#777; }
-    top: 70px;
-    right: 0;
-    width: 200px;
-    border: 1px solid #222;
-    padding: 15px;
-    border-radius: 5px;
-  }
-
-  nav .nav-links a {
-    margin: 10px 0;
-  }
-
-  .hamburger {
-    display: block;
-  }
-}
