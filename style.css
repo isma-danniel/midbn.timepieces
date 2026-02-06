@@ -4,8 +4,11 @@
 body { background:#0b0b0b; color:#e5e5e5; font-family:'Poppins',sans-serif; line-height:1.6; }
 a { text-decoration:none; color:inherit; }
 
-/* Header */
+/* Header with Logo */
 header { background:#000; padding:20px 40px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #222; }
+.logo-container { display:flex; align-items:center; gap:12px; }
+.logo-container .logo { height:40px; width:auto; object-fit:contain; filter: drop-shadow(0 0 5px rgba(212,175,55,0.6)); transition: transform 0.3s ease; }
+.logo-container:hover .logo { transform: scale(1.05); }
 header h1 { font-family:'Playfair Display',serif; letter-spacing:2px; font-size:20px; }
 nav a { margin-left:25px; font-size:14px; color:#d4af37; }
 
