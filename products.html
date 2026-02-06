@@ -17,6 +17,12 @@
 </header>
 
 <section>
+
+  <!-- Search Bar -->
+  <div class="search-bar">
+    <input type="text" id="productSearch" placeholder="Search watches..." />
+  </div>
+
   <!-- Category Filter -->
   <div class="filter-bar">
     <button onclick="filterProducts('all')">All</button>
@@ -129,6 +135,20 @@
       clearInterval(card.hoverInterval);
       imgs.forEach((img, i) => img.style.opacity = i === 0 ? 1 : 0);
       index = 0;
+    });
+  });
+
+  // Product Search
+  document.getElementById('productSearch').addEventListener('keyup', function() {
+    const searchTerm = this.value.toLowerCase();
+    document.querySelectorAll('.product-card').forEach(card => {
+      const name = card.querySelector('h3').textContent.toLowerCase();
+      const details = card.querySelector('.details').textContent.toLowerCase();
+      if(name.includes(searchTerm) || details.includes(searchTerm)) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
     });
   });
 </script>
