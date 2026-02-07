@@ -158,29 +158,34 @@ nav a {
 /* MOBILE SCROLLABLE BRAND FILTER */
 @media (max-width:768px) {
 
-  .filter-bar {
-    overflow-x: auto;             /* horizontal scroll */
-    display: flex;
-    flex-wrap: nowrap;            /* keep buttons in one row */
-    gap: 10px;
-    padding: 10px 0;
-    scroll-behavior: smooth;      /* smooth scrolling */
-    -webkit-overflow-scrolling: touch; /* smooth swipe on iOS */
-    scroll-snap-type: x mandatory;     /* snap each button */
-  }
+.filter-bar-vertical {
+  display: flex;
+  flex-direction: column;   /* vertical stack */
+  max-height: 300px;        /* optional: limit height */
+  overflow-y: auto;         /* scroll if too many */
+  gap: 10px;
+  padding: 10px;
+  border-right: 1px solid #222; /* optional for luxury look */
+}
 
-  .filter-bar button {
-    flex: 0 0 auto;               /* do not shrink */
-    scroll-snap-align: center;    /* snap buttons to center */
-    border-radius: 20px;
-    transition: all 0.3s ease;
-  }
-
-  .filter-bar button.selected {
-  background: #d4af37;
-  color: #000;
-  transform: scale(1.05);           /* slight enlargement */
-  box-shadow: 0 0 12px rgba(212,175,55,0.6); /* soft gold glow */
+.filter-bar-vertical button {
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: 1px solid #d4af37;
+  background: transparent;
+  color: #d4af37;
+  cursor: pointer;
   transition: all 0.3s ease;
 }
+
+.filter-bar-vertical button:hover {
+  background: #d4af37;
+  color: #000;
+}
+
+.filter-bar-vertical button.selected {
+  background: #d4af37;
+  color: #000;
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(212,175,55,0.6);
 }
