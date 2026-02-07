@@ -69,82 +69,84 @@ nav a {
 }
 
 /* ===========================
-   4. UNIFIED BUTTONS & FILTERS
+   4. UNIFIED BUTTONS, LINKS & FILTERS (FINAL FIX)
    =========================== */
 
-/* Container for Filter Bar (Text Styling Fix) */
+/* Style the "Filter by Category:" text container */
 .filter-bar {
   display: flex;
   flex-wrap: wrap;        
   justify-content: center;
   align-items: center;    
-  gap: 10px;              
+  gap: 8px;              
   margin-bottom: 20px;
   padding: 0 10px;
   
-  /* FLIX: Styling the "Filter by Category" Text */
-  color: #d4af37;         
+  color: #d4af37;         /* Gold Text */
   font-family: 'Poppins', sans-serif;
   font-weight: 600;       
   text-transform: uppercase; 
-  font-size: 14px;
+  font-size: 13px;
 }
 
 /* 
-   MASTER STYLE for: 
-   Select (Sort), Category Buttons, Brand Toggle 
+   MASTER SELECTOR:
+   Targets Buttons, Selects, AND Links (a) inside filter bar
 */
 select,
 .filter-bar button,
+.filter-bar a,             /* <--- THIS FIXES THE WHITE OVALS */
 .filter-bar-vertical button,
 .brand-toggle {
-  background: #000 !important;      
-  color: #d4af37 !important;        
-  border: 1px solid #d4af37 !important; 
+  background: #000 !important;          /* Force Black Background */
+  color: #d4af37 !important;            /* Force Gold Text */
+  border: 1px solid #d4af37 !important; /* Gold Border */
   
   /* UNIFORM SIZING */
-  height: 42px;                     
-  padding: 0 20px;                  
+  height: 40px;                         /* Fixed height */
+  line-height: 38px;                    /* Vertically center text */
+  padding: 0 16px;                      
   font-family: 'Poppins', sans-serif;
   font-size: 13px;
   font-weight: 600;
-  border-radius: 6px;
+  border-radius: 6px;                   /* Square with slight curve */
   
   /* Layout */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  outline: none;
+  text-decoration: none;                /* Remove link underline */
   transition: all 0.3s ease;
-  white-space: nowrap;              
-  margin: 5px; /* Added margin for safe spacing */
+  white-space: nowrap;
+  margin: 5px 2px;
+  box-shadow: none;
 }
 
-/* Custom styling for Sort Dropdown Arrow */
+/* Dropdown Arrow Fix */
 select {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
   padding-right: 35px; 
   background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23d4af37%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   background-size: 10px;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 /* HOVER EFFECTS */
 select:hover,
 .filter-bar button:hover,
+.filter-bar a:hover,
 .filter-bar-vertical button:hover,
 .brand-toggle:hover {
-  background: #d4af37 !important;   
-  color: #000 !important;           
+  background: #d4af37 !important;   /* Gold Background */
+  color: #000 !important;           /* Black Text */
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(212,175,55,0.4);
 }
 
-/* Vertical Brand Menu (Hidden by default on Desktop) */
+/* Vertical Brand Menu (Desktop Hidden) */
 .filter-bar-vertical {
   display:flex;
   flex-direction: column;
@@ -160,7 +162,7 @@ select:hover,
 }
 
 .brand-toggle {
-  display: none; /* Mobile only feature */
+  display: none; 
   width: 90%;
   margin: 10px auto;
   justify-content: space-between; 
@@ -256,6 +258,7 @@ select:hover,
   border-radius: 6px;     
   transition: all 0.3s ease;
   display: inline-block;
+  text-decoration: none;
 }
 .buy-btn:hover {
   background:#d4af37;
@@ -317,7 +320,7 @@ select:hover,
   }
   
   /* Make Category Buttons share space */
-  .filter-bar button {
+  .filter-bar button, .filter-bar a {
     flex: 1 1 40%; 
   }
 
