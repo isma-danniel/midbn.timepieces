@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Midbn Timepieces - Products</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Midbn Timepieces - Products</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<!-- ==========================
+       HEADER
+=========================== -->
 <header>
   <h1>MIDBN_TIMEPIECES</h1>
   <nav>
@@ -19,31 +22,39 @@
   </nav>
 </header>
 
-<section>
-
-  <!-- Search Bar -->
+<!-- ==========================
+       SEARCH & SORT
+=========================== -->
+<section class="search-sort">
   <div class="search-bar">
     <input type="text" id="productSearch" placeholder="Search watches...">
-    <div style="text-align:center; margin-bottom:20px;">
-  <select id="sortStock">
-    <option value="normal">Normal order</option>
-    <option value="instock">In stock first</option>
-  </select>
   </div>
 
-  <!-- Category Filter -->
-  <div class="filter-bar">
-    <strong>Filter by Category:</strong>
-    <button onclick="filterProducts('all')">All</button>
-    <button onclick="filterProducts('Men')">Men</button>
-    <button onclick="filterProducts('Women')">Women</button>
-    <button onclick="filterProducts('Couple')">Couple</button>
-    <button onclick="filterProducts('Defects')">Defects/promo</button>
-    <button onclick="filterProducts('Coming-soon')">Coming soon</button>
+  <div class="sort-bar">
+    <select id="sortStock">
+      <option value="normal">Normal order</option>
+      <option value="instock">In stock first</option>
+    </select>
   </div>
+</section>
 
-  <!-- Brand Filter -->
-    <div class="filter-bar">
+<!-- ==========================
+       CATEGORY FILTER
+=========================== -->
+<section class="filter-category">
+  <strong>Filter by Category:</strong>
+  <button onclick="filterProducts('all')">All</button>
+  <button onclick="filterProducts('Men')">Men</button>
+  <button onclick="filterProducts('Women')">Women</button>
+  <button onclick="filterProducts('Couple')">Couple</button>
+  <button onclick="filterProducts('Defects')">Defects/promo</button>
+  <button onclick="filterProducts('Coming-soon')">Coming soon</button>
+</section>
+
+<!-- ==========================
+       BRAND FILTER
+=========================== -->
+<section class="filter-brand">
   <button class="brand-toggle">Brands ▾</button>
   <div class="filter-bar-vertical">
     <button class="brand-btn" data-brand="all">All</button>
@@ -59,10 +70,12 @@
     <button class="brand-btn" data-brand="Seiko">Seiko</button>
     <button class="brand-btn" data-brand="Michael-Kors">Michael Kors</button>
   </div>
-</div>
+</section>
 
-  <!-- Product Grid -->
-  <div class="product-grid">
+<!-- ==========================
+       PRODUCT GRID
+=========================== -->
+<section class="product-grid">
 
     <!-- Proudct Card 1 -->
     <div class="product-card" data-category="Men" data-brand="Rolex">
@@ -1058,276 +1071,144 @@
       <a class="buy-btn whatsapp-product" data-product="defect Audemars Piguet royal oak (White) ">Buy via WhatsApp</a>
     </div>
   
-
-
-
-
-  </div>
 </section>
 
-<!-- Floating WhatsApp -->
-<a href="https://wa.me/6738908960?text=Hi%20Midbn%20Timepieces,%20I'm%20interested%20in%20your%20watches." 
-   class="whatsapp-float" target="_blank">WhatsApp</a>
+<!-- ==========================
+       FOOTER
+=========================== -->
+<!-- ======= Footer ======= -->
+<footer>
+  <div class="footer-container">
+    <p>&copy; 2026 MIDBN Timepieces. All rights reserved.</p>
+    <p>
+      Follow us on 
+      <a href="https://instagram.com/midbn" target="_blank">Instagram</a> | 
+      <a href="https://facebook.com/midbn" target="_blank">Facebook</a>
+    </p>
+  </div>
+</footer>
 
-<script>
-  // Hamburger Menu
-  const hamburger = document.getElementById('hamburger');
-  const navLinks = document.getElementById('navLinks');
-  hamburger.addEventListener('click', () => {
-    if(navLinks.style.display === 'flex') {
-      navLinks.style.display = 'none';
-    } else {
-      navLinks.style.display = 'flex';
-    }
-  });
-
-  // Stock Counter
-  document.querySelectorAll('.stock').forEach(el => {
-    const stock = parseInt(el.dataset.stock);
-    if(stock <= 0){
-      el.textContent = "Out of stock";
-      el.classList.add('out-stock');
-    } else if(stock <= 3){
-      el.textContent = `Only ${stock} left`;
-      el.classList.add('low-stock');
-    } else {
-      el.textContent = `Stock: ${stock}`;
-    }
-  });
-
-  // Filters
-  let currentCategory = 'all';
-  let currentBrand = 'all';
-  let currentSearch = '';
-
-  function filterProducts(category){
-    currentCategory = category;
-    applyFilters();
+<!-- Footer Styles -->
+<style>
+  footer {
+    background-color: #111;
+    color: #fff;
+    text-align: center;
+    padding: 20px 10px;
+    margin-top: 30px;
+    font-size: 14px;
   }
 
-  function filterBrand(brand){
-    currentBrand = brand;
-    applyFilters();
+  footer a {
+    color: #fff;
+    text-decoration: underline;
+    margin: 0 5px;
   }
 
-  document.getElementById('productSearch').addEventListener('keyup', function(){
-    currentSearch = this.value.toLowerCase();
-    applyFilters();
-  });
-
-  function applyFilters(){
-    document.querySelectorAll('.product-card').forEach(card => {
-      const matchCategory = (currentCategory === 'all' || card.dataset.category === currentCategory);
-      const matchBrand = (currentBrand === 'all' || card.dataset.brand === currentBrand);
-
-      const name = card.querySelector('h3').textContent.toLowerCase();
-      const brandText = card.querySelector('.brand').textContent.toLowerCase();
-      const details = card.querySelector('.details').textContent.toLowerCase();
-      const matchSearch = (name.includes(currentSearch) || brandText.includes(currentSearch) || details.includes(currentSearch));
-
-      card.style.display = (matchCategory && matchBrand && matchSearch) ? 'block' : 'none';
-    });
+  footer a:hover {
+    color: #ffcc00;
   }
 
-  // Dynamic WhatsApp Message
-  document.querySelectorAll('.whatsapp-product').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const product = btn.dataset.product;
-      const msg = `Hi Midbn Timepieces, I'm interested in the ${product}. Kindly advise on availability and pricing.`;
-      window.open(`https://wa.me/6738908960?text=${encodeURIComponent(msg)}`,'_blank');
-    });
-  });
-
-  // Hover Multi-Image Gallery
-  document.querySelectorAll('.product-card').forEach(card=>{
-    const imgs = card.querySelectorAll('.product-images img');
-    let index=0;
-    card.addEventListener('mouseenter',()=>{
-      if(imgs.length<=1) return;
-      card.hoverInterval = setInterval(()=>{
-        imgs[index].style.opacity=0;
-        index=(index+1)%imgs.length;
-        imgs[index].style.opacity=1;
-      },1500);
-    });
-    card.addEventListener('mouseleave',()=>{
-      clearInterval(card.hoverInterval);
-      imgs.forEach((img,i)=>img.style.opacity=i===0?1:0);
-      index=0;
-    });
-  });
-</script>
-
-<footer>© 2026 Midbn Timepieces</footer>
-
-  <script>
-  document.getElementById("sortStock").addEventListener("change", function () {
-
-    const grid = document.querySelector(".product-grid");
-    const cards = Array.from(document.querySelectorAll(".product-card"));
-
-    if (this.value === "instock") {
-      cards
-        .sort((a, b) => {
-          const stockA = parseInt(a.querySelector(".stock").dataset.stock) || 0;
-          const stockB = parseInt(b.querySelector(".stock").dataset.stock) || 0;
-          return stockB - stockA;
-        })
-        .forEach(card => grid.appendChild(card));
-  // Mobile toggle for vertical brand filter
-const toggleBtn = document.querySelector(".brand-toggle");
-const verticalFilter = document.querySelector(".filter-bar-vertical");
-
-toggleBtn.addEventListener("click", () => {
-  if (verticalFilter.style.display === "block") {
-    verticalFilter.style.display = "none";
-    toggleBtn.textContent = "Brands ▼";
-  } else {
-    verticalFilter.style.display = "block";
-    toggleBtn.textContent = "Brands ▲";
-    }   
-   });
-  });
-</script>
-<script>
-  // Select the toggle button and the vertical filter
-  const brandToggle = document.querySelector('.brand-toggle');
-  const verticalFilter = document.querySelector('.filter-bar-vertical');
-
-  // Add click event
-  brandToggle.addEventListener('click', () => {
-    // Toggle the 'show' class
-    verticalFilter.classList.toggle('show');
-
-    // Animate height for smooth slide
-    if (verticalFilter.classList.contains('show')) {
-      const scrollHeight = verticalFilter.scrollHeight + "px";
-      verticalFilter.style.height = scrollHeight;
-    } else {
-      verticalFilter.style.height = "0px";
-    }
-  });
-
-  // Optional: reset height after transition to auto
-  verticalFilter.addEventListener('transitionend', () => {
-    if (verticalFilter.classList.contains('show')) {
-      verticalFilter.style.height = "auto";
-    }
-  });
-</script>
-
-  <script>
-  const brandButtons = document.querySelectorAll('.brand-btn');
-  const products = document.querySelectorAll('.product-card');
-
-  brandButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const selectedBrand = btn.dataset.brand;
-
-      // highlight selected button
-      brandButtons.forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-
-      products.forEach(product => {
-        const productBrand = product.dataset.brand;
-
-        if (selectedBrand === 'all' || productBrand === selectedBrand) {
-          product.style.display = 'block';
-        } else {
-          product.style.display = 'none';
-        }
-      });
-    });
-  });
-</script>
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+</style>
+  <!-- Add your footer content if any -->
+</footer>
   
 <script>
-  // ----- Hamburger Menu Toggle -----
+  // Hamburger toggle
   const hamburger = document.getElementById('hamburger');
   const navLinks = document.getElementById('navLinks');
-
   hamburger.addEventListener('click', () => {
-    navLinks.classList.toggle('active'); // CSS should show/hide .active
+    navLinks.classList.toggle('active');
   });
 
-  // ----- Filters and Search -----
-  const products = document.querySelectorAll('.product-card');
-  const categoryButtons = document.querySelectorAll('.filter-bar button');
-  const brandButtons = document.querySelectorAll('.brand-btn');
-  const sortSelect = document.getElementById('sortStock');
-  const searchInput = document.getElementById('productSearch');
+  // Brand filter toggle
   const brandToggle = document.querySelector('.brand-toggle');
-  const brandFilterContainer = document.querySelector('.filter-bar-vertical');
-
-  // Toggle brand filter visibility
+  const brandMenu = document.querySelector('.filter-bar-vertical');
   brandToggle.addEventListener('click', () => {
-    brandFilterContainer.classList.toggle('active');
+    brandMenu.classList.toggle('show');
   });
 
-  let currentCategory = 'all';
-  let currentBrand = 'all';
-
+  // Filter products by category
   function filterProducts(category) {
-    currentCategory = category;
-    updateProducts();
-  }
-
-  brandButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      currentBrand = btn.getAttribute('data-brand');
-      updateProducts();
-    });
-  });
-
-  function updateProducts() {
-    const searchValue = searchInput.value.toLowerCase();
-
-    products.forEach(p => {
-      const category = p.getAttribute('data-category');
-      const brand = p.getAttribute('data-brand');
-      const title = p.querySelector('h3').innerText.toLowerCase();
-
-      const categoryMatch = (currentCategory === 'all' || category === currentCategory);
-      const brandMatch = (currentBrand === 'all' || brand === currentBrand);
-      const searchMatch = title.includes(searchValue);
-
-      if (categoryMatch && brandMatch && searchMatch) {
-        p.style.display = 'block';
+    const cards = document.querySelectorAll('.product-card');
+    cards.forEach(card => {
+      if(category === 'all' || card.dataset.category === category) {
+        card.style.display = 'block';
       } else {
-        p.style.display = 'none';
+        card.style.display = 'none';
       }
     });
-
-    sortProducts();
   }
 
-  // ----- Stock Sorting -----
-  function sortProducts() {
-    const container = document.querySelector('.product-grid');
-    const sorted = Array.from(products)
-      .filter(p => p.style.display !== 'none')
-      .sort((a, b) => {
-        if (sortSelect.value === 'instock') {
-          return parseInt(b.getAttribute('data-stock')) - parseInt(a.getAttribute('data-stock'));
+  // Filter products by brand
+  const brandButtons = document.querySelectorAll('.brand-btn');
+  brandButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const brand = btn.dataset.brand;
+      const cards = document.querySelectorAll('.product-card');
+      cards.forEach(card => {
+        if(brand === 'all' || card.dataset.brand === brand) {
+          card.style.display = 'block';
         } else {
-          return 0; // normal order
+          card.style.display = 'none';
         }
       });
+    });
+  });
 
-    sorted.forEach(p => container.appendChild(p));
-  }
+  // Search products
+  const searchInput = document.getElementById('productSearch');
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase();
+    const cards = document.querySelectorAll('.product-card');
+    cards.forEach(card => {
+      const title = card.querySelector('h3').textContent.toLowerCase();
+      if(title.includes(query)) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
 
-  // Event listeners
-  sortSelect.addEventListener('change', sortProducts);
-  searchInput.addEventListener('input', updateProducts);
+  // Sort by stock
+  const sortStock = document.getElementById('sortStock');
+  sortStock.addEventListener('change', () => {
+    const cards = Array.from(document.querySelectorAll('.product-card'));
+    if(sortStock.value === 'instock') {
+      cards.sort((a, b) => b.dataset.stock - a.dataset.stock);
+    }
+    const grid = document.querySelector('.product-grid');
+    grid.innerHTML = '';
+    cards.forEach(card => grid.appendChild(card));
+  });
 
-  // ----- Initial Setup -----
-  products.forEach(p => {
-    const stock = parseInt(p.getAttribute('data-stock'));
-    const stockEl = p.querySelector('.stock');
-    stockEl.innerText = stock > 0 ? `In stock: ${stock}` : 'Out of Stock';
+  // WhatsApp buy button
+  const whatsappBtns = document.querySelectorAll('.whatsapp-product');
+  whatsappBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const product = btn.dataset.product;
+      const url = `https://wa.me/6738908960?text=Hello,%20I%20want%20to%20buy%20${encodeURIComponent(product)}`;
+      window.open(url, '_blank');
+    });
+  });
+
+  // Display stock status
+  const stockElements = document.querySelectorAll('.stock');
+  stockElements.forEach(el => {
+    const stock = parseInt(el.dataset.stock);
+    if(stock > 0) {
+      el.textContent = `In Stock: ${stock}`;
+      el.style.color = 'green';
+    } else {
+      el.textContent = 'Out of Stock';
+      el.style.color = 'red';
+    }
   });
 </script>
-  
 </body>
 </html>
