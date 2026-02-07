@@ -95,6 +95,8 @@ nav a {
   padding:5px 12px;
   border:1px solid #d4af37;
   color:#d4af37;
+
+  z-index: 5;
 }
 
 .badge.best {
