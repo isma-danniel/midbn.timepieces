@@ -412,5 +412,24 @@
 </script>
 
 <footer>© 2026 Midbn Timepieces</footer>
+
+  <script>
+  document.getElementById("sortStock").addEventListener("change", function () {
+
+    const grid = document.querySelector(".product-grid");
+    const cards = Array.from(document.querySelectorAll(".product-card"));
+
+    if (this.value === "instock") {
+      cards
+        .sort((a, b) => {
+          const stockA = parseInt(a.querySelector(".stock").dataset.stock) || 0;
+          const stockB = parseInt(b.querySelector(".stock").dataset.stock) || 0;
+          return stockB - stockA;
+        })
+        .forEach(card => grid.appendChild(card));
+    }
+
+  });
+</script>
 </body>
 </html>
