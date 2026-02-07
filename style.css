@@ -210,4 +210,8 @@ nav a {
   .product-card {
     padding:15px;
   }
+  
+  .brand-btn.selected {
+  background: #d4af37;
+  color: #000;
 }
