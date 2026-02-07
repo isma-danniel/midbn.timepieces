@@ -155,26 +155,26 @@ nav a {
   color:#d4af37;
 }
 
-/* MOBILE SCROLLABLE BRAND FILTER */
-@media (max-width:768px) {
-.filter-bar-vertical button {
-  padding: 10px 20px;
-  border-radius: 20px;
-  border: 1px solid #d4af37;
+/* Mobile toggle button */
+.brand-toggle {
+  display: none; /* hidden on desktop */
   background: transparent;
-  color: #d4af37;          /* <--- add this */
+  color: #d4af37;
+  border: 1px solid #d4af37;
+  padding: 8px 15px;
+  border-radius: 20px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  margin-bottom: 10px;
+  font-family: 'Poppins', sans-serif;
 }
 
-.filter-bar-vertical button:hover {
-  background: #d4af37;
-  color: #000;
-}
+@media (max-width: 768px) {
+  .brand-toggle { display: block; }
 
-.filter-bar-vertical button.selected {
-  background: #d4af37;
-  color: #000;
-  transform: scale(1.05);
-  box-shadow: 0 0 12px rgba(212,175,55,0.6);
+  /* Hide the vertical filter by default on mobile */
+  .filter-bar-vertical {
+    display: none;
+    max-height: 300px;       /* scrollable when shown */
+    overflow-y: auto;
+  }
 }
