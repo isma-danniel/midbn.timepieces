@@ -66,17 +66,16 @@ nav a {
   color:#000;
 }
 
-/* VERTICAL FILTER (MOBILE) */
 .filter-bar-vertical {
-  display:none;
+  display:flex;
   flex-direction: column;
   width: 100%;
-  margin-bottom:20px;
+  max-height:0;
+  overflow:hidden;
+  transition: height 0.3s ease;
 }
-.filter-bar-vertical button {
-  width: 100%;
-  margin:5px 0;
-  text-align:left;
+.filter-bar-vertical.show {
+  /* height will be set dynamically via JS */
 }
 
 /* PRODUCT GRID */
