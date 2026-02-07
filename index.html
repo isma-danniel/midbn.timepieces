@@ -1189,5 +1189,31 @@ toggleBtn.addEventListener("click", () => {
    });
   });
 </script>
+<script>
+  // Select the toggle button and the vertical filter
+  const brandToggle = document.querySelector('.brand-toggle');
+  const verticalFilter = document.querySelector('.filter-bar-vertical');
+
+  // Add click event
+  brandToggle.addEventListener('click', () => {
+    // Toggle the 'show' class
+    verticalFilter.classList.toggle('show');
+
+    // Animate height for smooth slide
+    if (verticalFilter.classList.contains('show')) {
+      const scrollHeight = verticalFilter.scrollHeight + "px";
+      verticalFilter.style.height = scrollHeight;
+    } else {
+      verticalFilter.style.height = "0px";
+    }
+  });
+
+  // Optional: reset height after transition to auto
+  verticalFilter.addEventListener('transitionend', () => {
+    if (verticalFilter.classList.contains('show')) {
+      verticalFilter.style.height = "auto";
+    }
+  });
+</script>
 </body>
 </html>
