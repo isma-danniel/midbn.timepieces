@@ -1240,5 +1240,92 @@ toggleBtn.addEventListener("click", () => {
     });
   });
 </script>
+<script>
+  // ----- Hamburger Menu Toggle -----
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('navLinks');
+
+  hamburger.addEventListener('click', () => {
+    navLinks.classList.toggle('active'); // CSS should show/hide .active
+  });
+
+  // ----- Filters and Search -----
+  const products = document.querySelectorAll('.product-card');
+  const categoryButtons = document.querySelectorAll('.filter-bar button');
+  const brandButtons = document.querySelectorAll('.brand-btn');
+  const sortSelect = document.getElementById('sortStock');
+  const searchInput = document.getElementById('productSearch');
+  const brandToggle = document.querySelector('.brand-toggle');
+  const brandFilterContainer = document.querySelector('.filter-bar-vertical');
+
+  // Toggle brand filter visibility
+  brandToggle.addEventListener('click', () => {
+    brandFilterContainer.classList.toggle('active');
+  });
+
+  let currentCategory = 'all';
+  let currentBrand = 'all';
+
+  function filterProducts(category) {
+    currentCategory = category;
+    updateProducts();
+  }
+
+  brandButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentBrand = btn.getAttribute('data-brand');
+      updateProducts();
+    });
+  });
+
+  function updateProducts() {
+    const searchValue = searchInput.value.toLowerCase();
+
+    products.forEach(p => {
+      const category = p.getAttribute('data-category');
+      const brand = p.getAttribute('data-brand');
+      const title = p.querySelector('h3').innerText.toLowerCase();
+
+      const categoryMatch = (currentCategory === 'all' || category === currentCategory);
+      const brandMatch = (currentBrand === 'all' || brand === currentBrand);
+      const searchMatch = title.includes(searchValue);
+
+      if (categoryMatch && brandMatch && searchMatch) {
+        p.style.display = 'block';
+      } else {
+        p.style.display = 'none';
+      }
+    });
+
+    sortProducts();
+  }
+
+  // ----- Stock Sorting -----
+  function sortProducts() {
+    const container = document.querySelector('.product-grid');
+    const sorted = Array.from(products)
+      .filter(p => p.style.display !== 'none')
+      .sort((a, b) => {
+        if (sortSelect.value === 'instock') {
+          return parseInt(b.getAttribute('data-stock')) - parseInt(a.getAttribute('data-stock'));
+        } else {
+          return 0; // normal order
+        }
+      });
+
+    sorted.forEach(p => container.appendChild(p));
+  }
+
+  // Event listeners
+  sortSelect.addEventListener('change', sortProducts);
+  searchInput.addEventListener('input', updateProducts);
+
+  // ----- Initial Setup -----
+  products.forEach(p => {
+    const stock = parseInt(p.getAttribute('data-stock'));
+    const stockEl = p.querySelector('.stock');
+    stockEl.innerText = stock > 0 ? `In stock: ${stock}` : 'Out of Stock';
+  });
+</script>
 </body>
 </html>
