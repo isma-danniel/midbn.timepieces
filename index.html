@@ -1215,5 +1215,30 @@ toggleBtn.addEventListener("click", () => {
     }
   });
 </script>
+
+  <script>
+  const brandButtons = document.querySelectorAll('.brand-btn');
+  const products = document.querySelectorAll('.product-card');
+
+  brandButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const selectedBrand = btn.dataset.brand;
+
+      // highlight selected button
+      brandButtons.forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+
+      products.forEach(product => {
+        const productBrand = product.dataset.brand;
+
+        if (selectedBrand === 'all' || productBrand === selectedBrand) {
+          product.style.display = 'block';
+        } else {
+          product.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
 </body>
 </html>
