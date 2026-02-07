@@ -19,14 +19,16 @@ header {
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:20px 40px;
+  padding:15px 25px;
   border-bottom:1px solid #222;
+  backdrop-filter: blur(6px);
 }
 
 h1 {
   font-family:'Playfair Display', serif;
   color:#d4af37;
   letter-spacing:2px;
+  font-size: 22px;
 }
 
 nav a {
@@ -47,23 +49,23 @@ nav a {
    =========================== */
 .search-bar { 
   text-align:center; 
-  margin:30px auto; 
+  margin:15px auto; 
   max-width: 90%;
 }
 
 .search-bar input {
-  padding:12px 25px;
+  padding:10px 20px;
   border-radius:25px;
   border:1px solid #d4af37;
   background:#000;
   color:#fff;
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
   font-family: 'Poppins', sans-serif;
   outline: none;
-  /* Remove iOS rounded corners on inputs */
   -webkit-appearance: none;
   appearance: none;
+  font-size:14px;
 }
 
 ::placeholder {
@@ -72,46 +74,33 @@ nav a {
 }
 
 /* ===========================
-   4. UNIFIED BUTTONS & FILTERS (MOBILE FIX INCLUDED)
+   4. FILTERS & DROPDOWNS
    =========================== */
 
-/* Style the text "Filter by Category:" */
 .filter-bar {
   display: flex;
-  flex-wrap: wrap;        
-  justify-content: center;
-  align-items: center;    
-  gap: 8px;              
-  margin-bottom: 20px;
-  padding: 0 10px;
-  
-  /* Text Styling */
-  color: #d4af37;         
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;       
-  text-transform: uppercase; 
-  font-size: 13px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  padding: 0 12px;
+  scrollbar-width: none;
+  backdrop-filter: blur(6px);
 }
+.filter-bar::-webkit-scrollbar { display:none; }
 
-/* 
-   MASTER SELECTOR
-   Targets: Sort Dropdown, Category Buttons, Category Links, Brand Toggle
-*/
 select,
 .filter-bar button,
 .filter-bar a,
 .brand-toggle {
-  /* COMPLETE OVERRIDE OF BROWSER DEFAULTS */
   background-color: #000 !important;      
   color: #d4af37 !important;           
   border: 1px solid #d4af37 !important; 
-  
-  /* Remove default Mobile/iOS Styling (The White Bar Fix) */
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-
-  /* Sizing & Font */
   height: 40px;                         
   line-height: 1.2;                    
   padding: 8px 16px;                      
@@ -119,8 +108,6 @@ select,
   font-size: 13px;
   font-weight: 600;
   border-radius: 6px;                   
-  
-  /* Layout properties */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -128,32 +115,30 @@ select,
   text-decoration: none;                
   transition: all 0.3s ease;
   white-space: nowrap;
-  margin: 5px 2px;
   box-shadow: none;
 }
 
-/* Specific Fix for Sort Dropdown Arrow */
+/* Dropdown arrow */
 select {
-  padding-right: 35px; /* Room for arrow */
-  /* Adds Gold Arrow Icon */
+  padding-right: 35px;
   background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23d4af37%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   background-size: 10px;
 }
 
-/* HOVER EFFECTS */
+/* Hover */
 select:hover,
 .filter-bar button:hover,
 .filter-bar a:hover,
 .brand-toggle:hover {
   background: #d4af37 !important;   
   color: #000 !important;           
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(212,175,55,0.4);
 }
 
-/* Active/Selected State */
+/* Active */
 .filter-bar a.active,
 .filter-bar button.active,
 .brand-btn.selected {
@@ -161,61 +146,21 @@ select:hover,
   color: #000 !important;
 }
 
-/* Vertical Brand Menu (Hidden on Desktop) */
-.filter-bar-vertical {
-  display:flex;
-  flex-direction: column;
-  width: 100%;
-  max-height:0;
-  overflow:hidden;
-  transition: max-height 0.4s ease;
-  padding: 0 20px;
-}
-.filter-bar-vertical.show {
-  max-height: 500px;
-  margin-bottom: 20px;
-}
-
-/* Vertical Menu Buttons */
-.filter-bar-vertical button {
-  background-color: #000;
-  color: #d4af37;
-  border: 1px solid #d4af37;
-  width: 100%;
-  padding: 10px;
-  text-align: left;
-  margin-bottom: 5px;
-  cursor: pointer;
-  /* Specific override for these buttons */
-  -webkit-appearance: none;
-  appearance: none;
-}
-.filter-bar-vertical button:hover {
-  background: #d4af37;
-  color: #000;
-}
-
-.brand-toggle {
-  display: none; 
-  width: 90%;
-  margin: 10px auto;
-  justify-content: space-between; 
-}
-
 /* ===========================
-   5. PRODUCT GRID & CARD
+   5. PRODUCT GRID
    =========================== */
+
 .product-grid {
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-  gap:25px;
-  padding:30px;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:15px;
+  padding:20px 12px;
 }
 
 .product-card {
   border:1px solid #222;
   background: #0f0f0f;
-  padding:25px;
+  padding:15px;
   text-align:center;
   position:relative;
   border-radius: 8px;
@@ -228,126 +173,94 @@ select:hover,
 }
 
 /* ===========================
-   6. INNER CARD COMPONENTS
+   6. CARD COMPONENTS
    =========================== */
 
-/* Badges */
 .badge {
   position:absolute;
-  top:15px;
-  left:15px;
-  font-size:11px;
+  top:10px;
+  left:10px;
+  font-size:10px;
   font-weight: 600;
-  padding:5px 12px;
+  padding:4px 10px;
   border:1px solid #d4af37;
   background: #000;
   color:#d4af37;
   z-index:5;
   border-radius: 4px;
 }
-.badge.best {
-  background:#d4af37;
-  color:#000;
-}
 
-/* Product Images */
 .product-images {
-  position:relative;
-  height:180px;
-  margin-bottom:15px;
+  height:150px;
+  margin-bottom:10px;
 }
-.product-images img {
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  opacity:0;
-  transition:0.6s;
-  filter:drop-shadow(0 0 10px rgba(212,175,55,0.2));
-}
-.product-images img:first-child { opacity:1; }
 
-/* Text Details */
 .brand { 
   color:#d4af37; 
-  font-size:13px; 
+  font-size:12px; 
   text-transform: uppercase; 
   letter-spacing: 1px;
 }
-.details { font-size:13px; color:#aaa; margin: 5px 0; }
-.price { margin:10px 0; font-weight: bold; font-size: 1.1em; }
-.low-stock { color:#ff4d4d; }
 
-/* Buy Button */
+.details { font-size:12px; color:#aaa; margin: 5px 0; }
+.price { margin:8px 0; font-weight: bold; font-size: 1em; }
+
 .buy-btn {
-  margin-top:14px;
+  margin-top:10px;
   background:#000;
   border:1px solid #d4af37;
   color:#d4af37;
-  padding:8px 20px;       
+  padding:6px 16px;       
   cursor:pointer;
-  font-size:12px;
+  font-size:11px;
   font-weight: 600;
   border-radius: 6px;     
   transition: all 0.3s ease;
   display: inline-block;
   text-decoration: none;
 }
+
 .buy-btn:hover {
   background:#d4af37;
   color:#000;
   box-shadow: 0 0 10px rgba(212,175,55,0.5);
 }
 
-/* Floating WhatsApp */
+/* ===========================
+   7. FLOATING WHATSAPP
+   =========================== */
+
 .whatsapp-float {
   position:fixed;
-  right:25px;
-  bottom:25px;
+  right:20px;
+  bottom:20px;
   border:1px solid #d4af37;
   background: #000;
-  padding:12px 20px;
+  padding:10px 18px;
   color:#d4af37;
   border-radius: 50px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.8);
   font-weight: bold;
   text-decoration: none;
   z-index: 100;
   transition: 0.3s;
 }
-.whatsapp-float:hover {
-  background: #d4af37;
-  color: #000;
-}
 
 /* ===========================
-   7. MOBILE RESPONSIVENESS
+   8. MOBILE OPTIMIZATION
    =========================== */
+
 @media(max-width:768px){
 
-  header { padding: 15px 20px; }
+  header { padding: 12px 15px; }
+  h1 { font-size: 18px; }
   .hamburger { display:block; }
-  nav { display: none; } 
-  .brand-toggle { display: flex; }
+  nav { display:none; }
 
-  /* Mobile Filter Layout */
   .filter-bar {
-    padding: 0 15px;
-    gap: 8px;
+    padding: 0 10px;
   }
 
-  /* Make Main Controls Full Width on Mobile */
-  select {
-    width: 100%;
-    margin-bottom: 15px;
+  .product-grid {
+    grid-template-columns: repeat(2,1fr);
   }
-  
-  /* Make Category Buttons share space */
-  .filter-bar button, .filter-bar a {
-    flex: 1 1 30%; /* Stretch to fill lines */
-  }
-
-  .product-grid { padding:20px 10px; gap:15px; }
-  .product-card { padding:15px; }
 }
