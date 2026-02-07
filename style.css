@@ -68,22 +68,23 @@ nav a {
    =========================== */
 
 /* Container for Desktop Filter Bar */
+./* Update this section */
 .filter-bar {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: wrap;        /* Allows wrapping on small screens */
   justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin-bottom:20px;
-  padding: 0 10px;
+  align-items: center;    /* Keeps text and buttons aligned in the middle */
+  gap: 10px;              /* Space between text and buttons */
+  margin-bottom: 20px;
+  
+  /* THIS FIXES THE "Filter by Category:" TEXT */
+  color: #d4af37;         /* Makes the text Gold */
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;       /* Makes text Bold like the buttons */
+  text-transform: uppercase; /* Optional: Looks more premium */
+  font-size: 14px;
 }
 
-/* 
-   MASTER STYLE for: 
-   1. Sort Dropdown (select)
-   2. Category Buttons (.filter-bar button)
-   3. Brand Toggle Button (.brand-toggle)
-   4. Mobile Filter Buttons (.filter-bar-vertical button)
 */
 select,
 .filter-bar button,
