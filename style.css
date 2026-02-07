@@ -154,3 +154,30 @@ nav a {
   padding:12px 20px;
   color:#d4af37;
 }
+
+/* MOBILE SCROLLABLE BRAND FILTER */
+@media (max-width:768px) {
+
+  .filter-bar {
+    overflow-x: auto;             /* horizontal scroll */
+    display: flex;
+    flex-wrap: nowrap;            /* keep buttons in one row */
+    gap: 10px;
+    padding: 10px 0;
+    scroll-behavior: smooth;      /* smooth scrolling */
+    -webkit-overflow-scrolling: touch; /* smooth swipe on iOS */
+    scroll-snap-type: x mandatory;     /* snap each button */
+  }
+
+  .filter-bar button {
+    flex: 0 0 auto;               /* do not shrink */
+    scroll-snap-align: center;    /* snap buttons to center */
+    border-radius: 20px;
+    transition: all 0.3s ease;
+  }
+
+  .filter-bar button.selected {
+    background:#d4af37;
+    color:#000;
+  }
+}
