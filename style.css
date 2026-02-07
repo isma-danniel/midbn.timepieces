@@ -177,7 +177,10 @@ nav a {
   }
 
   .filter-bar button.selected {
-    background:#d4af37;
-    color:#000;
-  }
+  background: #d4af37;
+  color: #000;
+  transform: scale(1.05);           /* slight enlargement */
+  box-shadow: 0 0 12px rgba(212,175,55,0.6); /* soft gold glow */
+  transition: all 0.3s ease;
+}
 }
