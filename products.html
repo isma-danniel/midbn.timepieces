@@ -1179,7 +1179,18 @@
           return stockB - stockA;
         })
         .forEach(card => grid.appendChild(card));
-    }
+  // Mobile toggle for vertical brand filter
+const toggleBtn = document.querySelector(".brand-toggle");
+const verticalFilter = document.querySelector(".filter-bar-vertical");
+
+toggleBtn.addEventListener("click", () => {
+  if (verticalFilter.style.display === "block") {
+    verticalFilter.style.display = "none";
+    toggleBtn.textContent = "Brands ▼";
+  } else {
+    verticalFilter.style.display = "block";
+    toggleBtn.textContent = "Brands ▲";
+    }   
 
   });
 </script>
