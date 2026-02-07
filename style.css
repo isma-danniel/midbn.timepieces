@@ -63,40 +63,48 @@ nav a {
   outline: none;
 }
 
+::placeholder {
+  color: rgba(212, 175, 55, 0.5);
+  opacity: 1;
+}
+
 /* ===========================
-   4. UNIFIED BUTTONS & FILTERS (THE FIX)
+   4. UNIFIED BUTTONS & FILTERS
    =========================== */
 
-/* Container for Desktop Filter Bar */
-./* Update this section */
+/* Container for Filter Bar (Text Styling Fix) */
 .filter-bar {
   display: flex;
-  flex-wrap: wrap;        /* Allows wrapping on small screens */
+  flex-wrap: wrap;        
   justify-content: center;
-  align-items: center;    /* Keeps text and buttons aligned in the middle */
-  gap: 10px;              /* Space between text and buttons */
+  align-items: center;    
+  gap: 10px;              
   margin-bottom: 20px;
+  padding: 0 10px;
   
-  /* THIS FIXES THE "Filter by Category:" TEXT */
-  color: #d4af37;         /* Makes the text Gold */
+  /* FLIX: Styling the "Filter by Category" Text */
+  color: #d4af37;         
   font-family: 'Poppins', sans-serif;
-  font-weight: 600;       /* Makes text Bold like the buttons */
-  text-transform: uppercase; /* Optional: Looks more premium */
+  font-weight: 600;       
+  text-transform: uppercase; 
   font-size: 14px;
 }
 
+/* 
+   MASTER STYLE for: 
+   Select (Sort), Category Buttons, Brand Toggle 
 */
 select,
 .filter-bar button,
 .filter-bar-vertical button,
 .brand-toggle {
-  background: #000 !important;      /* Black Background */
-  color: #d4af37 !important;        /* Gold Text */
-  border: 1px solid #d4af37 !important; /* Gold Border */
+  background: #000 !important;      
+  color: #d4af37 !important;        
+  border: 1px solid #d4af37 !important; 
   
   /* UNIFORM SIZING */
-  height: 42px;                     /* Fixed height for alignment */
-  padding: 0 20px;                  /* Consistent internal spacing */
+  height: 42px;                     
+  padding: 0 20px;                  
   font-family: 'Poppins', sans-serif;
   font-size: 13px;
   font-weight: 600;
@@ -109,8 +117,8 @@ select,
   cursor: pointer;
   outline: none;
   transition: all 0.3s ease;
-  white-space: nowrap;              /* Prevent text breaking */
-  margin: 0;                        /* Reset margins, handled by gap */
+  white-space: nowrap;              
+  margin: 5px; /* Added margin for safe spacing */
 }
 
 /* Custom styling for Sort Dropdown Arrow */
@@ -118,21 +126,20 @@ select {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  padding-right: 35px; /* Space for the arrow */
-  /* Gold Arrow Icon */
+  padding-right: 35px; 
   background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23d4af37%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   background-size: 10px;
 }
 
-/* HOVER EFFECTS for ALL Controls */
+/* HOVER EFFECTS */
 select:hover,
 .filter-bar button:hover,
 .filter-bar-vertical button:hover,
 .brand-toggle:hover {
-  background: #d4af37 !important;   /* Gold Background */
-  color: #000 !important;           /* Black Text */
+  background: #d4af37 !important;   
+  color: #000 !important;           
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(212,175,55,0.4);
 }
@@ -156,7 +163,7 @@ select:hover,
   display: none; /* Mobile only feature */
   width: 90%;
   margin: 10px auto;
-  justify-content: space-between; /* Align text left, arrow right */
+  justify-content: space-between; 
 }
 
 /* ===========================
@@ -242,11 +249,11 @@ select:hover,
   background:#000;
   border:1px solid #d4af37;
   color:#d4af37;
-  padding:8px 20px;       /* Matched to other buttons */
+  padding:8px 20px;       
   cursor:pointer;
   font-size:12px;
   font-weight: 600;
-  border-radius: 6px;     /* Matched radius */
+  border-radius: 6px;     
   transition: all 0.3s ease;
   display: inline-block;
 }
@@ -277,7 +284,7 @@ select:hover,
   color: #000;
 }
 
-/* Selected State for Logic (JS) */
+/* JS Selected State */
 .brand-btn.selected {
   background: #d4af37 !important;
   color: #000 !important;
@@ -294,7 +301,6 @@ select:hover,
 
   .hamburger { display:block; }
   
-  /* Hide standard Nav, show Toggle */
   nav { display: none; } 
   .brand-toggle { display: flex; }
 
@@ -312,18 +318,17 @@ select:hover,
   
   /* Make Category Buttons share space */
   .filter-bar button {
-    flex: 1 1 40%; /* Grow to fill space, at least 40% width */
+    flex: 1 1 40%; 
   }
 
   /* Vertical Menu Buttons */
   .filter-bar-vertical button {
     width:100%;
     text-align:left;
-    justify-content: flex-start; /* Align text left for list view */
+    justify-content: flex-start;
     margin: 5px 0;
   }
 
-  /* Grid Adjustments */
   .product-grid {
     padding:20px 10px;
     gap:15px;
@@ -332,4 +337,3 @@ select:hover,
     padding:15px;
   }
 }
-
