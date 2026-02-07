@@ -61,6 +61,9 @@ nav a {
   max-width: 400px;
   font-family: 'Poppins', sans-serif;
   outline: none;
+  /* Remove iOS rounded corners on inputs */
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 ::placeholder {
@@ -69,10 +72,10 @@ nav a {
 }
 
 /* ===========================
-   4. UNIFIED BUTTONS, LINKS & FILTERS (FINAL FIX)
+   4. UNIFIED BUTTONS & FILTERS (MOBILE FIX INCLUDED)
    =========================== */
 
-/* Style the "Filter by Category:" text container */
+/* Style the text "Filter by Category:" */
 .filter-bar {
   display: flex;
   flex-wrap: wrap;        
@@ -82,7 +85,8 @@ nav a {
   margin-bottom: 20px;
   padding: 0 10px;
   
-  color: #d4af37;         /* Gold Text */
+  /* Text Styling */
+  color: #d4af37;         
   font-family: 'Poppins', sans-serif;
   font-weight: 600;       
   text-transform: uppercase; 
@@ -90,63 +94,74 @@ nav a {
 }
 
 /* 
-   MASTER SELECTOR:
-   Targets Buttons, Selects, AND Links (a) inside filter bar
+   MASTER SELECTOR
+   Targets: Sort Dropdown, Category Buttons, Category Links, Brand Toggle
 */
 select,
 .filter-bar button,
-.filter-bar a,             /* <--- THIS FIXES THE WHITE OVALS */
-.filter-bar-vertical button,
+.filter-bar a,
 .brand-toggle {
-  background: #000 !important;          /* Force Black Background */
-  color: #d4af37 !important;            /* Force Gold Text */
-  border: 1px solid #d4af37 !important; /* Gold Border */
+  /* COMPLETE OVERRIDE OF BROWSER DEFAULTS */
+  background-color: #000 !important;      
+  color: #d4af37 !important;           
+  border: 1px solid #d4af37 !important; 
   
-  /* UNIFORM SIZING */
-  height: 40px;                         /* Fixed height */
-  line-height: 38px;                    /* Vertically center text */
-  padding: 0 16px;                      
+  /* Remove default Mobile/iOS Styling (The White Bar Fix) */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* Sizing & Font */
+  height: 40px;                         
+  line-height: 1.2;                    
+  padding: 8px 16px;                      
   font-family: 'Poppins', sans-serif;
   font-size: 13px;
   font-weight: 600;
-  border-radius: 6px;                   /* Square with slight curve */
+  border-radius: 6px;                   
   
-  /* Layout */
+  /* Layout properties */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  text-decoration: none;                /* Remove link underline */
+  text-decoration: none;                
   transition: all 0.3s ease;
   white-space: nowrap;
   margin: 5px 2px;
   box-shadow: none;
 }
 
-/* Dropdown Arrow Fix */
+/* Specific Fix for Sort Dropdown Arrow */
 select {
-  padding-right: 35px; 
+  padding-right: 35px; /* Room for arrow */
+  /* Adds Gold Arrow Icon */
   background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23d4af37%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   background-size: 10px;
-  -webkit-appearance: none;
-  appearance: none;
 }
 
 /* HOVER EFFECTS */
 select:hover,
 .filter-bar button:hover,
 .filter-bar a:hover,
-.filter-bar-vertical button:hover,
 .brand-toggle:hover {
-  background: #d4af37 !important;   /* Gold Background */
-  color: #000 !important;           /* Black Text */
+  background: #d4af37 !important;   
+  color: #000 !important;           
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(212,175,55,0.4);
 }
 
-/* Vertical Brand Menu (Desktop Hidden) */
+/* Active/Selected State */
+.filter-bar a.active,
+.filter-bar button.active,
+.brand-btn.selected {
+  background: #d4af37 !important;
+  color: #000 !important;
+}
+
+/* Vertical Brand Menu (Hidden on Desktop) */
 .filter-bar-vertical {
   display:flex;
   flex-direction: column;
@@ -159,6 +174,25 @@ select:hover,
 .filter-bar-vertical.show {
   max-height: 500px;
   margin-bottom: 20px;
+}
+
+/* Vertical Menu Buttons */
+.filter-bar-vertical button {
+  background-color: #000;
+  color: #d4af37;
+  border: 1px solid #d4af37;
+  width: 100%;
+  padding: 10px;
+  text-align: left;
+  margin-bottom: 5px;
+  cursor: pointer;
+  /* Specific override for these buttons */
+  -webkit-appearance: none;
+  appearance: none;
+}
+.filter-bar-vertical button:hover {
+  background: #d4af37;
+  color: #000;
 }
 
 .brand-toggle {
@@ -287,56 +321,33 @@ select:hover,
   color: #000;
 }
 
-/* JS Selected State */
-.brand-btn.selected {
-  background: #d4af37 !important;
-  color: #000 !important;
-}
-
 /* ===========================
    7. MOBILE RESPONSIVENESS
    =========================== */
 @media(max-width:768px){
 
-  header {
-    padding: 15px 20px;
-  }
-
+  header { padding: 15px 20px; }
   .hamburger { display:block; }
-  
   nav { display: none; } 
   .brand-toggle { display: flex; }
 
   /* Mobile Filter Layout */
   .filter-bar {
     padding: 0 15px;
-    gap: 10px;
+    gap: 8px;
   }
 
   /* Make Main Controls Full Width on Mobile */
   select {
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
   }
   
   /* Make Category Buttons share space */
   .filter-bar button, .filter-bar a {
-    flex: 1 1 40%; 
+    flex: 1 1 30%; /* Stretch to fill lines */
   }
 
-  /* Vertical Menu Buttons */
-  .filter-bar-vertical button {
-    width:100%;
-    text-align:left;
-    justify-content: flex-start;
-    margin: 5px 0;
-  }
-
-  .product-grid {
-    padding:20px 10px;
-    gap:15px;
-  }
-  .product-card {
-    padding:15px;
-  }
+  .product-grid { padding:20px 10px; gap:15px; }
+  .product-card { padding:15px; }
 }
