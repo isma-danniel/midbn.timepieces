@@ -157,23 +157,12 @@ nav a {
 
 /* MOBILE SCROLLABLE BRAND FILTER */
 @media (max-width:768px) {
-
-.filter-bar-vertical {
-  display: flex;
-  flex-direction: column;   /* vertical stack */
-  max-height: 300px;        /* optional: limit height */
-  overflow-y: auto;         /* scroll if too many */
-  gap: 10px;
-  padding: 10px;
-  border-right: 1px solid #222; /* optional for luxury look */
-}
-
 .filter-bar-vertical button {
   padding: 10px 20px;
   border-radius: 20px;
   border: 1px solid #d4af37;
   background: transparent;
-  color: #d4af37;
+  color: #d4af37;          /* <--- add this */
   cursor: pointer;
   transition: all 0.3s ease;
 }
