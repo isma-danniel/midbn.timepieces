@@ -1,44 +1,39 @@
-/* =======================
-   Global Styles
-======================= */
+/* ========================
+   GENERAL RESET
+======================== */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
   font-family: 'Arial', sans-serif;
 }
 
 body {
-  background-color: #111; /* Dark luxury background */
-  color: #fff;
-  line-height: 1.5;
+  background-color: #f9f9f9;
+  color: #333;
+  line-height: 1.6;
 }
 
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-/* =======================
-   Header
-======================= */
+/* ========================
+   HEADER & NAV
+======================== */
 header {
-  background-color: #111;
-  padding: 20px 40px;
+  background-color: #000;
+  color: #fff;
+  padding: 15px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: sticky;
   top: 0;
   z-index: 100;
-  border-bottom: 1px solid #333;
 }
 
 header h1 {
   font-family: 'Georgia', serif;
-  font-weight: bold;
-  font-size: 28px;
-  color: #f5c518; /* Luxury gold accent */
+  font-size: 1.6rem;
+  letter-spacing: 1px;
+  color: #FFD700;
 }
 
 nav {
@@ -46,55 +41,55 @@ nav {
   align-items: center;
 }
 
-.nav-links {
-  display: flex;
-  gap: 20px;
-}
-
 .nav-links a {
   color: #fff;
-  padding: 6px 12px;
-  transition: 0.3s;
+  text-decoration: none;
+  margin-left: 20px;
+  font-weight: 500;
+  transition: color 0.3s;
 }
 
 .nav-links a:hover {
-  color: #f5c518;
+  color: #FFD700;
 }
 
-/* Hamburger menu for mobile */
 .hamburger {
   display: none;
-  font-size: 28px;
+  font-size: 1.8rem;
   cursor: pointer;
-  color: #fff;
 }
 
-/* =======================
-   Search & Filter Bar
-======================= */
+/* ========================
+   SEARCH BAR & FILTERS
+======================== */
 .search-bar {
+  max-width: 1200px;
+  margin: 20px auto;
   text-align: center;
-  margin: 30px 0 10px 0;
 }
 
-.search-bar input {
+.search-bar input[type="text"] {
+  width: 60%;
+  max-width: 500px;
   padding: 10px 15px;
-  width: 250px;
-  max-width: 90%;
-  border-radius: 5px;
-  border: none;
+  border: 2px solid #ccc;
+  border-radius: 25px;
+  font-size: 1rem;
+  transition: all 0.3s;
+}
+
+.search-bar input[type="text"]:focus {
+  border-color: #FFD700;
   outline: none;
-  font-size: 16px;
 }
 
 #sortStock {
   padding: 8px 12px;
-  margin-top: 10px;
   border-radius: 5px;
-  border: none;
-  font-size: 14px;
-  background-color: #222;
+  border: 1px solid #ccc;
+  background-color: #000;
   color: #fff;
+  margin-top: 10px;
 }
 
 /* Filter Bars */
@@ -102,87 +97,79 @@ nav {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
   margin: 15px 0;
+  background-color: #000;
+  padding: 10px 0;
+  border-radius: 10px;
 }
 
-.filter-bar button {
-  padding: 8px 15px;
-  border: 1px solid #f5c518;
-  background-color: #111;
+.filter-bar button,
+.filter-bar-vertical .brand-btn {
+  margin: 5px 10px;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 25px;
+  background-color: #222;
   color: #fff;
-  border-radius: 5px;
   cursor: pointer;
-  transition: 0.3s;
-  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s;
 }
 
-.filter-bar button:hover {
-  background-color: #f5c518;
-  color: #111;
-}
-
-/* Vertical brand filter */
-.filter-bar-vertical {
-  display: none;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 10px;
+.filter-bar button:hover,
+.filter-bar-vertical .brand-btn:hover {
+  background-color: #FFD700;
+  color: #000;
 }
 
 .brand-toggle {
-  padding: 8px 15px;
-  border: 1px solid #f5c518;
-  background-color: #111;
+  background-color: #222;
   color: #fff;
-  border-radius: 5px;
   cursor: pointer;
-  font-size: 14px;
-  transition: 0.3s;
+  padding: 8px 20px;
+  border-radius: 25px;
+  margin: 5px;
+  font-weight: 500;
 }
 
-.brand-toggle:hover {
-  background-color: #f5c518;
-  color: #111;
+.filter-bar-vertical {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
 }
 
-.brand-btn {
-  padding: 6px 12px;
-  border: 1px solid #f5c518;
-  background-color: #111;
-  color: #fff;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: 0.3s;
-  font-size: 13px;
+.filter-bar-vertical .brand-btn {
+  width: 150px;
+  text-align: center;
 }
 
-.brand-btn:hover {
-  background-color: #f5c518;
-  color: #111;
-}
-
-/* =======================
-   Product Grid
-======================= */
+/* ========================
+   PRODUCT GRID
+======================== */
 .product-grid {
+  max-width: 1200px;
+  margin: 20px auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  padding: 20px 40px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 25px;
 }
 
 .product-card {
-  background-color: #1c1c1c;
-  border-radius: 8px;
+  background-color: #fff;
+  border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
   transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .product-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
 }
 
 .product-images img {
@@ -190,93 +177,108 @@ nav {
   display: block;
 }
 
+.product-card .badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.badge.new {
+  background-color: #FFD700;
+  color: #000;
+}
+
 .product-card h3 {
-  margin: 10px;
-  color: #f5c518;
-  font-size: 18px;
+  font-size: 1.1rem;
+  margin: 10px 15px 5px 15px;
+}
+
+.product-card .details {
+  font-size: 0.85rem;
+  margin: 0 15px 10px 15px;
+  color: #555;
+}
+
+.product-card .brand {
+  font-size: 0.8rem;
+  margin: 10px 15px;
+  font-weight: bold;
+  color: #000;
 }
 
 .product-card p {
-  margin: 5px 10px;
-  font-size: 14px;
-  color: #ddd;
+  margin: 5px 15px;
 }
 
-.badge {
-  position: absolute;
-  background-color: #f00;
-  color: #fff;
-  padding: 4px 8px;
-  font-size: 12px;
-  font-weight: bold;
-  top: 10px;
-  left: 10px;
-  border-radius: 3px;
-}
-
-/* WhatsApp Button */
 .buy-btn {
-  display: block;
-  margin: 10px;
   text-align: center;
-  padding: 8px 12px;
-  background-color: #25D366;
-  color: #fff;
-  border-radius: 5px;
+  margin: 10px 15px 15px 15px;
+  padding: 8px 0;
+  background-color: #000;
+  color: #FFD700;
+  border-radius: 25px;
+  text-decoration: none;
   font-weight: bold;
-  transition: 0.3s;
+  transition: all 0.3s;
 }
 
 .buy-btn:hover {
-  background-color: #1ebe5d;
+  background-color: #FFD700;
+  color: #000;
 }
 
-/* =======================
-   Footer
-======================= */
+/* ========================
+   FOOTER
+======================== */
 footer {
-  background-color: #111;
+  background-color: #000;
   color: #fff;
-  padding: 30px 40px;
+  padding: 25px 20px;
   text-align: center;
-  border-top: 1px solid #333;
+  font-size: 0.9rem;
 }
 
 footer a {
-  color: #f5c518;
-  margin: 0 10px;
-  transition: 0.3s;
+  color: #FFD700;
+  text-decoration: none;
 }
 
 footer a:hover {
-  color: #fff;
+  text-decoration: underline;
 }
 
-/* =======================
-   Responsive
-======================= */
+/* ========================
+   MEDIA QUERIES
+======================== */
 @media (max-width: 768px) {
-  .nav-links {
-    display: none;
-    flex-direction: column;
-    gap: 10px;
-    background-color: #111;
-    position: absolute;
-    top: 70px;
-    right: 20px;
-    padding: 10px 20px;
-    border-radius: 5px;
-  }
-
-  .nav-links.show {
-    display: flex;
-  }
-
   .hamburger {
     display: block;
   }
 
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    margin-top: 10px;
+  }
+
+  .nav-links a {
+    margin: 10px 0;
+  }
+
+  .filter-bar {
+    flex-direction: column;
+  }
+
   .filter-bar-vertical {
     display: flex;
+  }
+
+  .search-bar input[type="text"] {
+    width: 90%;
   }
 }
