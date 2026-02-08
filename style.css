@@ -1,8 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@300;400;600&display=swap');
 
-/* ===========================
-   LUXURY COLOR SYSTEM
-=========================== */
 :root {
   --gold-main: #d4af37;
   --gold-soft: #e6c65c;
@@ -10,9 +7,6 @@
   --glass-bg: rgba(255,255,255,0.03);
 }
 
-/* ===========================
-   GLOBAL RESET
-=========================== */
 * {
   margin: 0;
   padding: 0;
@@ -114,7 +108,7 @@ nav {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding: 10px 12px;
+  padding: 10px 12px 4px;
   scrollbar-width: none;
 }
 
@@ -147,7 +141,7 @@ nav {
    BRAND FILTER
 =========================== */
 .filter-brand {
-  padding: 5px 12px;
+  padding: 4px 12px 5px;
 }
 
 .brand-toggle {
@@ -158,14 +152,29 @@ nav {
   background: #111;
   color: gold;
   cursor: pointer;
+  margin-top: 6px;
 }
 
+/* Premium slide animation */
 .filter-bar-vertical {
-  display: none;
-  margin-top: 10px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-6px);
+  margin-top: 6px;
   display: grid;
   grid-template-columns: repeat(2,1fr);
   gap: 8px;
+  transition: 
+    max-height .45s cubic-bezier(.4,0,.2,1),
+    opacity .25s ease,
+    transform .35s ease;
+}
+
+.filter-bar-vertical.show {
+  max-height: 420px;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .brand-btn {
@@ -182,7 +191,6 @@ nav {
   background: gold;
   color: #000;
 }
-
 
 /* ===========================
    PRODUCT GRID
@@ -213,7 +221,6 @@ nav {
   box-shadow:0 12px 30px rgba(212,175,55,.25);
 }
 
-/* Reflection shine */
 .product-card::after {
   content:"";
   position:absolute;
@@ -242,8 +249,8 @@ nav {
   position:absolute;
   inset:-18px;
   background:radial-gradient(circle,var(--gold-glow) 0%,transparent 70%);
-  filter:blur(25px);
-  opacity:.85;
+  filter:blur(35px);
+  opacity:.95;
   z-index:0;
   animation:glowPulse 4s infinite ease-in-out;
 }
@@ -355,4 +362,6 @@ nav {
     grid-template-columns:repeat(2,1fr);
   }
 
+  .filter-category { padding-bottom:2px; }
+  .filter-brand { padding-top:2px; }
 }
