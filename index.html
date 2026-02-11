@@ -3,1212 +3,186 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Midbn Timepieces - Products</title>
+  <title>MIDBN.Timepieces</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ==========================
-       HEADER
-=========================== -->
-<header>
-  <h1>MIDBN_TIMEPIECES</h1>
+<!-- HEADER / NAVIGATION -->
+<header class="header">
   <nav>
-    <div class="hamburger" id="hamburger">&#9776;</div>
-    <div class="nav-links" id="navLinks">
-      <a href="index.html">Home</a>
-      <a href="https://wa.me/6738908960">Contact</a>
+    <div class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
     </div>
+    <ul>
+      <li><a href="#intro">Intro</a></li>
+      <li><a href="#arrivals">New Arrivals</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#brands">Brands</a></li>
+      <li><a href="#catalog">Catalogue</a></li>
+    </ul>
   </nav>
 </header>
 
-<!-- ==========================
-       SEARCH & SORT
-=========================== -->
-<section class="search-sort">
-  <div class="search-bar">
-    <input type="text" id="productSearch" placeholder="Search watches...">
-  </div>
-
-  <div class="sort-bar">
-    <select id="sortStock">
-      <option value="normal">Normal order</option>
-      <option value="instock">In stock first</option>
-    </select>
-  </div>
-</section>
-
-<!-- ==========================
-       CATEGORY FILTER
-=========================== -->
-<section class="filter-category">
-  <strong>Filter by Category:</strong>
-  <button onclick="filterProducts('all')">All</button>
-  <button onclick="filterProducts('Men')">Men</button>
-  <button onclick="filterProducts('Women')">Women</button>
-  <button onclick="filterProducts('Couple')">Couple</button>
-  <button onclick="filterProducts('Defects')">Defects/promo</button>
-  <button onclick="filterProducts('Coming-soon')">Coming soon</button>
-</section>
-
-<!-- ==========================
-       BRAND FILTER
-=========================== -->
-<section class="filter-brand">
-  <button class="brand-toggle">Brands ▾</button>
-  <div class="filter-bar-vertical">
-    <button class="brand-btn" data-brand="all">All</button>
-    <button class="brand-btn" data-brand="Rolex">Rolex</button>
-    <button class="brand-btn" data-brand="Omega">Omega</button>
-    <button class="brand-btn" data-brand="Casio">Casio</button>
-    <button class="brand-btn" data-brand="Cartier">Cartier</button>
-    <button class="brand-btn" data-brand="Patek-Philippe">Patek Philippe</button>
-    <button class="brand-btn" data-brand="G-Shock">G-Shock</button>
-    <button class="brand-btn" data-brand="Swarvowski">Swarvowski</button>
-    <button class="brand-btn" data-brand="Franc-Muller">Franc Muller</button>
-    <button class="brand-btn" data-brand="Audemars-Piguet">Audemars Piguet</button>
-    <button class="brand-btn" data-brand="Seiko">Seiko</button>
-    <button class="brand-btn" data-brand="Michael-Kors">Michael Kors</button>
+<!-- HERO -->
+<section class="hero">
+  <video class="hero-video" autoplay muted loop playsinline>
+    <source src="images/hero.mp4" type="video/mp4">
+  </video>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1 class="hero-quote">
+      MAKE EVERY<br>
+      SECOND PRECIOUS
+    </h1>
+    <a href="products.html" class="hero-btn">Shop Now</a>
   </div>
 </section>
 
-<!-- ==========================
-       PRODUCT GRID
-=========================== -->
-<section class="product-grid">
-
-    <!-- Proudct Card 1 -->
-    <div class="product-card" data-category="Men" data-brand="Rolex">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/men-1.png" alt="men-1.png">
-      </div>
-      <p class="brand">Brand: Rolex</p>
-      <h3>Daytona (Black/Gold)</h3>
-      <p class="details"> Quartz, stainless steel case, men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Rolex Daytona">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 2 -->
-    <div class="product-card" data-category="Men" data-brand="Rolex">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/men-2.png" alt="men-2.png">
-      </div>
-      <p class="brand">Brand: Rolex</p>
-      <h3>Daytona (Gold)</h3>
-      <p class="details"> Quartz, stainless steel case, men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Rolex Daytona">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 3 -->
-    <div class="product-card" data-category="Men" data-brand="Rolex">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="unknown.png">
-      </div>
-      <p class="brand">Brand: Rolex</p>
-      <h3>Daytona (Black)</h3>
-      <p class="details"> Quartz, stainless steel case, men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Rolex Daytona">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 4 -->
-    <div class="product-card" data-category="Men" data-brand="Rolex">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="unknown.png">
-      </div>
-      <p class="brand">Brand: Rolex</p>
-      <h3>Daytona (White)</h3>
-      <p class="details"> Quartz, stainless steel case, men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Rolex Daytona">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 5 -->
-    <div class="product-card" data-category="Men" data-brand="Rolex">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/men-5.png" alt="men-5.png">
-      </div>
-      <p class="brand">Brand: Rolex</p>
-      <h3>GMT Master II (Batman)</h3>
-      <p class="details"> Quartz, rubber strap, men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Rolex GMT Master II">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 6 -->
-    <div class="product-card" data-category="Men" data-brand="Rolex">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/men-6.png" alt="men-6.png">
-      </div>
-      <p class="brand">Brand: Rolex</p>
-      <h3>GMT Master II (Black)</h3>
-      <p class="details"> Quartz, rubber strap, men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Rolex GMT Master II">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 7 -->
-    <div class="product-card" data-category="Men" data-brand="Rolex">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/men-7.png" alt="men-7.png">
-      </div>
-      <p class="brand">Brand: Rolex</p>
-      <h3>GMT Master II (Pepsi)</h3>
-      <p class="details"> Quartz, rubber strap, men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Rolex GMT Master II">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 8 -->
-    <div class="product-card" data-category="Men" data-brand="Rolex">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="unknown.png">
-      </div>
-      <p class="brand">Brand: Rolex</p>
-      <h3>GMT Master II (Coke)</h3>
-      <p class="details"> Quartz, rubber strap, men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Rolex GMT Master II">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 9 -->
-    <div class="product-card" data-category="Men" data-brand="Patek-Philippe">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/men-9.png" alt="men-9.png">
-      </div>
-      <p class="brand">Brand: Patek-Philippe</p>
-      <h3>Nautilus (Blue)</h3>
-      <p class="details"> Quartz, stainless steel case, men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Patek Philippe Nautilus">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 10 -->
-    <div class="product-card" data-category="Men" data-brand="Patek-Philippe">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/men-10.png" alt="men-10.png">
-      </div>
-      <p class="brand">Brand: Patek-Philippe</p>
-      <h3>Nautilus (Black)</h3>
-      <p class="details"> Quartz, stainless steel case, men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Patek Philippe Nautilus">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 11 -->
-    <div class="product-card" data-category="Men" data-brand="Patek-Philippe">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/men-11.png" alt="men-11.png">
-      </div>
-      <p class="brand">Brand: Patek-Philippe</p>
-      <h3>Nautilus (White)</h3>
-      <p class="details"> Quartz, stainless steel case, men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="Patek Philippe Nautilus">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 12 -->
-    <div class="product-card" data-category="Women" data-brand="Franc-Muller">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/women/women-1.png" alt="women-1.png">
-      </div>
-      <p class="brand">Brand: Franc-Muller</p>
-      <h3>Vanguard (White)</h3>
-      <p class="details"> Quartz, leather strap, women watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="Franc Muller Vanguard">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 13 -->
-    <div class="product-card" data-category="Women" data-brand="Franc-Muller">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/women/women-2.png" alt="women-2.png">
-      </div>
-      <p class="brand">Brand: Franc-Muller</p>
-      <h3>Vanguard (Black)</h3>
-      <p class="details"> Quartz, leather strap, women watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="Franc Muller Vanguard">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 14 -->
-    <div class="product-card" data-category="Women" data-brand="Franc-Muller">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="unknown.png">
-      </div>
-      <p class="brand">Brand: Franc-Muller</p>
-      <h3>Vanguard (Pink)</h3>
-      <p class="details"> Quartz, Leather strap, women watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Franc Muller Vanguard">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 15 -->
-    <div class="product-card" data-category="Women" data-brand="Franc-Muller">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/women/women-4.png" alt="women-4.png">
-      </div>
-      <p class="brand">Brand: Franc-Muller</p>
-      <h3>Cintree Curvex (Black)</h3>
-      <p class="details"> Quartz, Leather strap, women watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="Franc Muller Cintree Curvex">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 16 -->
-    <div class="product-card" data-category="Women" data-brand="Franc-Muller">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/women/women-5.png" alt="women-5.png">
-      </div>
-      <p class="brand">Brand: Franc-Muller</p>
-      <h3>Master Square</h3>
-      <p class="details"> Quartz, Leather strap, women watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="2"></p>
-      <a class="buy-btn whatsapp-product" data-product="Franc Muller Master Square">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 17 -->
-    <div class="product-card" data-category="Women" data-brand="Franc-Muller">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="unknown.png">
-      </div>
-      <p class="brand">Brand: Franc-Muller</p>
-      <h3>Cintree Curvex (Pink)</h3>
-      <p class="details"> Quartz, Leather strap, men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Franc Muller Cintree Curvex">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 18 -->
-    <div class="product-card" data-category="Women" data-brand="Franc-Muller">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="unknown.png">
-      </div>
-      <p class="brand">Brand: Franc-Muller</p>
-      <h3>Oalet (Black)</h3>
-      <p class="details"> Quartz, Leather strap, women watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Franc Muller Oalet (Black)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 19 -->
-    <div class="product-card" data-category="Men" data-brand="Cartier">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/women/women-8.png" alt="women-8.png">
-      </div>
-      <p class="brand">Brand: Cartier</p>
-      <h3>Santos (White)</h3>
-      <p class="details"> Quartz, stainless steel case, Men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="Cartier Santos (White)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 20 -->
-    <div class="product-card" data-category="Men" data-brand="Cartier">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/women/women-9.png" alt="women-9.png">
-      </div>
-      <p class="brand">Brand: Cartier</p>
-      <h3>Santos (Black)</h3>
-      <p class="details"> Quartz, stainless steel case, Men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="Cartier Santos (Black)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 21 -->
-    <div class="product-card" data-category="Men" data-brand="Cartier">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/women/women-10.png" alt="women-10.png">
-      </div>
-      <p class="brand">Brand: Cartier</p>
-      <h3>Santos (Sapphire)</h3>
-      <p class="details"> Quartz, stainless steel case, Men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="Cartier Santos (Sapphire)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 22 -->
-    <div class="product-card" data-category="Men" data-brand="Cartier">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/women/women-11.png" alt="women-11.png">
-      </div>
-      <p class="brand">Brand: Cartier</p>
-      <h3>Santos (Emerald)</h3>
-      <p class="details"> Quartz, stainless steel case, Men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="Cartier Santos (Emerald)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 23 -->
-    <div class="product-card" data-category="Women" data-brand="Cartier">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/women/women-12.png" alt="women-12.png">
-      </div>
-      <p class="brand">Brand: Cartier</p>
-      <h3>Santos (Gold/Black)</h3>
-      <p class="details"> Quartz, stainless steel case, women watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="Cartier Santos (Gold/Black)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 24 -->
-    <div class="product-card" data-category="Women" data-brand="Cartier">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/women/women-13.png" alt="women-13.png">
-      </div>
-      <p class="brand">Brand: Cartier</p>
-      <h3>Santos (Silver/White)</h3>
-      <p class="details"> Quartz, stainless steel case, women watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Cartier Santos (Silver/White)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 25 -->
-    <div class="product-card" data-category="Women" data-brand="Cartier">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/women/women-14.png" alt="women-14.png">
-      </div>
-      <p class="brand">Brand: Cartier</p>
-      <h3>Santos (Silver/Black)</h3>
-      <p class="details"> Quartz, stainless steel case, women watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="Cartier Santos (Silver/Black)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 26 -->
-    <div class="product-card" data-category="Women" data-brand="Cartier">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/women/women-15.png" alt="women-15.png">
-      </div>
-      <p class="brand">Brand: Cartier</p>
-      <h3>Santos (Gold/White)</h3>
-      <p class="details"> Quartz, stainless steel case, women watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Cartier Santos (Gold/White)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 27 -->
-    <div class="product-card" data-category="Men" data-brand="Michael-Kors">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/women/women-17.png" alt="women-17.png">
-      </div>
-      <p class="brand">Brand: Michael-Kors</p>
-      <h3>Slim Runaway (Silver)</h3>
-      <p class="details"> Quartz, stainless steel case, men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="Michael Kors Slim Runaway (Silver)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 28 -->
-    <div class="product-card" data-category="Men" data-brand="Michael-Kors">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/women/women-18.png" alt="women-18.png">
-      </div>
-      <p class="brand">Brand: Michael-Kors</p>
-      <h3>Slim Runaway (Blue)</h3>
-      <p class="details"> Quartz, stainless steel case, men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="Michael Kors Slim Runaway (Blue)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 29 -->
-    <div class="product-card" data-category="Women" data-brand="Michael-Kors">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/women/women-19.png" alt="women-19.png">
-      </div>
-      <p class="brand">Brand: Michael-Kors</p>
-      <h3>Portia (White)</h3>
-      <p class="details"> Quartz, stainless steel case, women watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="2"></p>
-      <a class="buy-btn whatsapp-product" data-product="Michael Kors Portia (White)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 30 -->
-    <div class="product-card" data-category="Women" data-brand="Michael-Kors">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/women/women-20.png" alt="women-20.png">
-      </div>
-      <p class="brand">Brand: Michael-Kors</p>
-      <h3>Portia (Gold)</h3>
-      <p class="details"> Quartz, stainless steel case, women watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="Michael Kors Portia (Gold)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 31 -->
-    <div class="product-card" data-category="Women" data-brand="Michael-Kors">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/women/women-21.png" alt="women-21.png">
-      </div>
-      <p class="brand">Brand: Michael-Kors</p>
-      <h3>Portia (Black)</h3>
-      <p class="details"> Quartz, stainless steel case, women watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="Michael Kors Portia (Black)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 32 -->
-    <div class="product-card" data-category="Men" data-brand="Audemars-Piguet">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/men-12.png" alt="men-12.png">
-      </div>
-      <p class="brand">Brand: Audemars Piguet</p>
-      <h3>Royal Oak (Black)</h3>
-      <p class="details"> Quartz, rubber strap, men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Audemars Piguet Royal Oak(Black)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 33 -->
-    <div class="product-card" data-category="Men" data-brand="Audemars-Piguet">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="men-13.png">
-      </div>
-      <p class="brand">Brand: Audemars Piguet</p>
-      <h3>Royal Oak (White)</h3>
-      <p class="details"> Quartz, stainless steel case, men watch, Grade A </p>
-      <p>Price: $25</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Audemars Piguet Royal Oak(White)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 34 -->
-    <div class="product-card" data-category="Couple" data-brand="Rolex">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/couple/couple-1.png" alt="couple-1.png">
-      </div>
-      <p class="brand">Brand: Rolex</p>
-      <h3>couple (Red)</h3>
-      <p class="details"> Quartz, stainless steel case, couple watch, Grade A </p>
-      <p>Price: $40</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Rolex Couple (red)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 35 -->
-    <div class="product-card" data-category="Couple" data-brand="Rolex">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/couple/couple-2.png" alt="couple-2.png">
-      </div>
-      <p class="brand">Brand: Rolex</p>
-      <h3>couple (Green)</h3>
-      <p class="details"> Quartz, stainless steel case, couple watch, Grade A </p>
-      <p>Price: $40</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="Rolex Couple (Green)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 36 -->
-    <div class="product-card" data-category="Couple" data-brand="Rolex">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/couple/couple-3.png" alt="couple-3.png">
-      </div>
-      <p class="brand">Brand: Rolex</p>
-      <h3>couple (Black)</h3>
-      <p class="details"> Quartz, stainless steel case, couple watch, Grade A </p>
-      <p>Price: $40</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Rolex Couple (Black)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 37 -->
-    <div class="product-card" data-category="Couple" data-brand="Rolex">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/couple/couple-4.png" alt="couple-4.png">
-      </div>
-      <p class="brand">Brand: Rolex</p>
-      <h3>couple (White/Silver)</h3>
-      <p class="details"> Quartz, stainless steel case, couple watch, Grade A </p>
-      <p>Price: $40</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="Rolex Couple (White/Silver)">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 38 -->
-    <div class="product-card" data-category="Couple" data-brand="Rolex">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/couple/couple-5.png" alt="couple-5.png">
-      </div>
-      <p class="brand">Brand: Rolex</p>
-      <h3>couple (Yellow)</h3>
-      <p class="details"> Quartz, stainless steel case, couple watch, Grade A </p>
-      <p>Price: $40</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="Rolex Couple (Yellow)">Buy via WhatsApp</a>
-    </div>
-
-     <!-- Product Card 39 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-1.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Manga Green)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Manga Green ">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 40 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-2.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Manga D.Green)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Manga D.Green ">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 41 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-3.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Manga Gray)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Manga Gray ">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 42 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-4.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Manga D.gray)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Manga D.Gray ">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 43 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-5.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Manga Beach)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Manga Beach">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 44 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-6.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Manga Brown)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Manga Brown ">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 45 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-7.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Manga Blue)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Manga Blue">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 46 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-8.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (TP all Red)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 TP all Red">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 47 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-9.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (TP all Yellow)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 TP all Yellow">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 48 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-10.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (TP all Gray)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 TP all Gray">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 49 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-11.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (TP White/Blue)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 TP White/Blue">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 50 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-12.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (TP Black/Gold)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 TP Black/Gold">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 51 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-13.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (TP Yellow/rbw)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 TP Yellow/Rbw">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 52 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-14.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (TP Blue/rbw)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 TP Blue/Rbw">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 53 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-15.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (TP White Rbw)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 TP White/Rbw">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 54 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-16.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Solid Black/Rbw)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Solid Black/Rbw">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 55 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-17.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Solid Red/Black)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Solid Red/Black">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 56 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-18.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Solid White/Black)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Solid White/Black">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 57 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-19.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Solid Black/gold)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Solid Black/Gold">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 58 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-20.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Solid Salmon/Black)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Solid Salmon/Black">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 59 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-21.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Solid Gray/Black)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Solid Gray/Black">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 60 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-22.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Solid all Gray)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Solid all Gray">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 61 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-23.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Solid TP Rainbow)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Solid TP Rainbow">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 62 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-24.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Abstract Tp Gold)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Abstract Tp Gold">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 63 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-25.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Abstract TP Turquoise)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Abstract TP Turquoise">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 64 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-26.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (abstract TP Rainbow)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 abstract TP Rainbow">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 65 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-27.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (abstract Blue/White)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Abstarct Blue/White">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 66 -->
-    <div class="product-card" data-category="Coming-soon" data-brand="G-Shock">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/men/unknown.png" alt="gs-28.png">
-      </div>
-      <p class="brand">Brand: G-Shock</p>
-      <h3>GA2100 (Abstract Gray/Green)</h3>
-      <p class="details"> rubber, Complete With box & Paper bag, Grade Premium </p>
-      <p>Price: $35</p>
-      <p class="stock" data-stock="0"></p>
-      <a class="buy-btn whatsapp-product" data-product="G-Shock GA2100 Abstract Gray/Green">Buy via WhatsApp</a>
-    </div>
-
-  <!-- Product Card 67 -->
-    <div class="product-card" data-category="Defects" data-brand="Patek-Phillipe">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/defect/defect-1.PNG" alt="defect-1.png">
-      </div>
-      <p class="brand">Brand: Patek-Philippe</p>
-      <h3>Nautilus(Black)</h3>
-      <p class="details"> Complete With box, Grade A (Slight dent) </p>
-      <p>Price: $15</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="defect patek Philippe Nautilus Black ">Buy via WhatsApp</a>
-    </div>
-
-    <!-- Product Card 68 -->
-    <div class="product-card" data-category="Defects" data-brand="Michael-Kors">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/defect/defect-4.PNG" alt="defect-4.png">
-      </div>
-      <p class="brand">Brand: Michael-Kors</p>
-      <h3>Lexington (Bronze)</h3>
-      <p class="details"> Complete With box, Grade A (Slight dirty inside) </p>
-      <p>Price: $15</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="defect Michael Kors Lexington (bronze) ">Buy via WhatsApp</a>
-    </div>
-
-     <!-- Product Card 69 -->
-    <div class="product-card" data-category="Defects" data-brand="Franc-Muller">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/defect/defect-5.PNG" alt="defect-5.png">
-      </div>
-      <p class="brand">Brand: Franc-Muller</p>
-      <h3>Oalet (Black)</h3>
-      <p class="details"> Complete With box, Grade A (Scratch on the glass) </p>
-      <p>Price: $15</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="defect Franc Muller Oalet Black ">Buy via WhatsApp</a>
-    </div>
-
-     <!-- Product Card 70 -->
-    <div class="product-card" data-category="Defects" data-brand="Patek-Philippe">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/defect/defect-2.PNG" alt="defect-2.png">
-      </div>
-      <p class="brand">Brand: Patek-Philippe</p>
-      <h3>Nautilus(Blue)</h3>
-      <p class="details"> Complete With box, Grade A (Faded colour & Scratches) </p>
-      <p>Price: $15</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="defect patek Philippe Nautilus Blue ">Buy via WhatsApp</a>
-    </div>
-
-     <!-- Product Card 67 -->
-    <div class="product-card" data-category="Defects" data-brand="Audemars-Piguet">
-      <span class="badge new">New Arrival</span>
-      <div class="product-images">
-        <img src="images/defect/defect-3.PNG" alt="defect-3.png">
-      </div>
-      <p class="brand">Brand: Audemars-Piguet</p>
-      <h3>Royal Oak (White)</h3>
-      <p class="details"> Complete With box, Grade A (Faded color & Scratches) </p>
-      <p>Price: $15</p>
-      <p class="stock" data-stock="1"></p>
-      <a class="buy-btn whatsapp-product" data-product="defect Audemars Piguet royal oak (White) ">Buy via WhatsApp</a>
-    </div>
-  
-</section>
-
-<!-- ==========================
-       FOOTER
-=========================== -->
-<!-- ======= Footer ======= -->
-<footer>
-  <div class="footer-container">
-    <p>&copy; 2026 MIDBN Timepieces. All rights reserved.</p>
+<!-- INTRO -->
+<section id="intro" class="intro">
+  <div class="intro-content">
+    <h2>About MIDBN.Timepieces</h2>
+    <hr class="intro-divider">
     <p>
-      Follow us on 
-      <a href="https://instagram.com/@midbn_timepieces" target="_blank">Instagram</a> | 
-      <a href="https://tiktok.com/@_midbn" target="_blank">Tiktok</a>
+      At <strong>MIDBN.Timepieces</strong>, we bring <span class="highlight">timeless elegance</span> to your wrist.
+      Offering a curated selection of <span class="highlight">quality watches</span> for all ages, we combine style,
+      functionality, and affordability. Whether you’re looking for a <span class="highlight">classic design</span>,
+      a <span class="highlight">modern statement piece</span>, or a gift for someone special,
+      MIDBN.Timepieces has the perfect watch for every occasion. Your time, your style—elevated.
     </p>
+    <hr class="intro-divider">
   </div>
+</section>
+
+<!-- NEW ARRIVALS -->
+<section id="arrivals" class="arrivals">
+  <h2>New Arrivals</h2>
+  <div class="arrival-scroll">
+    <div>
+      <div class="arrival-card"><img src="images/watch1.JPG" alt="Watch 1"></div>
+      <p class="arrival-name">Nautilus Black</p>
+    </div>
+    <div>
+      <div class="arrival-card"><img src="images/watch2.JPG" alt="Watch 2"></div>
+      <p class="arrival-name">Oalet Black</p>
+    </div>
+    <div>
+      <div class="arrival-card"><img src="images/watch3.JPG" alt="Watch 3"></div>
+      <p class="arrival-name">Rolex Couple Green</p>
+    </div>
+    <div>
+      <div class="arrival-card"><img src="images/watch4.JPG" alt="Watch 4"></div>
+      <p class="arrival-name">Rolex Daytona Black</p>
+    </div>
+    <div>
+      <div class="arrival-card"><img src="images/watch5.JPG" alt="Watch 5"></div>
+      <p class="arrival-name">Franc Muller</p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="faq">
+  <div class="glass-card faq-card">
+    <h2>F.A.Q</h2>
+
+    <div class="faq-item">
+      <button class="faq-question">How To Place An Order With Us</button>
+      <div class="faq-answer">
+        Contact us through WhatsApp and we will guide you from there.
+        We will provide the details and information of the watches that you desire to grab.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">Warranty</button>
+      <div class="faq-answer">
+        We will provide 7 days warranty which includes battery and internal defect.
+        (Scratches, dents & water damage are not included.)
+        <br><br>
+        <strong>NOTE:</strong> Before handing the watch, we will ask you to inspect first.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">Service We Provide</button>
+      <div class="faq-answer">
+        Bracelet adjustment, battery replacement, gift wrapping & custom engraving.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">Delivery Fee</button>
+      <div class="faq-answer">
+        Brunei Delivery: BND 5 – 10 (depending on location)<br>
+        Self pickup available<br>
+        International shipping calculated separately
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- BRANDS -->
+<section id="brands" class="brands">
+  <h2>BRANDS</h2>
+  <div class="brand-scroll">
+    <div class="brand-card"><img src="images/men-1.png" alt="Rolex"><div class="brand-name">Rolex</div></div>
+    <div class="brand-card"><img src="images/men-2.png" alt="Omega"><div class="brand-name">Omega</div></div>
+    <div class="brand-card"><img src="images/men-3.png" alt="Casio"><div class="brand-name">Casio</div></div>
+    <div class="brand-card"><img src="images/men-7.png" alt="Cartier"><div class="brand-name">Cartier</div></div>
+    <div class="brand-card"><img src="images/men-8.png" alt="Patek Philippe"><div class="brand-name">Patek Philippe</div></div>
+    <div class="brand-card"><img src="images/men-9.png" alt="G-Shock"><div class="brand-name">G-Shock</div></div>
+    <div class="brand-card"><img src="images/women-1.png" alt="Swarovski"><div class="brand-name">Swarovski</div></div>
+    <div class="brand-card"><img src="images/women-2.png" alt="Franck Muller"><div class="brand-name">Franck Muller</div></div>
+    <div class="brand-card"><img src="images/women-3.png" alt="Audemars Piguet"><div class="brand-name">Audemars Piguet</div></div>
+    <div class="brand-card"><img src="images/couple-1.png" alt="Seiko"><div class="brand-name">Seiko</div></div>
+    <div class="brand-card"><img src="images/couple-2.png" alt="Michael Kors"><div class="brand-name">Michael Kors</div></div>
+  </div>
+</section>
+
+<!-- CATALOGUE CTA -->
+<section id="catalog" class="catalog">
+  <div class="catalog-content">
+    <h2>Explore Our Collection</h2>
+    <div style="height:30px;"></div>
+    <a href="products.html" class="catalog-btn">View Catalogue</a>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<!-- CONTACT - LUXURY UPGRADE -->
+<section class="contact-section">
+  <h2>Contact Us</h2>
+
+  <div class="contact-links">
+    <a href="https://instagram.com/YOURIG" target="_blank">
+      <img src="icons/instagram.svg" width="20" alt="Instagram"> Instagram
+    </a>
+    <a href="https://tiktok.com/@YOURTIKTOK" target="_blank">
+      <img src="icons/tiktok.svg" width="20" alt="TikTok"> TikTok
+    </a>
+    <a href="https://wa.me/673XXXXXXXX" target="_blank">
+      <img src="icons/whatsapp.svg" width="20" alt="WhatsApp"> WhatsApp
+    </a>
+  </div>
+
+  <form class="contact-form" action="#" method="POST">
+    <input type="text" name="name" placeholder="Your Name" required>
+    <input type="email" name="email" placeholder="Your Email" required>
+    <textarea name="message" placeholder="Your Message" required></textarea>
+    <button type="submit">Send Message</button>
+  </form>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>&copy; 2026 MIDBN.Timepieces. All rights reserved.</p>
 </footer>
 
-<!-- Footer Styles -->
-<style>
-  footer {
-    background-color: #111;
-    color: #fff;
-    text-align: center;
-    padding: 20px 10px;
-    margin-top: 30px;
-    font-size: 14px;
-  }
-
-  footer a {
-    color: #fff;
-    text-decoration: underline;
-    margin: 0 5px;
-  }
-
-  footer a:hover {
-    color: #ffcc00;
-  }
-
-  .footer-container {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-</style>
-  <!-- Add your footer content if any -->
-</footer>
-  
-<script>
-  // Hamburger toggle
-  const hamburger = document.getElementById('hamburger');
-  const navLinks = document.getElementById('navLinks');
-  hamburger.addEventListener('click', () => {
-    navLinks.classList.toggle('active');
-  });
-
-  // Brand filter toggle
-  const brandToggle = document.querySelector('.brand-toggle');
-  const brandMenu = document.querySelector('.filter-bar-vertical');
-  brandToggle.addEventListener('click', () => {
-    brandMenu.classList.toggle('show');
-  });
-
-  // Filter products by category
-  function filterProducts(category) {
-    const cards = document.querySelectorAll('.product-card');
-    cards.forEach(card => {
-      if(category === 'all' || card.dataset.category === category) {
-        card.style.display = 'block';
-      } else {
-        card.style.display = 'none';
-      }
-    });
-  }
-
-  // Filter products by brand
-  const brandButtons = document.querySelectorAll('.brand-btn');
-  brandButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const brand = btn.dataset.brand;
-      const cards = document.querySelectorAll('.product-card');
-      cards.forEach(card => {
-        if(brand === 'all' || card.dataset.brand === brand) {
-          card.style.display = 'block';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-    });
-  });
-
-  // Search products
-  const searchInput = document.getElementById('productSearch');
-  searchInput.addEventListener('input', () => {
-    const query = searchInput.value.toLowerCase();
-    const cards = document.querySelectorAll('.product-card');
-    cards.forEach(card => {
-      const title = card.querySelector('h3').textContent.toLowerCase();
-      if(title.includes(query)) {
-        card.style.display = 'block';
-      } else {
-        card.style.display = 'none';
-      }
-    });
-  });
-
-  // Sort by stock
-  const sortStock = document.getElementById('sortStock');
-  sortStock.addEventListener('change', () => {
-    const cards = Array.from(document.querySelectorAll('.product-card'));
-    if(sortStock.value === 'instock') {
-      cards.sort((a, b) => b.dataset.stock - a.dataset.stock);
-    }
-    const grid = document.querySelector('.product-grid');
-    grid.innerHTML = '';
-    cards.forEach(card => grid.appendChild(card));
-  });
-
-  // WhatsApp buy button
-  const whatsappBtns = document.querySelectorAll('.whatsapp-product');
-  whatsappBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const product = btn.dataset.product;
-      const url = `https://wa.me/6738908960?text=Hello,%20I%20want%20to%20buy%20${encodeURIComponent(product)}`;
-      window.open(url, '_blank');
-    });
-  });
-
-  // Display stock status
-  const stockElements = document.querySelectorAll('.stock');
-  stockElements.forEach(el => {
-    const stock = parseInt(el.dataset.stock);
-    if(stock > 0) {
-      el.textContent = `In Stock: ${stock}`;
-      el.style.color = 'green';
-    } else {
-      el.textContent = 'Out of Stock';
-      el.style.color = 'red';
-    }
-  });
-</script>
+<script src="script.js"></script>
 </body>
 </html>
