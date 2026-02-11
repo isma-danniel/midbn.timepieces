@@ -79,19 +79,30 @@ body{
   box-shadow: 0 0 8px rgba(220,251,255,0.35);
 }
 
-/* ===== FILTER PANEL ===== */
+/* ===== FILTER PANEL (FIX TOP GAP) ===== */
 .filters{
   background:var(--panel);
-  padding:16px;
-  border-bottom:1px solid rgba(220,251,255,.15);
   display:flex;
   flex-direction:column;
   gap:12px;
+
+  /* CLOSED STATE = NO GAP */
   max-height:0;
+  padding:0;
+  border-bottom:0;
   overflow:hidden;
-  transition:max-height .35s ease;
+
+  transition:
+    max-height .35s ease,
+    padding .25s ease,
+    border-bottom-color .25s ease;
 }
-.filters.active{max-height:700px;}
+.filters.active{
+  max-height:700px;
+  padding:16px;
+  border-bottom:1px solid rgba(220,251,255,.15);
+}
+
 .filters input,
 .filters select{
   width:100%;
@@ -184,30 +195,9 @@ body{
   filter:brightness(1.15);
 }
 
-/* ===== FLOATING IMAGE ADD BUTTON ===== */
-.img-addcart{
-  position:absolute;
-  bottom:14px;
-  right:14px;
-  padding:7px 12px;
-  font-size:12px;
-  border-radius:14px;
-  border:1px solid rgba(220,251,255,.55);
-  background:rgba(13,15,16,.75);
-  color:var(--primary);
-  backdrop-filter:blur(10px);
-  cursor:pointer;
-  transition:.2s;
-  z-index:5;
-}
-.img-addcart:hover{
-  background:rgba(220,251,255,.12);
-  box-shadow:0 0 14px rgba(220,251,255,.35);
-}
-.img-addcart:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-}
+/* ✅ REMOVE “+ Add” ON CARD (KEEP MODAL ADD) */
+.img-addcart{ display:none !important; }      /* removes the +Add button on card image */
+.card-buttons{ display:none !important; }    /* removes any old button row if still present */
 
 /* ===== LABEL ===== */
 .label{
@@ -340,7 +330,7 @@ body{
   cursor:not-allowed;
 }
 
-/* ===== “ADDED” CLEAN (NO GREEN BLOCK) ===== */
+/* ===== “ADDED” CLEAN ===== */
 .modal-addcart.added{
   background: rgba(220,251,255,0.15) !important;
   border-color: rgba(220,251,255,0.65) !important;
