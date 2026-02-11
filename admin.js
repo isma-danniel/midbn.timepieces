@@ -1,55 +1,122 @@
-// ✅ Put YOUR Apps Script /exec URL here (same one your products page uses)
-const API = "PASTE_YOUR_APPS_SCRIPT_EXEC_URL_HERE";
+// ===============================
+// CONFIG
+// ===============================
+const API = "https://script.google.com/macros/s/AKfycbzLO0s0zhXDIAJ4oVyd0GNLoXqiP2lzohaIfsY9-kluiVBvljmY8G4KlbK_-aUqhApz9w/exec";
+const ADMIN_TOKEN = "kirah1211"; // must match Code.gs
 
-const rowsEl = document.getElementById("rows");
-const searchEl = document.getElementById("search");
-const statusText = document.getElementById("statusText");
-const refreshBtn = document.getElementById("refreshBtn");
-const saveBtn = document.getElementById("saveBtn");
-const adminKeyEl = document.getElementById("adminKey");
+// ===============================
+// DOM
+// ===============================
+const adminBody = document.getElementById("adminBody");
+const searchAdmin = document.getElementById("searchAdmin");
+const reloadBtn = document.getElementById("reloadBtn");
+const saveAllBtn = document.getElementById("saveAllBtn");
 
 let allProducts = [];
-let dirtyMap = new Map(); // id -> {id, price, stock, name?}
 
-function setStatus(msg){ statusText.textContent = msg; }
+// ===============================
+// LOAD
+// ===============================
+async function loadProducts(){
+  adminBody.innerHTML = `<tr><td colspan="5" class="muted">Loading...</td></tr>`;
 
-async function fetchProducts(){
-  setStatus("Loading products...");
-  const res = await fetch(API, { method:"GET" });
-  const data = await res.json();
-  if(!Array.isArray(data)) throw new Error("API returned not an array");
-  allProducts = data;
+  try{
+    const res = await fetch(API, { method: "GET" });
+    const data = await res.json();
 
-  // ✅ prioritize in-stock first (your request #3)
-  allProducts.sort((a,b)=> Number(b.stock||0) - Number(a.stock||0));
+    if(!Array.isArray(data)) throw new Error("API not returning array");
+    allProducts = data;
 
-  renderTable(allProducts);
-  setStatus(`Loaded ${allProducts.length} products`);
+    renderAdmin(allProducts);
+  }catch(e){
+    adminBody.innerHTML = `<tr><td colspan="5" class="muted">Failed to load. Check deployment access (Anyone) + Products sheet headers.</td></tr>`;
+  }
 }
 
-function renderTable(list){
-  rowsEl.innerHTML = "";
+function renderAdmin(list){
+  const q = (searchAdmin.value || "").toLowerCase().trim();
+  const filtered = !q ? list : list.filter(p => String(p.name || "").toLowerCase().includes(q));
 
-  list.forEach(p=>{
+  adminBody.innerHTML = "";
+
+  filtered.forEach(p=>{
     const tr = document.createElement("tr");
 
-    const stockNum = Number(p.stock||0);
-    const liveBadge = stockNum > 0
-      ? `<span class="badge">In stock</span>`
-      : `<span class="badge out">Out</span>`;
-
     tr.innerHTML = `
-      <td><strong>${p.id}</strong></td>
+      <td>${p.id}</td>
       <td>${escapeHtml(p.name || "")}</td>
-      <td><input class="cell-input" data-field="price" data-id="${p.id}" type="number" step="0.01" value="${Number(p.price||0)}"></td>
-      <td><input class="cell-input" data-field="stock" data-id="${p.id}" type="number" step="1" value="${stockNum}"></td>
-      <td>${liveBadge}</td>
+      <td><input class="cell-input price" type="number" step="0.01" value="${Number(p.price || 0)}"></td>
+      <td><input class="cell-input stock" type="number" step="1" value="${Number(p.stock || 0)}"></td>
+      <td><button class="row-btn">Save</button></td>
     `;
 
-    rowsEl.appendChild(tr);
+    tr.querySelector(".row-btn").addEventListener("click", async ()=>{
+      const price = Number(tr.querySelector(".price").value);
+      const stock = Number(tr.querySelector(".stock").value);
+
+      const ok = await saveItems([{ id: p.id, price, stock }]);
+      if(ok){
+        const btn = tr.querySelector(".row-btn");
+        btn.textContent = "Saved ✓";
+        setTimeout(()=> btn.textContent = "Save", 800);
+      }
+    });
+
+    adminBody.appendChild(tr);
   });
+
+  if(filtered.length === 0){
+    adminBody.innerHTML = `<tr><td colspan="5" class="muted">No match.</td></tr>`;
+  }
 }
 
+// ===============================
+// SAVE
+// ===============================
+async function saveItems(items){
+  try{
+    const res = await fetch(API, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        type: "admin_update",
+        token: ADMIN_TOKEN,
+        items
+      })
+    });
+
+    const out = await res.json();
+    if(out.status !== "success"){
+      alert(out.message || "Save failed");
+      return false;
+    }
+    return true;
+  }catch(e){
+    alert("Save failed (network/API).");
+    return false;
+  }
+}
+
+saveAllBtn.addEventListener("click", async ()=>{
+  const rows = Array.from(adminBody.querySelectorAll("tr"));
+
+  const items = rows.map(r=>{
+    const id = Number(r.children[0].textContent.trim());
+    const price = Number(r.querySelector(".price")?.value || 0);
+    const stock = Number(r.querySelector(".stock")?.value || 0);
+    return { id, price, stock };
+  }).filter(x => Number.isFinite(x.id));
+
+  const ok = await saveItems(items);
+  if(ok) alert("Saved all ✅");
+});
+
+reloadBtn.addEventListener("click", loadProducts);
+searchAdmin.addEventListener("input", ()=>renderAdmin(allProducts));
+
+// ===============================
+// UTIL
+// ===============================
 function escapeHtml(str){
   return String(str)
     .replaceAll("&","&amp;")
@@ -59,83 +126,5 @@ function escapeHtml(str){
     .replaceAll("'","&#039;");
 }
 
-// Track edits
-document.addEventListener("input", (e)=>{
-  const inp = e.target.closest(".cell-input");
-  if(!inp) return;
-
-  const id = inp.dataset.id;
-  const field = inp.dataset.field;
-  const val = inp.value;
-
-  const existing = dirtyMap.get(id) || { id:Number(id) };
-  existing[field] = field === "price" ? Number(val) : Number(val);
-  dirtyMap.set(id, existing);
-
-  setStatus(`Unsaved changes: ${dirtyMap.size}`);
-});
-
-function applySearch(){
-  const q = (searchEl.value||"").toLowerCase().trim();
-  if(!q){
-    renderTable(allProducts);
-    return;
-  }
-  const filtered = allProducts.filter(p=>{
-    const idMatch = String(p.id).includes(q);
-    const nameMatch = String(p.name||"").toLowerCase().includes(q);
-    return idMatch || nameMatch;
-  });
-  renderTable(filtered);
-}
-
-searchEl.addEventListener("input", applySearch);
-
-refreshBtn.addEventListener("click", async ()=>{
-  dirtyMap.clear();
-  await fetchProducts();
-});
-
-saveBtn.addEventListener("click", async ()=>{
-  const key = adminKeyEl.value.trim();
-  if(!key){
-    alert("Enter admin key first.");
-    return;
-  }
-  if(dirtyMap.size === 0){
-    alert("No changes to save.");
-    return;
-  }
-
-  const updates = Array.from(dirtyMap.values());
-
-  setStatus("Saving...");
-  const res = await fetch(API, {
-    method:"POST",
-    headers: { "Content-Type":"application/json" },
-    body: JSON.stringify({
-      type: "admin_update",
-      key,
-      updates
-    })
-  });
-
-  const out = await res.json();
-  if(out.status !== "success"){
-    console.log(out);
-    alert(out.message || "Save failed");
-    setStatus("Save failed");
-    return;
-  }
-
-  dirtyMap.clear();
-  await fetchProducts();
-  alert("Saved ✅");
-});
-
-// init
-fetchProducts().catch(err=>{
-  console.error(err);
-  setStatus("Failed to load (check API URL / deployment / sheet headers)");
-  alert("Failed to load products. Check console.");
-});
+// boot
+loadProducts();
