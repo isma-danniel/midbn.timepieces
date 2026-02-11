@@ -3,7 +3,7 @@
 // ==========================================
 
 // ✅ Your Apps Script endpoint (optional for live stock/price)
-const API = "https://script.google.com/macros/s/AKfycbxfJM507scVm6CCksF7DI7pAb2EKE8tcVO4p--4H9sre1G10HQZTA7J4Rwcx3wN3yq7/exec";
+const API = "https://script.google.com/macros/s/AKfycbxQAANX3EZIqkXryd4xgudSxo8mx-7WTcT8KdgA8C4Rm5VnQcYXoCDnmaggPzD7BQGD/exec";
 
 // ==========================================
 // PRODUCT DATA (YOUR REAL PRODUCTS)
