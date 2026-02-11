@@ -1,5 +1,9 @@
 // ==========================================
-// CHECKOUT.JS (FULL) - MIDBN Glass + Apple stepper + Stock limit
+// CHECKOUT.JS (FULL) - MIDBN Glass + Apple stepper + Stock limit + iOS Safari fix
+// Notes:
+// - Uses your CSS classes (cart-left/right, qty-controls, qty-btn, remove-btn)
+// - Stock limit supported if item has stock/available/inventory/maxStock/max/remaining
+// - IMPORTANT: Uses text/plain to avoid iOS/Safari CORS preflight issues with Apps Script
 // ==========================================
 
 const API =
@@ -29,14 +33,19 @@ function getQty(item) {
   return Math.max(1, toNumber(q));
 }
 function setQty(item, qty) {
-  // keep both in sync if either exists
   item.qty = qty;
   if ("quantity" in item) item.quantity = qty;
 }
 
 // Stock field compatibility (stock / available / inventory / maxStock)
 function getStock(item) {
-  const s = item.stock ?? item.available ?? item.inventory ?? item.maxStock ?? item.max ?? item.remaining;
+  const s =
+    item.stock ??
+    item.available ??
+    item.inventory ??
+    item.maxStock ??
+    item.max ??
+    item.remaining;
   const n = toNumber(s);
   return n > 0 ? n : Infinity; // if no stock value, treat as unlimited
 }
@@ -51,6 +60,32 @@ function calcTotal() {
     const price = toNumber(it.price);
     return sum + price * qty;
   }, 0);
+}
+
+function escapeHtml(str) {
+  return String(str ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+// iOS/Safari-friendly POST to Apps Script (avoid CORS preflight)
+function postToAPI(payload) {
+  return fetch(API, {
+    method: "POST",
+    redirect: "follow",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload),
+  }).then(async (res) => {
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      throw new Error("Server returned non-JSON: " + text.slice(0, 160));
+    }
+  });
 }
 
 // -------------------- Render --------------------
@@ -74,7 +109,7 @@ function renderCart() {
     const minusDisabled = qty <= 1;
     const plusDisabled = qty >= stock;
 
-    // MIDBN style: show only when meaningful
+    // show only when meaningful
     let stockHint = "";
     if (stock !== Infinity) {
       if (stock <= 3) stockHint = ` • Only ${stock} left`;
@@ -126,15 +161,6 @@ function renderCart() {
   });
 
   if (cartTotalEl) cartTotalEl.innerText = formatBND(calcTotal());
-}
-
-function escapeHtml(str) {
-  return String(str ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
 }
 
 renderCart();
@@ -205,32 +231,22 @@ checkoutForm.addEventListener("submit", (e) => {
 
   const totalText = cartTotalEl ? cartTotalEl.innerText : "BND 0";
 
-  // MIDBN feel: lock the button during submit
   if (placeOrderBtn) {
     placeOrderBtn.disabled = true;
     placeOrderBtn.textContent = "Processing…";
   }
 
   // 1) SAVE ORDER
-  fetch(API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      type: "order",
-      cart,
-      total: totalText,
-      customer: { name, phone, address, payment }
-    })
+  postToAPI({
+    type: "order",
+    cart,
+    total: totalText,
+    customer: { name, phone, address, payment },
   })
-    .then((res) => res.json())
     .then((orderRes) => {
       if (orderRes.status === "success") {
-        // 2) DEDUCT STOCK
-        fetch(API, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "stock", cart })
-        });
+        // 2) DEDUCT STOCK (fire-and-forget)
+        postToAPI({ type: "stock", cart }).catch(console.error);
 
         // Save summary for success.html
         localStorage.setItem(
@@ -239,7 +255,7 @@ checkoutForm.addEventListener("submit", (e) => {
             orderId: orderRes.orderId,
             customer: { name, phone, address, payment },
             cart,
-            total: totalText
+            total: totalText,
           })
         );
 
@@ -248,7 +264,7 @@ checkoutForm.addEventListener("submit", (e) => {
 
         window.location.href = "success.html";
       } else {
-        alert("Failed to place order, try again!");
+        alert("Failed to place order: " + (orderRes.message || "Try again"));
         if (placeOrderBtn) {
           placeOrderBtn.disabled = false;
           placeOrderBtn.textContent = "Place Order";
@@ -257,7 +273,7 @@ checkoutForm.addEventListener("submit", (e) => {
     })
     .catch((err) => {
       console.error(err);
-      alert("Error connecting to server. Try again.");
+      alert("Error connecting to server: " + err.message);
       if (placeOrderBtn) {
         placeOrderBtn.disabled = false;
         placeOrderBtn.textContent = "Place Order";
