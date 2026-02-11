@@ -1,77 +1,58 @@
-// ===== GOOGLE APPS SCRIPT WEB APP (MUST BE /exec) =====
-const API = "https://script.google.com/macros/s/AKfycbwzKvHmOeestXmMxg-_mQitkAELdSSxZdz1TMTnSUABdmZu7YenCD2zLDBESHV5wBbX/exec";
+// ==========================================
+// CHECKOUT.JS (FULL)
+// ==========================================
+
+const API = "https://script.google.com/macros/s/AKfycbwPTwgGLqGy75TQ8fY9E-pyKoncCVmbs6BJdzZzfgGBRXv4OKTgLbJaBJ3hB4ZfW2rd/exec"; 
+// ^ replace with your latest Apps Script URL if you changed it
 
 const cartItemsContainer = document.getElementById("cartItems");
-
-// IMPORTANT: your HTML uses <div class="cart-total">BND 0</div>
-// so we must select it like this (NOT getElementById)
-const cartTotalEl = document.querySelector(".cart-total");
+// IMPORTANT: your HTML must have id="cartTotal" on the total element
+const cartTotal = document.getElementById("cartTotal");
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-// ---------- helpers ----------
-function money(n) {
-  return "BND " + Number(n || 0).toFixed(2);
-}
-
-async function postToScript(payload) {
-  // ✅ NO "Content-Type: application/json" header -> avoids CORS preflight
-  const res = await fetch(API, {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
-
-  // Sometimes Apps Script returns HTML when not deployed correctly
-  const text = await res.text();
-
-  let data;
-  try {
-    data = JSON.parse(text);
-  } catch (e) {
-    throw new Error("API returned non-JSON (deploy/permission issue). Response: " + text.slice(0, 120));
-  }
-
-  return data;
-}
-
-// ---------- render cart ----------
+// ===============================
+// RENDER CART
+// ===============================
 function renderCart() {
   cartItemsContainer.innerHTML = "";
 
-  if (!cart.length) {
+  if (cart.length === 0) {
     cartItemsContainer.innerHTML = `<p style="opacity:.6;text-align:center">Your cart is empty</p>`;
-    cartTotalEl.textContent = money(0);
+    if (cartTotal) cartTotal.innerText = "BND 0";
     return;
   }
 
   let total = 0;
 
-  cart.forEach((item) => {
-    const line = Number(item.price) * Number(item.qty);
-    total += line;
+  cart.forEach(item => {
+    const qty = Number(item.qty || 0);
+    const price = Number(item.price || 0);
+    total += price * qty;
 
     cartItemsContainer.innerHTML += `
       <div class="cart-item">
         <div>
           <strong>${item.name}</strong><br>
-          <small>Qty: ${item.qty}</small>
+          <small>Qty: ${qty}</small>
         </div>
-        <div>${money(line)}</div>
+        <div>BND ${(price * qty).toFixed(2)}</div>
       </div>
     `;
   });
 
-  cartTotalEl.textContent = money(total);
+  if (cartTotal) cartTotal.innerText = "BND " + total.toFixed(2);
 }
 
 renderCart();
 
-// ---------- checkout submit ----------
-document.getElementById("checkoutForm").addEventListener("submit", async function (e) {
+// ===============================
+// CHECKOUT FORM SUBMIT
+// ===============================
+document.getElementById("checkoutForm").addEventListener("submit", function (e) {
   e.preventDefault();
 
-  cart = JSON.parse(localStorage.getItem("cart")) || [];
-  if (!cart.length) {
+  if (cart.length === 0) {
     alert("Your cart is empty!");
     return;
   }
@@ -81,34 +62,51 @@ document.getElementById("checkoutForm").addEventListener("submit", async functio
   const address = document.getElementById("address").value.trim();
   const payment = document.getElementById("payment").value;
 
-  const total = cartTotalEl.textContent;
+  // This is what your Apps Script will store as total (string)
+  const total = cartTotal ? cartTotal.innerText : "BND 0";
 
-  try {
-    // 1) Save order
-    const orderRes = await postToScript({
+  // 1) SAVE ORDER
+  fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
       type: "order",
       cart,
       total,
-      customer: { name, phone, address, payment },
+      customer: { name, phone, address, payment }
+    })
+  })
+    .then(res => res.json())
+    .then(orderRes => {
+      if (orderRes.status === "success") {
+
+        // 2) DEDUCT STOCK
+        fetch(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "stock", cart })
+        });
+
+        // ✅ SAVE ORDER SUMMARY FOR success.html
+        localStorage.setItem("lastOrder", JSON.stringify({
+          orderId: orderRes.orderId,
+          customer: { name, phone, address, payment },
+          cart: cart,
+          total: total
+        }));
+
+        // ✅ CLEAR CART
+        localStorage.removeItem("cart");
+
+        // ✅ GO TO SUCCESS PAGE
+        window.location.href = "success.html";
+
+      } else {
+        alert("Failed to place order, try again!");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error connecting to server. Try again.");
     });
-
-    if (orderRes.status !== "success") {
-      throw new Error("Order failed: " + JSON.stringify(orderRes));
-    }
-
-    // 2) Deduct stock (don’t block user if this step is slow)
-    postToScript({ type: "stock", cart }).catch(() => {});
-
-    alert(`Order placed successfully!\nOrder ID: ${orderRes.orderId}`);
-
-    localStorage.removeItem("cart");
-    window.location.href = "products.html";
-  } catch (err) {
-    console.error(err);
-    alert(
-      "Stock system is unreachable right now.\n" +
-      "Please try again in a moment.\n\n" +
-      "(If it keeps happening: your Apps Script web app is not deployed for public POST.)"
-    );
-  }
 });
