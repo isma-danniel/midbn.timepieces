@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MIDBN | Checkout</title>
+
+  <link rel="stylesheet" href="style-products.css" />
+  <link rel="stylesheet" href="checkout.css" />
+</head>
+<body>
+
+  <header class="header">
+    <a href="products.html" class="logo">← Products</a>
+  </header>
+
+  <div id="particleContainer"></div>
+
+  <h2 class="checkout-title">Checkout</h2>
+
+  <div class="checkout-container">
+
+    <!-- CART -->
+    <div class="cart-section">
+      <div class="cart-head">
+        <h3>Your Cart</h3>
+        <button id="clearCartBtn" class="ghost-btn" type="button">Clear</button>
+      </div>
+
+      <div id="cartItems"></div>
+      <div id="cartTotal" class="cart-total">BND 0.00</div>
+    </div>
+
+    <!-- FORM -->
+    <div class="form-section">
+      <h3>Customer Details</h3>
+
+      <form id="checkoutForm" class="checkout-form">
+        <input type="text" id="name" placeholder="Full Name" required />
+        <input type="text" id="phone" placeholder="Phone Number" required />
+        <textarea id="address" placeholder="Delivery Address" required></textarea>
+
+        <select id="payment" required>
+          <option value="">Select Payment Method</option>
+          <option value="Cash">Cash</option>
+          <option value="Bank Transfer">Bank Transfer</option>
+        </select>
+
+        <button id="placeOrderBtn" type="submit">Place Order</button>
+        <p class="order-hint">Stock will be deducted after order is saved.</p>
+      </form>
+    </div>
+
+  </div>
+
+  <script src="checkout.js"></script>
+</body>
+</html>
