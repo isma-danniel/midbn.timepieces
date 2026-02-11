@@ -3,16 +3,11 @@
 // ==========================================
 
 // ✅ Your Apps Script endpoint (optional for live stock/price)
-// If your API is working, it will override price/stock by product id.
 const API = "https://script.google.com/macros/s/AKfycbwPTwgGLqGy75TQ8fY9E-pyKoncCVmbs6BJdzZzfgGBRXv4OKTgLbJaBJ3hB4ZfW2rd/exec";
 
 // ==========================================
 // PRODUCT DATA (YOUR REAL PRODUCTS)
-// id must be unique + stable for stock sync
-// category values: mens | womens | couple | promo | coming
-// grade values: A | B | C | Premium
 // ==========================================
-
 const products = [
   // ===== MEN (Rolex) =====
   {id:1,  name:"Daytona (Black/Gold)", brand:"Rolex", category:"mens", grade:"A", price:25, stock:0, label:"NEW", img:"images/men/men-1.png", details:"Quartz, stainless steel case, men watch, Grade A"},
@@ -170,9 +165,6 @@ function renderProducts(list){
       <img src="${p.img}" alt="${p.name}">
       ${p.label ? `<div class="label">${p.label}</div>` : ""}
 
-      <!-- FLOATING ADD BUTTON ON IMAGE -->
-      <button class="img-addcart" data-id="${p.id}" type="button">+ Add</button>
-
       <div class="card-body">
         <div class="brand">${p.brand}</div>
         <div class="name product-name">${p.name}</div>
@@ -189,13 +181,6 @@ function renderProducts(list){
       openQuickView(p);
     });
 
-    // Disable add if stock 0
-    const addBtn = card.querySelector(".img-addcart");
-    if(Number(p.stock) <= 0){
-      addBtn.disabled = true;
-      addBtn.textContent = "Out";
-    }
-
     productGrid.appendChild(card);
   });
 }
@@ -203,6 +188,13 @@ function renderProducts(list){
 // ==========================================
 // FILTER + SORT
 // ==========================================
+function inStockFirstComparator(a, b){
+  const aIn = Number(a.stock) > 0 ? 1 : 0;
+  const bIn = Number(b.stock) > 0 ? 1 : 0;
+  if (aIn !== bIn) return bIn - aIn; // in-stock first
+  return 0;
+}
+
 function filterSortProducts(){
   let filtered = products.filter(p=>{
     const q = (searchInput.value || "").toLowerCase().trim();
@@ -221,10 +213,24 @@ function filterSortProducts(){
     return searchMatch && brandMatch && categoryMatch && gradeMatch && minMatch && maxMatch;
   });
 
-  // Sorting
-  if(sortSelect.value === "az") filtered.sort((a,b)=> a.name.localeCompare(b.name));
-  if(sortSelect.value === "priceLow") filtered.sort((a,b)=> Number(a.price) - Number(b.price));
-  if(sortSelect.value === "inStock") filtered.sort((a,b)=> Number(b.stock) - Number(a.stock));
+  // ✅ ALWAYS in-stock first (default)
+  filtered.sort(inStockFirstComparator);
+
+  // User sorting (still keeps in-stock first as priority)
+  if(sortSelect.value === "az"){
+    filtered.sort((a,b)=>{
+      const pri = inStockFirstComparator(a,b);
+      if(pri !== 0) return pri;
+      return a.name.localeCompare(b.name);
+    });
+  }
+  if(sortSelect.value === "priceLow"){
+    filtered.sort((a,b)=>{
+      const pri = inStockFirstComparator(a,b);
+      if(pri !== 0) return pri;
+      return Number(a.price) - Number(b.price);
+    });
+  }
 
   renderProducts(filtered);
 }
@@ -274,7 +280,7 @@ window.addEventListener("click", (e)=>{
 });
 
 // ==========================================
-// ADD TO CART (with LIVE STOCK CHECK if API works)
+// LIVE API SAFE FETCH
 // ==========================================
 async function getLiveProductsSafe(){
   try{
@@ -288,6 +294,9 @@ async function getLiveProductsSafe(){
   }
 }
 
+// ==========================================
+// ADD TO CART (ONLY FROM MODAL NOW)
+// ==========================================
 async function addToCart(id, name, price){
   // Try live stock check first
   const live = await getLiveProductsSafe();
@@ -315,29 +324,6 @@ async function addToCart(id, name, price){
   localStorage.setItem("cart", JSON.stringify(cart));
 }
 
-// Floating image add button
-document.addEventListener("click", async (e)=>{
-  const btn = e.target.closest(".img-addcart");
-  if(!btn) return;
-
-  const card = btn.closest(".product-card");
-  const id = btn.dataset.id;
-
-  const name = card.querySelector(".product-name")?.textContent?.trim() || "Item";
-  const priceText = card.querySelector(".price")?.textContent || "BND 0";
-  const price = Number(priceText.replace("BND","").trim()) || 0;
-
-  await addToCart(id, name, price);
-
-  // subtle feedback (no green block)
-  btn.textContent = "Added";
-  btn.style.opacity = "0.85";
-  setTimeout(()=>{
-    btn.textContent = "+ Add";
-    btn.style.opacity = "";
-  }, 700);
-});
-
 // Modal add
 if(modalAddCart){
   modalAddCart.addEventListener("click", async ()=>{
@@ -364,14 +350,16 @@ if(modalAddCart){
 // ==========================================
 // CHECKOUT BUTTON
 // ==========================================
-goCheckoutBottom.addEventListener("click", ()=>{
-  const cartNow = JSON.parse(localStorage.getItem("cart")) || [];
-  if(cartNow.length === 0){
-    alert("Your cart is empty!");
-    return;
-  }
-  window.location.href = "checkout.html";
-});
+if(goCheckoutBottom){
+  goCheckoutBottom.addEventListener("click", ()=>{
+    const cartNow = JSON.parse(localStorage.getItem("cart")) || [];
+    if(cartNow.length === 0){
+      alert("Your cart is empty!");
+      return;
+    }
+    window.location.href = "checkout.html";
+  });
+}
 
 // ==========================================
 // WATERFALL PARTICLES
@@ -407,13 +395,12 @@ spawnParticles();
 window.addEventListener("resize", spawnParticles);
 
 // ==========================================
-// OPTIONAL: LIVE STOCK/PPRICE OVERRIDE ON LOAD
+// LIVE STOCK/PRICE OVERRIDE ON LOAD
 // ==========================================
 (async function applyLiveStock(){
   const live = await getLiveProductsSafe();
   if(!live) return;
 
-  // Update your local array
   live.forEach(lp=>{
     const local = products.find(p=> String(p.id) === String(lp.id));
     if(!local) return;
@@ -421,6 +408,6 @@ window.addEventListener("resize", spawnParticles);
     if(lp.stock != null) local.stock = Number(lp.stock);
   });
 
-  // Re-render with latest filters
+  // ✅ re-render + keep in-stock first
   filterSortProducts();
 })();
