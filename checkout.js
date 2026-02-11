@@ -1,5 +1,5 @@
 // ===== GOOGLE APPS SCRIPT WEB APP (MUST BE /exec) =====
-const API = "https://script.google.com/macros/s/AKfycbw7dpFfhktww2Y9hzxVfgGCKIzUSrZLS3suMIF9f6IB3r3gIC1JNVspmTSCBjzbOGuT5A/exec";
+const API = "https://script.google.com/macros/s/AKfycbxfJM507scVm6CCksF7DI7pAb2EKE8tcVO4p--4H9sre1G10HQZTA7J4Rwcx3wN3yq7/exec";
 
 const cartItemsContainer = document.getElementById("cartItems");
 
