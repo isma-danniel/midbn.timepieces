@@ -1,171 +1,127 @@
-const SPREADSHEET_ID = "10LuGs69-xFYm-xh0M2abzCAfxrClL0dXmOwpu5-Sd7M";
-const SHEET_PRODUCTS = "Products";
-const SHEET_ORDERS = "Orders";
-
-// ✅ change this (keep it secret)
-const ADMIN_KEY = "kirah1211";
-
-function ss() {
-  return SpreadsheetApp.openById(SPREADSHEET_ID);
-}
-
-function jsonOut(obj) {
-  return ContentService
-    .createTextOutput(JSON.stringify(obj))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeader("Access-Control-Allow-Origin", "*")
-    .setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
-    .setHeader("Access-Control-Allow-Headers", "Content-Type");
-}
-
-function doOptions() {
-  return jsonOut({ ok: true });
-}
-
-function doGet() {
-  const sheet = ss().getSheetByName(SHEET_PRODUCTS);
-  if (!sheet) return jsonOut({ status: "error", message: "Missing sheet: Products" });
-
-  const values = sheet.getDataRange().getValues();
-  if (values.length < 2) return jsonOut([]);
-
-  const headers = values[0].map(h => String(h).trim());
-  const rows = values.slice(1);
-
-  const products = rows
-    .filter(r => r.some(v => v !== "" && v != null))
-    .map(r => {
-      const o = {};
-      headers.forEach((h, i) => (o[h] = r[i]));
-      o.id = Number(o.id);
-      o.price = Number(o.price);
-      o.stock = Number(o.stock);
-      return o;
-    });
-
-  return jsonOut(products);
-}
-
-function doPost(e) {
-  const payload = JSON.parse((e && e.postData && e.postData.contents) || "{}");
-  const book = ss();
-
-  // =========================
-  // 1) SAVE ORDER
-  // =========================
-  if (payload.type === "order") {
-    const sheet = book.getSheetByName(SHEET_ORDERS);
-    if (!sheet) return jsonOut({ status: "error", message: "Missing sheet: Orders" });
-
-    const orderId = "ORD" + Date.now();
-    const c = payload.customer || {};
-    const cart = payload.cart || [];
-
-    sheet.appendRow([
-      orderId,
-      new Date(),
-      c.name || "",
-      c.phone || "",
-      c.address || "",
-      c.payment || "",
-      JSON.stringify(cart),
-      payload.total || ""
-    ]);
-
-    return jsonOut({ status: "success", orderId });
-  }
-
-  // =========================
-  // 2) DEDUCT STOCK
-  // =========================
-  if (payload.type === "stock") {
-    const sheet = book.getSheetByName(SHEET_PRODUCTS);
-    if (!sheet) return jsonOut({ status: "error", message: "Missing sheet: Products" });
-
-    const values = sheet.getDataRange().getValues();
-    if (values.length < 2) return jsonOut({ status: "error", message: "No product rows" });
-
-    const headers = values[0].map(h => String(h).trim().toLowerCase());
-    const idCol = headers.indexOf("id");
-    const stockCol = headers.indexOf("stock");
-    if (idCol === -1 || stockCol === -1) {
-      return jsonOut({ status: "error", message: "Products headers must include: id, stock" });
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MIDBN Admin - Stock Dashboard</title>
+  <link rel="stylesheet" href="style-products.css">
+  <style>
+    .admin-wrap{max-width:1100px;margin:0 auto;padding:16px;}
+    .admin-head{
+      display:flex;gap:10px;align-items:center;justify-content:space-between;
+      margin:8px 0 14px 0;
     }
-
-    const idToRow = {};
-    for (let r = 1; r < values.length; r++) {
-      const pid = String(values[r][idCol]);
-      if (pid) idToRow[pid] = r + 1; // 1-based
+    .admin-head h2{font-size:16px;color:var(--primary);margin:0;}
+    .admin-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .admin-actions input{
+      padding:10px 12px;border-radius:12px;border:1px solid rgba(220,251,255,.18);
+      background:rgba(255,255,255,.06);color:var(--text);outline:none;
     }
-
-    const cart = payload.cart || [];
-    const updates = [];
-
-    cart.forEach(item => {
-      const pid = String(item.id);
-      const qty = Number(item.qty || 0);
-      const row = idToRow[pid];
-      if (!row || qty <= 0) return;
-
-      const cell = sheet.getRange(row, stockCol + 1);
-      const current = Number(cell.getValue() || 0);
-      const next = Math.max(0, current - qty);
-      cell.setValue(next);
-
-      updates.push({ id: pid, from: current, to: next });
-    });
-
-    return jsonOut({ status: "stock_updated", updates });
-  }
-
-  // =========================
-  // 3) ADMIN UPDATE (price/stock)
-  // =========================
-  if (payload.type === "admin_update") {
-    if (String(payload.key || "") !== ADMIN_KEY) {
-      return jsonOut({ status: "error", message: "Unauthorized" });
+    .admin-actions button{
+      padding:10px 14px;border-radius:12px;border:1px solid rgba(220,251,255,.35);
+      background:rgba(13,15,16,.65);color:var(--primary);cursor:pointer;
     }
-
-    const sheet = book.getSheetByName(SHEET_PRODUCTS);
-    if (!sheet) return jsonOut({ status: "error", message: "Missing sheet: Products" });
-
-    const values = sheet.getDataRange().getValues();
-    if (values.length < 2) return jsonOut({ status: "error", message: "No product rows" });
-
-    const headers = values[0].map(h => String(h).trim().toLowerCase());
-    const idCol = headers.indexOf("id");
-    const priceCol = headers.indexOf("price");
-    const stockCol = headers.indexOf("stock");
-    const nameCol = headers.indexOf("name");
-
-    if (idCol === -1 || priceCol === -1 || stockCol === -1) {
-      return jsonOut({ status: "error", message: "Products headers must include: id, price, stock" });
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0 10px;
     }
-
-    // build id -> row map
-    const idToRow = {};
-    for (let r = 1; r < values.length; r++) {
-      const pid = String(values[r][idCol]);
-      if (pid) idToRow[pid] = r + 1;
+    thead th{
+      text-align:left;
+      font-size:12px;
+      color:rgba(230,230,230,.7);
+      font-weight:600;
+      padding:0 10px;
     }
+    tbody tr{
+      background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.01));
+      border:1px solid rgba(220,251,255,.18);
+      box-shadow: inset 0 0 18px rgba(255,255,255,.04), 0 12px 35px rgba(0,0,0,.65);
+    }
+    tbody td{
+      padding:12px 10px;
+      border-top:1px solid rgba(220,251,255,.12);
+      border-bottom:1px solid rgba(220,251,255,.12);
+      font-size:13px;
+    }
+    tbody tr td:first-child{
+      border-left:1px solid rgba(220,251,255,.12);
+      border-top-left-radius:14px;border-bottom-left-radius:14px;
+      width:70px;
+      color:rgba(220,251,255,.9);
+      font-weight:700;
+    }
+    tbody tr td:last-child{
+      border-right:1px solid rgba(220,251,255,.12);
+      border-top-right-radius:14px;border-bottom-right-radius:14px;
+      width:160px;
+    }
+    .cell-input{
+      width:100%;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid rgba(220,251,255,.18);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      outline:none;
+    }
+    .row-btn{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(220,251,255,.35);
+      background:linear-gradient(135deg,#4E5D5D,#0d0f10);
+      color:#DCFBFF;
+      font-weight:700;
+      cursor:pointer;
+    }
+    .tag{
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:11px;
+      border:1px solid rgba(220,251,255,.25);
+      color:rgba(220,251,255,.85);
+      background:rgba(220,251,255,.06);
+    }
+    .muted{color:rgba(230,230,230,.6);font-size:12px;}
+  </style>
+</head>
+<body>
 
-    const updates = Array.isArray(payload.updates) ? payload.updates : [];
-    const results = [];
+  <header class="header">
+    <a href="products.html" class="logo">← Back</a>
+    <div class="muted">Admin Dashboard</div>
+  </header>
 
-    updates.forEach(u => {
-      const pid = String(u.id);
-      const row = idToRow[pid];
-      if (!row) return;
+  <div class="admin-wrap">
+    <div class="admin-head">
+      <h2>Stock + Price Manager</h2>
+      <div class="admin-actions">
+        <input id="searchAdmin" type="text" placeholder="Search name...">
+        <button id="reloadBtn" type="button">Reload</button>
+        <button id="saveAllBtn" type="button">Save All</button>
+      </div>
+    </div>
 
-      if (u.price != null) sheet.getRange(row, priceCol + 1).setValue(Number(u.price));
-      if (u.stock != null) sheet.getRange(row, stockCol + 1).setValue(Number(u.stock));
-      if (nameCol !== -1 && u.name != null) sheet.getRange(row, nameCol + 1).setValue(String(u.name));
+    <div class="muted" style="margin-bottom:10px;">
+      Tip: change price/stock → click <span class="tag">Save</span> per row, or <span class="tag">Save All</span>.
+    </div>
 
-      results.push({ id: pid, ok: true });
-    });
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Price (BND)</th>
+          <th>Stock</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="adminBody"></tbody>
+    </table>
+  </div>
 
-    return jsonOut({ status: "success", updated: results.length });
-  }
-
-  return jsonOut({ status: "invalid", message: "Unknown type" });
-}
+  <script src="admin.js"></script>
+</body>
+</html>
