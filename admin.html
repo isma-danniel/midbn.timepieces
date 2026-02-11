@@ -1,0 +1,171 @@
+const SPREADSHEET_ID = "10LuGs69-xFYm-xh0M2abzCAfxrClL0dXmOwpu5-Sd7M";
+const SHEET_PRODUCTS = "Products";
+const SHEET_ORDERS = "Orders";
+
+// ✅ change this (keep it secret)
+const ADMIN_KEY = "kirah1211";
+
+function ss() {
+  return SpreadsheetApp.openById(SPREADSHEET_ID);
+}
+
+function jsonOut(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON)
+    .setHeader("Access-Control-Allow-Origin", "*")
+    .setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+    .setHeader("Access-Control-Allow-Headers", "Content-Type");
+}
+
+function doOptions() {
+  return jsonOut({ ok: true });
+}
+
+function doGet() {
+  const sheet = ss().getSheetByName(SHEET_PRODUCTS);
+  if (!sheet) return jsonOut({ status: "error", message: "Missing sheet: Products" });
+
+  const values = sheet.getDataRange().getValues();
+  if (values.length < 2) return jsonOut([]);
+
+  const headers = values[0].map(h => String(h).trim());
+  const rows = values.slice(1);
+
+  const products = rows
+    .filter(r => r.some(v => v !== "" && v != null))
+    .map(r => {
+      const o = {};
+      headers.forEach((h, i) => (o[h] = r[i]));
+      o.id = Number(o.id);
+      o.price = Number(o.price);
+      o.stock = Number(o.stock);
+      return o;
+    });
+
+  return jsonOut(products);
+}
+
+function doPost(e) {
+  const payload = JSON.parse((e && e.postData && e.postData.contents) || "{}");
+  const book = ss();
+
+  // =========================
+  // 1) SAVE ORDER
+  // =========================
+  if (payload.type === "order") {
+    const sheet = book.getSheetByName(SHEET_ORDERS);
+    if (!sheet) return jsonOut({ status: "error", message: "Missing sheet: Orders" });
+
+    const orderId = "ORD" + Date.now();
+    const c = payload.customer || {};
+    const cart = payload.cart || [];
+
+    sheet.appendRow([
+      orderId,
+      new Date(),
+      c.name || "",
+      c.phone || "",
+      c.address || "",
+      c.payment || "",
+      JSON.stringify(cart),
+      payload.total || ""
+    ]);
+
+    return jsonOut({ status: "success", orderId });
+  }
+
+  // =========================
+  // 2) DEDUCT STOCK
+  // =========================
+  if (payload.type === "stock") {
+    const sheet = book.getSheetByName(SHEET_PRODUCTS);
+    if (!sheet) return jsonOut({ status: "error", message: "Missing sheet: Products" });
+
+    const values = sheet.getDataRange().getValues();
+    if (values.length < 2) return jsonOut({ status: "error", message: "No product rows" });
+
+    const headers = values[0].map(h => String(h).trim().toLowerCase());
+    const idCol = headers.indexOf("id");
+    const stockCol = headers.indexOf("stock");
+    if (idCol === -1 || stockCol === -1) {
+      return jsonOut({ status: "error", message: "Products headers must include: id, stock" });
+    }
+
+    const idToRow = {};
+    for (let r = 1; r < values.length; r++) {
+      const pid = String(values[r][idCol]);
+      if (pid) idToRow[pid] = r + 1; // 1-based
+    }
+
+    const cart = payload.cart || [];
+    const updates = [];
+
+    cart.forEach(item => {
+      const pid = String(item.id);
+      const qty = Number(item.qty || 0);
+      const row = idToRow[pid];
+      if (!row || qty <= 0) return;
+
+      const cell = sheet.getRange(row, stockCol + 1);
+      const current = Number(cell.getValue() || 0);
+      const next = Math.max(0, current - qty);
+      cell.setValue(next);
+
+      updates.push({ id: pid, from: current, to: next });
+    });
+
+    return jsonOut({ status: "stock_updated", updates });
+  }
+
+  // =========================
+  // 3) ADMIN UPDATE (price/stock)
+  // =========================
+  if (payload.type === "admin_update") {
+    if (String(payload.key || "") !== ADMIN_KEY) {
+      return jsonOut({ status: "error", message: "Unauthorized" });
+    }
+
+    const sheet = book.getSheetByName(SHEET_PRODUCTS);
+    if (!sheet) return jsonOut({ status: "error", message: "Missing sheet: Products" });
+
+    const values = sheet.getDataRange().getValues();
+    if (values.length < 2) return jsonOut({ status: "error", message: "No product rows" });
+
+    const headers = values[0].map(h => String(h).trim().toLowerCase());
+    const idCol = headers.indexOf("id");
+    const priceCol = headers.indexOf("price");
+    const stockCol = headers.indexOf("stock");
+    const nameCol = headers.indexOf("name");
+
+    if (idCol === -1 || priceCol === -1 || stockCol === -1) {
+      return jsonOut({ status: "error", message: "Products headers must include: id, price, stock" });
+    }
+
+    // build id -> row map
+    const idToRow = {};
+    for (let r = 1; r < values.length; r++) {
+      const pid = String(values[r][idCol]);
+      if (pid) idToRow[pid] = r + 1;
+    }
+
+    const updates = Array.isArray(payload.updates) ? payload.updates : [];
+    const results = [];
+
+    updates.forEach(u => {
+      const pid = String(u.id);
+      const row = idToRow[pid];
+      if (!row) return;
+
+      if (u.price != null) sheet.getRange(row, priceCol + 1).setValue(Number(u.price));
+      if (u.stock != null) sheet.getRange(row, stockCol + 1).setValue(Number(u.stock));
+      if (nameCol !== -1 && u.name != null) sheet.getRange(row, nameCol + 1).setValue(String(u.name));
+
+      results.push({ id: pid, ok: true });
+    });
+
+    return jsonOut({ status: "success", updated: results.length });
+  }
+
+  return jsonOut({ status: "invalid", message: "Unknown type" });
+}
