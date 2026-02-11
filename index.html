@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MIDBN.Timepieces</title>
+
   <link rel="stylesheet" href="style.css">
+
+  <!-- (Optional) Helps browser start fetching assets earlier -->
+  <link rel="preload" as="video" href="images/video.mp4" type="video/mp4">
 </head>
 <body>
 
@@ -28,9 +32,18 @@
 
 <!-- HERO -->
 <section class="hero">
-  <video class="hero-video" autoplay muted loop playsinline>
+  <video
+    class="hero-video"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="metadata"
+    poster="images/hero-poster.jpg"
+  >
     <source src="images/video.mp4" type="video/mp4">
   </video>
+
   <div class="hero-overlay"></div>
   <div class="hero-content">
     <h1 class="hero-quote">
@@ -62,23 +75,37 @@
   <h2>New Arrivals</h2>
   <div class="arrival-scroll">
     <div>
-      <div class="arrival-card"><img src="images/mens-1.jpg" alt="Watch 1"></div>
+      <div class="arrival-card">
+        <img src="images/mens-1.jpg" loading="lazy" decoding="async" alt="Watch 1">
+      </div>
       <p class="arrival-name">Nautilus Black</p>
     </div>
+
     <div>
-      <div class="arrival-card"><img src="images/mens-2.jpg" alt="Watch 2"></div>
+      <div class="arrival-card">
+        <img src="images/mens-2.jpg" loading="lazy" decoding="async" alt="Watch 2">
+      </div>
       <p class="arrival-name">Oalet Black</p>
     </div>
+
     <div>
-      <div class="arrival-card"><img src="images/mens-7-1.jpg" alt="Watch 3"></div>
+      <div class="arrival-card">
+        <img src="images/mens-7-1.jpg" loading="lazy" decoding="async" alt="Watch 3">
+      </div>
       <p class="arrival-name">Rolex Couple Green</p>
     </div>
+
     <div>
-      <div class="arrival-card"><img src="images/mens-5.jpg" alt="Watch 4"></div>
+      <div class="arrival-card">
+        <img src="images/mens-5.jpg" loading="lazy" decoding="async" alt="Watch 4">
+      </div>
       <p class="arrival-name">Rolex Daytona Black</p>
     </div>
+
     <div>
-      <div class="arrival-card"><img src="images/mens-6.jpg" alt="Watch 5"></div>
+      <div class="arrival-card">
+        <img src="images/mens-6.jpg" loading="lazy" decoding="async" alt="Watch 5">
+      </div>
       <p class="arrival-name">Franc Muller</p>
     </div>
   </div>
@@ -130,17 +157,17 @@
 <section id="brands" class="brands">
   <h2>BRANDS</h2>
   <div class="brand-scroll">
-    <div class="brand-card"><img src="images/men-1.png" alt="Rolex"><div class="brand-name">Rolex</div></div>
-    <div class="brand-card"><img src="images/men-2.png" alt="Omega"><div class="brand-name">Omega</div></div>
-    <div class="brand-card"><img src="images/men-3.png" alt="Casio"><div class="brand-name">Casio</div></div>
-    <div class="brand-card"><img src="images/men-7.png" alt="Cartier"><div class="brand-name">Cartier</div></div>
-    <div class="brand-card"><img src="images/men-8.png" alt="Patek Philippe"><div class="brand-name">Patek Philippe</div></div>
-    <div class="brand-card"><img src="images/men-9.png" alt="G-Shock"><div class="brand-name">G-Shock</div></div>
-    <div class="brand-card"><img src="images/women-1.png" alt="Swarovski"><div class="brand-name">Swarovski</div></div>
-    <div class="brand-card"><img src="images/women-2.png" alt="Franck Muller"><div class="brand-name">Franck Muller</div></div>
-    <div class="brand-card"><img src="images/women-3.png" alt="Audemars Piguet"><div class="brand-name">Audemars Piguet</div></div>
-    <div class="brand-card"><img src="images/couple-1.png" alt="Seiko"><div class="brand-name">Seiko</div></div>
-    <div class="brand-card"><img src="images/couple-2.png" alt="Michael Kors"><div class="brand-name">Michael Kors</div></div>
+    <div class="brand-card"><img src="images/men-1.png" loading="lazy" decoding="async" alt="Rolex"><div class="brand-name">Rolex</div></div>
+    <div class="brand-card"><img src="images/men-2.png" loading="lazy" decoding="async" alt="Omega"><div class="brand-name">Omega</div></div>
+    <div class="brand-card"><img src="images/men-3.png" loading="lazy" decoding="async" alt="Casio"><div class="brand-name">Casio</div></div>
+    <div class="brand-card"><img src="images/men-7.png" loading="lazy" decoding="async" alt="Cartier"><div class="brand-name">Cartier</div></div>
+    <div class="brand-card"><img src="images/men-8.png" loading="lazy" decoding="async" alt="Patek Philippe"><div class="brand-name">Patek Philippe</div></div>
+    <div class="brand-card"><img src="images/men-9.png" loading="lazy" decoding="async" alt="G-Shock"><div class="brand-name">G-Shock</div></div>
+    <div class="brand-card"><img src="images/women-1.png" loading="lazy" decoding="async" alt="Swarovski"><div class="brand-name">Swarovski</div></div>
+    <div class="brand-card"><img src="images/women-2.png" loading="lazy" decoding="async" alt="Franck Muller"><div class="brand-name">Franck Muller</div></div>
+    <div class="brand-card"><img src="images/women-3.png" loading="lazy" decoding="async" alt="Audemars Piguet"><div class="brand-name">Audemars Piguet</div></div>
+    <div class="brand-card"><img src="images/couple-1.png" loading="lazy" decoding="async" alt="Seiko"><div class="brand-name">Seiko</div></div>
+    <div class="brand-card"><img src="images/couple-2.png" loading="lazy" decoding="async" alt="Michael Kors"><div class="brand-name">Michael Kors</div></div>
   </div>
 </section>
 
@@ -157,23 +184,20 @@
 <section class="contact-section">
   <h2>Contact Us</h2>
 
-  <!-- Social logo buttons -->
   <div class="contact-links">
     <a class="social-btn" href="https://instagram.com/YOURIG" target="_blank" aria-label="Instagram">
-      <img src="icons/instagram.svg" alt="Instagram">
+      <img src="icons/instagram.svg" alt="Instagram" loading="lazy" decoding="async">
     </a>
 
     <a class="social-btn" href="https://tiktok.com/@YOURTIKTOK" target="_blank" aria-label="TikTok">
-      <img src="icons/tiktok.svg" alt="TikTok">
+      <img src="icons/tiktok.svg" alt="TikTok" loading="lazy" decoding="async">
     </a>
 
-    <!-- WhatsApp (NO +) -->
     <a class="social-btn" href="https://wa.me/6738908960" target="_blank" aria-label="WhatsApp">
-      <img src="icons/whatsapp.svg" alt="WhatsApp">
+      <img src="icons/whatsapp.svg" alt="WhatsApp" loading="lazy" decoding="async">
     </a>
   </div>
 
-  <!-- Contact form -->
   <form class="contact-form" action="#" method="POST">
     <input type="text" name="name" placeholder="Your Name" required>
     <input type="email" name="email" placeholder="Your Email" required>
@@ -187,6 +211,22 @@
   <p>&copy; 2026 MIDBN.Timepieces. All rights reserved.</p>
 </footer>
 
-<script src="script.js"></script>
+<!-- ✅ Defer JS so it doesn’t block loading -->
+<script src="script.js" defer></script>
+
+<!-- OPTIONAL: pause video on mobile to reduce lag (keeps function) -->
+<script>
+  (function(){
+    const v = document.querySelector('.hero-video');
+    if (!v) return;
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    if (isMobile) {
+      // keep poster visible; user still sees hero nicely
+      v.pause();
+      v.removeAttribute('autoplay');
+    }
+  })();
+</script>
+
 </body>
 </html>
