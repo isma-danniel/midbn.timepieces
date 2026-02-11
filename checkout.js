@@ -1,171 +1,145 @@
 // ==========================================
-// CHECKOUT.JS (FULL) - Apple-style qty control + Remove
-// Uses #cartItems, #cartTotal, #clearCartBtn, #checkoutForm
+// CHECKOUT.JS (FULL) - MIDBN Glass + Apple stepper + Stock limit
 // ==========================================
 
 const API =
   "https://script.google.com/macros/s/AKfycbwPTwgGLqGy75TQ8fY9E-pyKoncCVmbs6BJdzZzfgGBRXv4OKTgLbJaBJ3hB4ZfW2rd/exec";
 
 const cartItemsContainer = document.getElementById("cartItems");
-const cartTotal = document.getElementById("cartTotal");
+const cartTotalEl = document.getElementById("cartTotal");
 const clearCartBtn = document.getElementById("clearCartBtn");
 const checkoutForm = document.getElementById("checkoutForm");
+const placeOrderBtn = document.getElementById("placeOrderBtn");
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-// ===============================
-// HELPERS
-// ===============================
+// -------------------- Helpers --------------------
 function toNumber(v) {
   const n = Number(v);
   return Number.isFinite(n) ? n : 0;
 }
+
+function formatBND(n) {
+  return "BND " + toNumber(n).toFixed(2);
+}
+
+// Qty fields compatibility (qty / quantity)
+function getQty(item) {
+  const q = item.qty ?? item.quantity ?? 1;
+  return Math.max(1, toNumber(q));
+}
+function setQty(item, qty) {
+  // keep both in sync if either exists
+  item.qty = qty;
+  if ("quantity" in item) item.quantity = qty;
+}
+
+// Stock field compatibility (stock / available / inventory / maxStock)
+function getStock(item) {
+  const s = item.stock ?? item.available ?? item.inventory ?? item.maxStock ?? item.max ?? item.remaining;
+  const n = toNumber(s);
+  return n > 0 ? n : Infinity; // if no stock value, treat as unlimited
+}
+
 function saveCart() {
   localStorage.setItem("cart", JSON.stringify(cart));
 }
-function formatBND(amount) {
-  return "BND " + toNumber(amount).toFixed(2);
-}
-function ensureStyleOnce() {
-  if (document.getElementById("appleQtyStyle")) return;
 
-  const style = document.createElement("style");
-  style.id = "appleQtyStyle";
-  style.textContent = `
-    /* Apple-ish control (glass + pill) */
-    .apple-line{
-      display:flex; justify-content:space-between; align-items:center; gap:14px;
-      padding:14px 14px;
-      border-radius:16px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(220,251,255,0.12);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-      margin: 10px 0;
-    }
-    .apple-left{ min-width:0; display:flex; flex-direction:column; gap:6px; }
-    .apple-name{
-      font-weight:600;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-      letter-spacing: .2px;
-    }
-    .apple-sub{ opacity:.8; font-size:.9rem; display:flex; gap:8px; align-items:center; }
-    .apple-right{ display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
-    .apple-price{ font-weight:600; white-space:nowrap; }
-
-    .apple-stepper{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:6px 8px;
-      border-radius:999px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(220,251,255,0.14);
-      backdrop-filter: blur(14px) saturate(160%);
-    }
-    .apple-stepper button{
-      width:34px; height:34px;
-      display:grid; place-items:center;
-      border-radius:999px;
-      border: 1px solid rgba(220,251,255,0.18);
-      background: rgba(255,255,255,0.06);
-      color: inherit;
-      cursor:pointer;
-      transition: transform .12s ease, background .12s ease, border-color .12s ease;
-      user-select:none;
-    }
-    .apple-stepper button:hover{
-      background: rgba(255,255,255,0.10);
-      border-color: rgba(220,251,255,0.28);
-    }
-    .apple-stepper button:active{ transform: scale(0.96); }
-    .apple-stepper button:disabled{
-      opacity: .35;
-      cursor:not-allowed;
-    }
-    .apple-qty{
-      min-width:18px;
-      text-align:center;
-      font-weight:600;
-      letter-spacing:.3px;
-    }
-
-    /* Remove (small x) */
-    .apple-remove{
-      border:none;
-      background: transparent;
-      color: rgba(255,77,77,0.95);
-      cursor:pointer;
-      padding: 0;
-      font-size: 14px;
-      opacity: .9;
-      transition: opacity .12s ease, transform .12s ease;
-    }
-    .apple-remove:hover{ opacity: 1; transform: translateY(-1px); }
-
-    /* Tiny haptic-like pop */
-    .pop {
-      animation: pop .14s ease;
-    }
-    @keyframes pop {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.06); }
-      100% { transform: scale(1); }
-    }
-  `;
-  document.head.appendChild(style);
+function calcTotal() {
+  return cart.reduce((sum, it) => {
+    const qty = getQty(it);
+    const price = toNumber(it.price);
+    return sum + price * qty;
+  }, 0);
 }
 
-// ===============================
-// RENDER CART (Apple look)
-// ===============================
+// -------------------- Render --------------------
 function renderCart() {
-  ensureStyleOnce();
   cartItemsContainer.innerHTML = "";
 
-  if (!cart || cart.length === 0) {
-    cartItemsContainer.innerHTML = `<p style="opacity:.6;text-align:center">Your cart is empty</p>`;
-    if (cartTotal) cartTotal.innerText = "BND 0";
+  if (!cart.length) {
+    cartItemsContainer.innerHTML = `<div class="empty-cart">Your cart is empty</div>`;
+    if (cartTotalEl) cartTotalEl.innerText = "BND 0";
     return;
   }
 
-  let total = 0;
-
   cart.forEach((item, index) => {
-    item.qty = Math.max(1, toNumber(item.qty));
+    const name = item.name || item.title || "Item";
+    const qty = getQty(item);
     const price = toNumber(item.price);
-    const lineTotal = price * item.qty;
-    total += lineTotal;
+    const stock = getStock(item);
+
+    const lineTotal = price * qty;
+
+    const minusDisabled = qty <= 1;
+    const plusDisabled = qty >= stock;
+
+    // MIDBN style: show only when meaningful
+    let stockHint = "";
+    if (stock !== Infinity) {
+      if (stock <= 3) stockHint = ` • Only ${stock} left`;
+      else stockHint = ` • ${stock} available`;
+    }
 
     cartItemsContainer.innerHTML += `
-      <div class="apple-line">
-        <div class="apple-left">
-          <div class="apple-name">${item.name || "Item"}</div>
-          <div class="apple-sub">
-            <span>${formatBND(price)} each</span>
-            <span>•</span>
-            <button type="button" class="apple-remove" data-action="remove" data-index="${index}">Remove</button>
-          </div>
+      <div class="cart-item">
+        <div class="cart-left">
+          <strong>${escapeHtml(name)}</strong>
+          <small>${formatBND(price)} each${stockHint}</small>
         </div>
 
-        <div class="apple-right">
-          <div class="apple-price">${formatBND(lineTotal)}</div>
+        <div class="cart-right">
+          <div class="line-price">${formatBND(lineTotal)}</div>
 
-          <div class="apple-stepper" aria-label="Quantity selector">
-            <button type="button" data-action="minus" data-index="${index}" ${item.qty <= 1 ? "disabled" : ""} aria-label="Decrease quantity">−</button>
-            <span class="apple-qty" data-qty="${index}">${item.qty}</span>
-            <button type="button" data-action="plus" data-index="${index}" aria-label="Increase quantity">+</button>
+          <div class="qty-controls" aria-label="Quantity controls">
+            <button
+              type="button"
+              class="qty-btn"
+              data-action="minus"
+              data-index="${index}"
+              ${minusDisabled ? "disabled" : ""}
+              aria-label="Decrease quantity"
+            >−</button>
+
+            <span class="qty-number" aria-live="polite">${qty}</span>
+
+            <button
+              type="button"
+              class="qty-btn"
+              data-action="plus"
+              data-index="${index}"
+              ${plusDisabled ? "disabled" : ""}
+              aria-label="Increase quantity"
+            >+</button>
+
+            <button
+              type="button"
+              class="remove-btn"
+              data-action="remove"
+              data-index="${index}"
+              aria-label="Remove item"
+            >Remove</button>
           </div>
         </div>
       </div>
     `;
   });
 
-  if (cartTotal) cartTotal.innerText = formatBND(total);
+  if (cartTotalEl) cartTotalEl.innerText = formatBND(calcTotal());
+}
+
+function escapeHtml(str) {
+  return String(str ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 renderCart();
 
-// ===============================
-// CLICK HANDLER (plus/minus/remove)
-// ===============================
+// -------------------- Actions --------------------
 cartItemsContainer.addEventListener("click", (e) => {
   const btn = e.target.closest("button");
   if (!btn) return;
@@ -174,41 +148,31 @@ cartItemsContainer.addEventListener("click", (e) => {
   const index = Number(btn.dataset.index);
   if (!action || !Number.isFinite(index) || index < 0 || index >= cart.length) return;
 
+  const item = cart[index];
+  const stock = getStock(item);
+  let qty = getQty(item);
+
   if (action === "plus") {
-    cart[index].qty = Math.max(1, toNumber(cart[index].qty)) + 1;
-  }
-
-  if (action === "minus") {
-    const current = Math.max(1, toNumber(cart[index].qty));
-    cart[index].qty = Math.max(1, current - 1);
-  }
-
-  if (action === "remove") {
+    if (qty < stock) qty += 1;
+  } else if (action === "minus") {
+    qty = Math.max(1, qty - 1);
+  } else if (action === "remove") {
     cart.splice(index, 1);
+    saveCart();
+    renderCart();
+    if (!cart.length) window.location.href = "products.html";
+    return;
   }
 
+  setQty(item, qty);
   saveCart();
   renderCart();
-
-  // tiny "pop" on the stepper after update
-  const qtyEl = cartItemsContainer.querySelector(`[data-qty="${index}"]`);
-  if (qtyEl) {
-    qtyEl.classList.add("pop");
-    setTimeout(() => qtyEl.classList.remove("pop"), 180);
-  }
-
-  if (cart.length === 0) {
-    window.location.href = "products.html"; // change to cart.html if you use it
-  }
 });
 
-// ===============================
-// CLEAR CART BUTTON
-// ===============================
+// Clear cart
 if (clearCartBtn) {
   clearCartBtn.addEventListener("click", () => {
     if (!cart.length) return;
-
     const ok = confirm("Clear all items in cart?");
     if (!ok) return;
 
@@ -219,14 +183,12 @@ if (clearCartBtn) {
   });
 }
 
-// ===============================
-// CHECKOUT FORM SUBMIT
-// ===============================
-checkoutForm.addEventListener("submit", function (e) {
+// -------------------- Checkout Submit --------------------
+checkoutForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
   cart = JSON.parse(localStorage.getItem("cart")) || [];
-  if (cart.length === 0) {
+  if (!cart.length) {
     alert("Your cart is empty!");
     return;
   }
@@ -241,7 +203,13 @@ checkoutForm.addEventListener("submit", function (e) {
     return;
   }
 
-  const total = cartTotal ? cartTotal.innerText : "BND 0";
+  const totalText = cartTotalEl ? cartTotalEl.innerText : "BND 0";
+
+  // MIDBN feel: lock the button during submit
+  if (placeOrderBtn) {
+    placeOrderBtn.disabled = true;
+    placeOrderBtn.textContent = "Processing…";
+  }
 
   // 1) SAVE ORDER
   fetch(API, {
@@ -250,39 +218,49 @@ checkoutForm.addEventListener("submit", function (e) {
     body: JSON.stringify({
       type: "order",
       cart,
-      total,
+      total: totalText,
       customer: { name, phone, address, payment }
     })
   })
     .then((res) => res.json())
     .then((orderRes) => {
       if (orderRes.status === "success") {
-        // 2) DEDUCT STOCK (fire-and-forget)
+        // 2) DEDUCT STOCK
         fetch(API, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ type: "stock", cart })
         });
 
+        // Save summary for success.html
         localStorage.setItem(
           "lastOrder",
           JSON.stringify({
             orderId: orderRes.orderId,
             customer: { name, phone, address, payment },
-            cart: cart,
-            total: total
+            cart,
+            total: totalText
           })
         );
 
         localStorage.removeItem("cart");
         cart = [];
+
         window.location.href = "success.html";
       } else {
         alert("Failed to place order, try again!");
+        if (placeOrderBtn) {
+          placeOrderBtn.disabled = false;
+          placeOrderBtn.textContent = "Place Order";
+        }
       }
     })
     .catch((err) => {
       console.error(err);
       alert("Error connecting to server. Try again.");
+      if (placeOrderBtn) {
+        placeOrderBtn.disabled = false;
+        placeOrderBtn.textContent = "Place Order";
+      }
     });
 });
