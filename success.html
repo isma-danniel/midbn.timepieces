@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Order Successful | MIDBN</title>
+  <title>Order Successful</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -11,121 +11,103 @@
       font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial;
       padding:20px;
     }
-
     .box{
       max-width:520px;
       margin:40px auto;
       background:rgba(255,255,255,.05);
-      padding:30px;
+      padding:28px;
       border-radius:20px;
       border:1px solid rgba(220,251,255,.2);
-      backdrop-filter:blur(14px);
+      backdrop-filter:blur(12px);
     }
-
     h2{
       text-align:center;
       color:#DCFBFF;
-      margin-bottom:20px;
+      margin-bottom:16px;
+      letter-spacing:.4px;
     }
-
     .order-id{
       text-align:center;
       font-weight:600;
-      margin-bottom:20px;
-      opacity:.9;
+      margin-bottom:18px;
+      opacity:.95;
     }
-
     .item{
       display:flex;
       justify-content:space-between;
+      gap:12px;
       padding:8px 0;
       border-bottom:1px solid rgba(255,255,255,.08);
       font-size:14px;
     }
-
     .total{
       text-align:right;
-      font-weight:700;
-      margin-top:15px;
+      font-weight:800;
+      margin-top:14px;
       color:#DCFBFF;
+      letter-spacing:.2px;
     }
 
     .signature{
-      margin-top:30px;
-      padding-top:20px;
-      border-top:1px solid rgba(255,255,255,.1);
-      font-size:13px;
-      opacity:.85;
+      margin-top:18px;
+      padding-top:14px;
+      border-top:1px solid rgba(255,255,255,.10);
+      font-size:14px;
+      opacity:.95;
     }
-
-    .signature strong{
-      color:#DCFBFF;
-    }
-
     .note{
       margin-top:10px;
-      font-size:12px;
-      opacity:.6;
-      line-height:1.5;
+      font-size:12.5px;
+      line-height:1.45;
+      opacity:.7;
     }
 
     .btn{
       display:block;
-      margin-top:25px;
+      margin-top:16px;
       text-align:center;
       padding:12px;
       border-radius:30px;
       border:1px solid #DCFBFF;
       color:#DCFBFF;
       text-decoration:none;
-      transition:.3s;
+      transition:.25s;
     }
-
     .btn:hover{
       background:#DCFBFF;
       color:#000;
     }
 
-    .whatsapp-btn{
-      display:block;
-      margin-top:15px;
-      text-align:center;
-      padding:12px;
-      border-radius:30px;
-      background:#25D366;
-      color:#fff;
-      text-decoration:none;
-      font-weight:600;
+    .btn.secondary{
+      border:1px solid rgba(220,251,255,.35);
+      color:#DCFBFF;
+      background:rgba(255,255,255,.03);
+    }
+    .btn.secondary:hover{
+      background:rgba(220,251,255,.12);
+      color:#DCFBFF;
     }
   </style>
 </head>
 <body>
 
 <div class="box">
-  <h2>✅ Order Successfully Placed</h2>
+  <h2>✅ Order Successful</h2>
 
   <div class="order-id" id="orderId"></div>
-
   <div id="orderItems"></div>
-
   <div class="total" id="orderTotal"></div>
 
-  <!-- Signature / Initial Section -->
   <div class="signature">
     <p><strong>Authorized Initial:</strong> ____________</p>
-
     <div class="note">
-      This receipt serves as a confirmation of your order request.<br>
-      Please send a screenshot of this receipt to our official WhatsApp for
-      verification and seller validation before processing.
-      Orders without confirmation may not be processed.
+      *Valid upon seller verification and official confirmation.<br>
+      Please forward a screenshot of this receipt to our official WhatsApp for validation and processing.
+      Orders are only confirmed after seller approval.
     </div>
   </div>
 
-  <a id="whatsappLink" class="whatsapp-btn" target="_blank">
-    Send to Seller via WhatsApp
-  </a>
-
+  <a id="pdfBtn" href="#" target="_blank" class="btn secondary" style="display:none;">View PDF Receipt</a>
   <a href="products.html" class="btn">Continue Shopping</a>
 </div>
 
@@ -135,39 +117,32 @@
   if(!order){
     document.querySelector(".box").innerHTML = "<h2>No order found</h2>";
   } else {
-
-    document.getElementById("orderId").innerText =
-      "Order ID: " + order.orderId;
+    document.getElementById("orderId").innerText = "Order ID: " + (order.orderId || "-");
 
     const container = document.getElementById("orderItems");
-
-    order.cart.forEach(item=>{
+    (order.cart || []).forEach(item=>{
+      const qty = Number(item.qty || item.quantity || 1);
+      const price = Number(item.price || 0);
       const div = document.createElement("div");
       div.className = "item";
       div.innerHTML = `
-        <span>${item.name} (x${item.qty})</span>
-        <span>BND ${(item.price * item.qty).toFixed(2)}</span>
+        <span>${item.name} (x${qty})</span>
+        <span>BND ${(price * qty).toFixed(2)}</span>
       `;
       container.appendChild(div);
     });
 
-    document.getElementById("orderTotal").innerText =
-      "Total: " + order.total;
+    document.getElementById("orderTotal").innerText = "Total: " + (order.total || "BND 0");
 
-    // WhatsApp message auto-fill
-    const phone = "6738908960"; // your number
-    const message =
-      "Hello MIDBN, I have placed an order.\n\n" +
-      "Order ID: " + order.orderId + "\n" +
-      "Total: " + order.total + "\n\n" +
-      "Please validate my order.";
+    // PDF link if returned by Apps Script
+    if (order.pdfUrl) {
+      const pdfBtn = document.getElementById("pdfBtn");
+      pdfBtn.href = order.pdfUrl;
+      pdfBtn.style.display = "block";
+    }
 
-    document.getElementById("whatsappLink").href =
-      "https://wa.me/" + phone + "?text=" + encodeURIComponent(message);
-
-    setTimeout(()=>{
-      localStorage.removeItem("lastOrder");
-    }, 15000);
+    // optional clear after some time
+    setTimeout(()=> localStorage.removeItem("lastOrder"), 120000);
   }
 </script>
 
