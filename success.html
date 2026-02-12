@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <title>Order Successful</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <style>
     body{
       background:#0d0f10;
@@ -19,44 +18,31 @@
       border-radius:20px;
       border:1px solid rgba(220,251,255,.2);
       backdrop-filter:blur(12px);
-      -webkit-backdrop-filter:blur(12px);
-      box-shadow: 0 18px 55px rgba(0,0,0,.65);
     }
     h2{
       text-align:center;
       color:#DCFBFF;
-      margin-bottom:14px;
+      margin-bottom:12px;
       letter-spacing:.4px;
     }
-
-    .badge-row{
-      display:flex;
-      justify-content:center;
-      gap:10px;
-      flex-wrap:wrap;
-      margin: 0 0 16px;
-    }
-    .badge{
-      font-size:12px;
-      padding:7px 10px;
-      border-radius:999px;
-      border:1px solid rgba(220,251,255,.22);
-      background:rgba(255,255,255,.03);
-      color:#DCFBFF;
-      opacity:.95;
-    }
-    .badge.muted{
-      color: rgba(230,230,230,.85);
-      border-color: rgba(230,230,230,.18);
-    }
-
     .order-id{
       text-align:center;
       font-weight:600;
-      margin-bottom:14px;
+      margin-bottom:10px;
       opacity:.95;
     }
-
+    .status{
+      text-align:center;
+      font-size:13px;
+      padding:8px 12px;
+      border-radius:999px;
+      display:inline-block;
+      margin:0 auto 16px;
+      border:1px solid rgba(220,251,255,.22);
+      background:rgba(255,255,255,.03);
+      color:#DCFBFF;
+    }
+    .statusRow{ text-align:center; }
     .item{
       display:flex;
       justify-content:space-between;
@@ -72,7 +58,6 @@
       color:#DCFBFF;
       letter-spacing:.2px;
     }
-
     .signature{
       margin-top:18px;
       padding-top:14px;
@@ -84,17 +69,11 @@
       margin-top:10px;
       font-size:12.5px;
       line-height:1.45;
-      opacity:.75;
+      opacity:.7;
     }
-    .note em{
-      color:#DCFBFF;
-      font-style:normal;
-      font-weight:600;
-    }
-
     .btn{
       display:block;
-      margin-top:12px;
+      margin-top:16px;
       text-align:center;
       padding:12px;
       border-radius:30px;
@@ -102,13 +81,8 @@
       color:#DCFBFF;
       text-decoration:none;
       transition:.25s;
-      user-select:none;
     }
-    .btn:hover{
-      background:#DCFBFF;
-      color:#000;
-    }
-
+    .btn:hover{ background:#DCFBFF; color:#000; }
     .btn.secondary{
       border:1px solid rgba(220,251,255,.35);
       color:#DCFBFF;
@@ -118,29 +92,21 @@
       background:rgba(220,251,255,.12);
       color:#DCFBFF;
     }
-
-    .btn.whatsapp{
-      border:1px solid rgba(220,251,255,.45);
-      background: linear-gradient(135deg, rgba(78,93,93,.85), rgba(13,15,16,.9));
-    }
-    .btn.whatsapp:hover{
-      box-shadow: 0 0 18px rgba(220,251,255,.25);
-      color:#DCFBFF;
-      background: linear-gradient(135deg, rgba(78,93,93,1), rgba(13,15,16,1));
+    .mini{
+      margin-top:10px;
+      font-size:12px;
+      opacity:.6;
+      text-align:center;
     }
   </style>
 </head>
 <body>
 
 <div class="box">
-  <h2>✅ Order Saved</h2>
-
-  <div class="badge-row">
-    <div class="badge" id="statusBadge">Status: Pending Verification</div>
-    <div class="badge muted" id="paymentBadge" style="display:none;"></div>
-  </div>
+  <h2>✅ Order Received</h2>
 
   <div class="order-id" id="orderId"></div>
+  <div class="statusRow"><span class="status" id="orderStatus">Status: Pending Verification</span></div>
 
   <div id="orderItems"></div>
   <div class="total" id="orderTotal"></div>
@@ -149,51 +115,34 @@
     <p><strong>Authorized Initial:</strong> ____________</p>
     <div class="note">
       *Valid upon seller verification and official confirmation.<br>
-      To validate your initial, please send this receipt to the seller’s WhatsApp.
+      Please forward a screenshot of this receipt to our official WhatsApp for validation and processing.<br>
       Orders are only confirmed after seller approval.
-      <br><br>
-      <em>Tip:</em> You may send a screenshot, or use the button below (recommended).
     </div>
   </div>
 
   <a id="pdfBtn" href="#" target="_blank" class="btn secondary" style="display:none;">View PDF Receipt</a>
-  <a id="waBtn" href="#" target="_blank" class="btn whatsapp" style="display:none;">Send to Seller WhatsApp (for valid initial)</a>
-
   <a href="products.html" class="btn">Continue Shopping</a>
+
+  <div class="mini">This page will auto-refresh status until approved.</div>
 </div>
 
 <script>
-  // ✅ Seller WhatsApp (change if needed)
-  const SELLER_WA = "6738908960";
+  // ✅ Your Apps Script Web App URL
+  const API = "PASTE_YOUR_WEBAPP_URL_HERE";
 
   const order = JSON.parse(localStorage.getItem("lastOrder"));
+  const box = document.querySelector(".box");
 
-  function esc(str){
-    return String(str ?? "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
+  function esc(s){
+    return String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
   }
 
-  if(!order){
-    document.querySelector(".box").innerHTML = "<h2>No order found</h2>";
+  if(!order || !order.orderId){
+    box.innerHTML = "<h2>No order found</h2>";
   } else {
+    document.getElementById("orderId").innerText = "Order ID: " + order.orderId;
 
-    // Status (client default)
-    const statusText = order.status || "Pending Verification";
-    document.getElementById("statusBadge").innerText = "Status: " + statusText;
-
-    // Payment badge (optional)
-    if (order.customer && order.customer.payment) {
-      const p = document.getElementById("paymentBadge");
-      p.innerText = "Payment: " + order.customer.payment;
-      p.style.display = "inline-flex";
-    }
-
-    document.getElementById("orderId").innerText = "Order ID: " + (order.orderId || "-");
-
+    // Render items from localStorage first (instant UI)
     const container = document.getElementById("orderItems");
     (order.cart || []).forEach(item=>{
       const qty = Number(item.qty || item.quantity || 1);
@@ -209,33 +158,43 @@
 
     document.getElementById("orderTotal").innerText = "Total: " + (order.total || "BND 0");
 
-    // PDF link
-    const pdfUrl = order.pdfUrl || order.receiptPdfUrl || "";
-    if (pdfUrl) {
+    // PDF link from localStorage (if available)
+    if (order.pdfUrl) {
       const pdfBtn = document.getElementById("pdfBtn");
-      pdfBtn.href = pdfUrl;
+      pdfBtn.href = order.pdfUrl;
       pdfBtn.style.display = "block";
     }
 
-    // WhatsApp message (professional)
-    const msgLines = [
-      "Hello MIDBN, I would like to verify my order initial.",
-      "",
-      "Order ID: " + (order.orderId || "-"),
-      "Total: " + (order.total || "BND 0"),
-    ];
+    // ✅ Auto-refresh status from sheet
+    async function refreshStatus(){
+      try{
+        const res = await fetch(API + "?action=order&orderId=" + encodeURIComponent(order.orderId), { cache: "no-store" });
+        const data = await res.json();
+        if(!data || data.status !== "success" || !data.order) return;
 
-    if (pdfUrl) msgLines.push("PDF Receipt: " + pdfUrl);
+        const o = data.order;
+        const statusText = o.status ? o.status : "Pending Verification";
+        document.getElementById("orderStatus").innerText = "Status: " + statusText;
 
-    msgLines.push("");
-    msgLines.push("Please confirm and approve my order. Thank you.");
+        // If server has PDF but client doesn't, update button
+        if (o.receiptPdfUrl) {
+          const pdfBtn = document.getElementById("pdfBtn");
+          pdfBtn.href = o.receiptPdfUrl;
+          pdfBtn.style.display = "block";
+        }
 
-    const waMsg = encodeURIComponent(msgLines.join("\n"));
-    const waLink = "https://wa.me/" + SELLER_WA + "?text=" + waMsg;
+        // Optional: stop refreshing once Approved
+        if (String(statusText).toLowerCase() === "approved") {
+          // stop refreshing
+          clearInterval(window.__midbnTimer);
+        }
+      }catch(err){
+        // ignore
+      }
+    }
 
-    const waBtn = document.getElementById("waBtn");
-    waBtn.href = waLink;
-    waBtn.style.display = "block";
+    refreshStatus();
+    window.__midbnTimer = setInterval(refreshStatus, 3000);
 
     // optional clear after 2 minutes
     setTimeout(()=> localStorage.removeItem("lastOrder"), 120000);
