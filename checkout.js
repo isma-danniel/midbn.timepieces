@@ -1,13 +1,13 @@
 // ==========================================
-// MIDBN CHECKOUT.JS - FINAL+ (FULL)
-// - Anti duplicate submit (client + server token)
-// - Live stock qty limit on +/- and on submit
-// - Safari-safe response parsing (fixes “Server error…” when JSON parse fails)
-// - Receives pdfUrl from Apps Script and stores in lastOrder
+// MIDBN CHECKOUT.JS - FINAL (FIXED)
+// - Correct products endpoint: GET ?action=products
+// - Live stock limit on +/- and submit
+// - Anti double submit (client)
+// - Supports server fields: receiptPdfUrl (and pdfUrl fallback)
 // ==========================================
 
 const API =
-  "https://script.google.com/macros/s/AKfycbyFD2xjrwCjfWNIzpMQeaxUO5QCnv0GUwRXPSKgg42-xS6Fso5d5eh31WT58aBwToSo5Q/exec";
+  "https://script.google.com/macros/s/AKfycbxIEBzhxDsw_ovkvHLWWNmsxqVwp45UkUW8owkVJ77CaJfye6-NomyUMU0tsJXAy9nAVQ/exec";
 
 const cartItemsContainer = document.getElementById("cartItems");
 const cartTotalEl = document.getElementById("cartTotal");
@@ -17,10 +17,10 @@ const placeOrderBtn = document.getElementById("placeOrderBtn");
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-// ---------- Anti duplicate (client) ----------
+// --- Anti double submit (client) ---
 let isSubmitting = false;
 
-// ---------- Live stock cache ----------
+// --- Live stock cache ---
 let liveStockMap = null; // { "id": stockNumber }
 let lastStockFetchAt = 0;
 
@@ -53,36 +53,24 @@ function escapeHtml(str) {
     .replaceAll("'", "&#039;");
 }
 
-// ---------- Safari-safe POST (TEXT -> JSON) ----------
+// ---------- Safari-safe POST ----------
 function postToAPI(data) {
   return fetch(API, {
     method: "POST",
     headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(data),
-  })
-    .then((res) => res.text())
-    .then((text) => {
-      try {
-        return JSON.parse(text);
-      } catch (e) {
-        console.error("Invalid JSON response from server:", text);
-        throw new Error("Invalid JSON from server");
-      }
-    });
+    body: JSON.stringify(data)
+  }).then((res) => res.json());
 }
 
-// ---------- Fetch live products (GET) ----------
+// ---------- GET live products (MUST use ?action=products) ----------
 async function getLiveProductsSafe() {
   try {
-    // Your Code.gs supports action=products (based on your screenshot)
-    const url = API + "?action=products";
-    const res = await fetch(url, { method: "GET", cache: "no-store" });
+    const res = await fetch(API + "?action=products", { method: "GET", cache: "no-store" });
     if (!res.ok) throw new Error("API not ok");
     const data = await res.json();
     if (!Array.isArray(data)) throw new Error("API not array");
     return data;
   } catch (err) {
-    console.warn("Live products fetch failed:", err);
     return null;
   }
 }
@@ -90,7 +78,7 @@ async function getLiveProductsSafe() {
 async function ensureLiveStockMap() {
   // refresh every 30 seconds
   const now = Date.now();
-  if (liveStockMap && now - lastStockFetchAt < 30000) return liveStockMap;
+  if (liveStockMap && (now - lastStockFetchAt) < 30000) return liveStockMap;
 
   const live = await getLiveProductsSafe();
   if (!live) return null;
@@ -109,13 +97,13 @@ function getMaxStockForItem(item) {
   const id = String(item.id ?? "");
   if (liveStockMap && id in liveStockMap) return liveStockMap[id];
 
-  // fallback: if cart item has stock already, use it, else unknown
+  // fallback: if item has stock field
   const fallback = toNumber(item.stock);
   return fallback > 0 ? fallback : Infinity;
 }
 
 // ========================
-// Render Cart (stock clamp + disable plus)
+// Render Cart (clamp + disable plus)
 // ========================
 function renderCart() {
   cartItemsContainer.innerHTML = "";
@@ -131,7 +119,7 @@ function renderCart() {
 
     const maxStock = getMaxStockForItem(item);
 
-    // clamp qty to stock if known
+    // clamp qty if maxStock known
     if (maxStock !== Infinity && qty > maxStock) {
       qty = Math.max(1, maxStock);
       setQty(item, qty);
@@ -142,10 +130,10 @@ function renderCart() {
     const lineTotal = qty * price;
 
     const minusDisabled = qty <= 1;
-    const plusDisabled = maxStock !== Infinity ? qty >= maxStock : false;
+    const plusDisabled = (maxStock !== Infinity) ? qty >= maxStock : false;
 
     const stockHint =
-      maxStock !== Infinity
+      (maxStock !== Infinity)
         ? `<small>${formatBND(price)} each • Stock ${maxStock}</small>`
         : `<small>${formatBND(price)} each</small>`;
 
@@ -160,33 +148,10 @@ function renderCart() {
           <div class="line-price">${formatBND(lineTotal)}</div>
 
           <div class="qty-controls" aria-label="Quantity controls">
-            <button
-              type="button"
-              class="qty-btn"
-              data-action="minus"
-              data-index="${index}"
-              ${minusDisabled ? "disabled" : ""}
-              aria-label="Decrease quantity"
-            >−</button>
-
+            <button type="button" class="qty-btn" data-action="minus" data-index="${index}" ${minusDisabled ? "disabled" : ""}>−</button>
             <span class="qty-number" aria-live="polite">${qty}</span>
-
-            <button
-              type="button"
-              class="qty-btn"
-              data-action="plus"
-              data-index="${index}"
-              ${plusDisabled ? "disabled" : ""}
-              aria-label="Increase quantity"
-            >+</button>
-
-            <button
-              type="button"
-              class="remove-btn"
-              data-action="remove"
-              data-index="${index}"
-              aria-label="Remove item"
-            >Remove</button>
+            <button type="button" class="qty-btn" data-action="plus" data-index="${index}" ${plusDisabled ? "disabled" : ""}>+</button>
+            <button type="button" class="remove-btn" data-action="remove" data-index="${index}">Remove</button>
           </div>
         </div>
       </div>
@@ -199,14 +164,14 @@ function renderCart() {
 // initial render
 renderCart();
 
-// load live stock once (so checkout clamp works)
+// boot live stock once
 (async function bootStock() {
   await ensureLiveStockMap();
   renderCart();
 })();
 
 // ========================
-// Qty & Remove Controls (live stock enforced)
+// Qty & Remove Controls
 // ========================
 cartItemsContainer.addEventListener("click", async (e) => {
   const btn = e.target.closest("button");
@@ -214,42 +179,27 @@ cartItemsContainer.addEventListener("click", async (e) => {
 
   const action = btn.dataset.action;
   const index = Number(btn.dataset.index);
-  if (!Number.isFinite(index) || index < 0 || index >= cart.length) return;
+  if (!Number.isFinite(index) || index < 0) return;
 
-  // always reload cart from storage to avoid mismatch
   cart = JSON.parse(localStorage.getItem("cart")) || [];
   if (!cart[index]) return;
 
-  const item = cart[index];
-  let qty = getQty(item);
-
-  // refresh stock before changing
   await ensureLiveStockMap();
+
+  const item = cart[index];
   const maxStock = getMaxStockForItem(item);
 
-  if (action === "plus") {
-    const nextQty = qty + 1;
+  let qty = getQty(item);
 
-    if (maxStock !== Infinity && nextQty > maxStock) {
+  if (action === "plus") {
+    if (maxStock !== Infinity && qty + 1 > maxStock) {
       alert("Maximum stock reached.");
-      renderCart();
       return;
     }
-
-    qty = nextQty;
-    setQty(item, qty);
-    saveCart();
-    renderCart();
-    return;
+    qty += 1;
   }
 
-  if (action === "minus") {
-    qty = Math.max(1, qty - 1);
-    setQty(item, qty);
-    saveCart();
-    renderCart();
-    return;
-  }
+  if (action === "minus") qty = Math.max(1, qty - 1);
 
   if (action === "remove") {
     cart.splice(index, 1);
@@ -257,6 +207,12 @@ cartItemsContainer.addEventListener("click", async (e) => {
     renderCart();
     return;
   }
+
+  if (maxStock !== Infinity && qty > maxStock) qty = Math.max(1, maxStock);
+
+  setQty(item, qty);
+  saveCart();
+  renderCart();
 });
 
 // ========================
@@ -274,14 +230,12 @@ if (clearCartBtn) {
 }
 
 // ========================
-// Submit Order
-// - Anti duplicate (client + token)
-// - Stock recheck for ALL items before submit
+// Submit Order (anti duplicate + stock recheck)
 // ========================
 checkoutForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  if (isSubmitting) return; // anti double tap
+  if (isSubmitting) return;
   isSubmitting = true;
 
   cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -302,10 +256,12 @@ checkoutForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  // refresh live stock and validate ALL items before submit
   await ensureLiveStockMap();
+
+  // Validate all items against live stock
   for (const it of cart) {
     const maxStock = getMaxStockForItem(it);
+    const qty = getQty(it);
 
     if (maxStock !== Infinity && maxStock <= 0) {
       alert(`Out of stock: ${it.name}`);
@@ -313,8 +269,7 @@ checkoutForm.addEventListener("submit", async (e) => {
       isSubmitting = false;
       return;
     }
-
-    if (maxStock !== Infinity && getQty(it) > maxStock) {
+    if (maxStock !== Infinity && qty > maxStock) {
       alert(`Quantity exceeds stock for: ${it.name} (Stock ${maxStock})`);
       renderCart();
       isSubmitting = false;
@@ -327,70 +282,53 @@ checkoutForm.addEventListener("submit", async (e) => {
   placeOrderBtn.disabled = true;
   placeOrderBtn.textContent = "Processing...";
 
-  // unique client token helps server anti-duplicate too
+  // unique token for anti duplicate server
   const submitToken = `${Date.now()}_${Math.random().toString(16).slice(2)}`;
 
   try {
-    // 1) Save order (server generates PDF + returns pdfUrl)
     const orderRes = await postToAPI({
       type: "order",
-      token: submitToken, // ✅ anti duplicate key
+      token: submitToken, // server uses token/clientOrderId
       cart,
       total,
       customer: { name, phone, address, payment },
-      sellerSignature: "MIDBN Official", // sheet only
-      status: "Pending Verification", // sheet only
+      sellerSignature: "MIDBN Official",
+      status: "Pending Verification"
     });
 
-    // Server-side duplicate handling
-    if (orderRes && orderRes.status === "duplicate") {
-      alert("This order was already submitted. Opening your receipt.");
+    // IMPORTANT: your server returns "receiptPdfUrl"
+    const pdfUrl = orderRes.receiptPdfUrl || orderRes.pdfUrl || "";
 
-      localStorage.setItem(
-        "lastOrder",
-        JSON.stringify({
-          orderId: orderRes.orderId,
-          pdfUrl: orderRes.pdfUrl || "",
-          customer: { name, phone, address, payment },
-          cart,
-          total,
-        })
-      );
-
+    if (orderRes.status === "duplicate") {
+      localStorage.setItem("lastOrder", JSON.stringify({
+        orderId: orderRes.orderId,
+        pdfUrl,
+        customer: { name, phone, address, payment },
+        cart,
+        total
+      }));
       localStorage.removeItem("cart");
       window.location.href = "success.html";
       return;
     }
 
-    if (!orderRes || orderRes.status !== "success") {
-      throw new Error(orderRes?.message || "Order failed");
+    if (orderRes.status !== "success") {
+      throw new Error(orderRes.message || "Order failed");
     }
 
-    // 2) Deduct stock
-    const stockRes = await postToAPI({ type: "stock", cart });
-    if (stockRes && stockRes.status && stockRes.status !== "success" && stockRes.status !== "ok") {
-      // some scripts return "ok" for stock; accept both
-      console.warn("Stock response:", stockRes);
-    }
-
-    // Save for success
-    localStorage.setItem(
-      "lastOrder",
-      JSON.stringify({
-        orderId: orderRes.orderId,
-        pdfUrl: orderRes.pdfUrl || "",
-        customer: { name, phone, address, payment },
-        cart,
-        total,
-      })
-    );
+    localStorage.setItem("lastOrder", JSON.stringify({
+      orderId: orderRes.orderId,
+      pdfUrl,
+      customer: { name, phone, address, payment },
+      cart,
+      total
+    }));
 
     localStorage.removeItem("cart");
     window.location.href = "success.html";
   } catch (err) {
     console.error(err);
     alert("Server error. Check deployment / permissions.");
-
     placeOrderBtn.disabled = false;
     placeOrderBtn.textContent = "Place Order";
     isSubmitting = false;
