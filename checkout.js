@@ -1,5 +1,8 @@
 // ==========================================
-// MIDBN CHECKOUT.JS - FINAL (Works with Order + Stock)
+// MIDBN CHECKOUT.JS - FINAL+
+// - Anti duplicate submit (client + server token)
+// - Live stock qty limit on +/- and on submit
+// - Receives pdfUrl from Apps Script and stores in lastOrder
 // ==========================================
 
 const API =
@@ -13,39 +16,93 @@ const placeOrderBtn = document.getElementById("placeOrderBtn");
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-// ========================
-// Helpers
-// ========================
+// ---------- Anti duplicate (client) ----------
+let isSubmitting = false;
+
+// ---------- Live stock cache ----------
+let liveStockMap = null; // { "id": stockNumber }
+let lastStockFetchAt = 0;
+
 function toNumber(v) {
   const n = Number(v);
   return Number.isFinite(n) ? n : 0;
 }
-
 function formatBND(n) {
   return "BND " + toNumber(n).toFixed(2);
 }
-
 function getQty(item) {
   return Math.max(1, toNumber(item.qty ?? item.quantity ?? 1));
 }
-
 function setQty(item, qty) {
   item.qty = qty;
   if ("quantity" in item) item.quantity = qty;
 }
-
 function saveCart() {
   localStorage.setItem("cart", JSON.stringify(cart));
 }
-
 function calcTotal() {
-  return cart.reduce((sum, it) => {
-    return sum + getQty(it) * toNumber(it.price);
-  }, 0);
+  return cart.reduce((sum, it) => sum + getQty(it) * toNumber(it.price), 0);
+}
+
+function escapeHtml(str) {
+  return String(str ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+// ---------- Safari-safe POST ----------
+function postToAPI(data) {
+  return fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(data)
+  }).then((res) => res.json());
+}
+
+// ---------- Fetch live stock from API (GET) ----------
+async function getLiveProductsSafe() {
+  try {
+    const res = await fetch(API, { method: "GET", cache: "no-store" });
+    if (!res.ok) throw new Error("API not ok");
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error("API not array");
+    return data;
+  } catch (err) {
+    return null;
+  }
+}
+
+async function ensureLiveStockMap() {
+  // refresh every 30 seconds
+  const now = Date.now();
+  if (liveStockMap && (now - lastStockFetchAt) < 30000) return liveStockMap;
+
+  const live = await getLiveProductsSafe();
+  if (!live) return null;
+
+  const map = {};
+  live.forEach((p) => {
+    if (p && p.id != null) map[String(p.id)] = toNumber(p.stock);
+  });
+
+  liveStockMap = map;
+  lastStockFetchAt = now;
+  return map;
+}
+
+function getMaxStockForItem(item) {
+  const id = String(item.id ?? "");
+  if (liveStockMap && id in liveStockMap) return liveStockMap[id];
+  // fallback: if cart item has stock already, use it, else unlimited
+  const fallback = toNumber(item.stock);
+  return fallback > 0 ? fallback : Infinity;
 }
 
 // ========================
-// Render Cart
+// Render Cart (with stock clamp + disabled plus)
 // ========================
 function renderCart() {
   cartItemsContainer.innerHTML = "";
@@ -57,25 +114,65 @@ function renderCart() {
   }
 
   cart.forEach((item, index) => {
-    const qty = getQty(item);
+    let qty = getQty(item);
+
+    // clamp qty to stock if stock is known
+    const maxStock = getMaxStockForItem(item);
+    if (maxStock !== Infinity && qty > maxStock) {
+      qty = Math.max(1, maxStock);
+      setQty(item, qty);
+      saveCart();
+    }
+
     const price = toNumber(item.price);
     const lineTotal = qty * price;
+
+    const minusDisabled = qty <= 1;
+    const plusDisabled = (maxStock !== Infinity) ? qty >= maxStock : false;
+
+    const stockHint =
+      (maxStock !== Infinity)
+        ? `<small>${formatBND(price)} each • Stock ${maxStock}</small>`
+        : `<small>${formatBND(price)} each</small>`;
 
     cartItemsContainer.innerHTML += `
       <div class="cart-item">
         <div class="cart-left">
-          <strong>${item.name}</strong>
-          <small>${formatBND(price)} each</small>
+          <strong>${escapeHtml(item.name)}</strong>
+          ${stockHint}
         </div>
 
         <div class="cart-right">
           <div class="line-price">${formatBND(lineTotal)}</div>
 
-          <div class="qty-controls">
-            <button class="qty-btn" data-action="minus" data-index="${index}" ${qty <= 1 ? "disabled" : ""}>−</button>
-            <span class="qty-number">${qty}</span>
-            <button class="qty-btn" data-action="plus" data-index="${index}">+</button>
-            <button class="remove-btn" data-action="remove" data-index="${index}">Remove</button>
+          <div class="qty-controls" aria-label="Quantity controls">
+            <button
+              type="button"
+              class="qty-btn"
+              data-action="minus"
+              data-index="${index}"
+              ${minusDisabled ? "disabled" : ""}
+              aria-label="Decrease quantity"
+            >−</button>
+
+            <span class="qty-number" aria-live="polite">${qty}</span>
+
+            <button
+              type="button"
+              class="qty-btn"
+              data-action="plus"
+              data-index="${index}"
+              ${plusDisabled ? "disabled" : ""}
+              aria-label="Increase quantity"
+            >+</button>
+
+            <button
+              type="button"
+              class="remove-btn"
+              data-action="remove"
+              data-index="${index}"
+              aria-label="Remove item"
+            >Remove</button>
           </div>
         </div>
       </div>
@@ -85,23 +182,45 @@ function renderCart() {
   cartTotalEl.innerText = formatBND(calcTotal());
 }
 
+// initial render
 renderCart();
 
+// load live stock once (so checkout clamp works)
+(async function bootStock(){
+  await ensureLiveStockMap();
+  renderCart();
+})();
+
 // ========================
-// Qty & Remove Controls
+// Qty & Remove Controls (with live stock check)
 // ========================
-cartItemsContainer.addEventListener("click", (e) => {
+cartItemsContainer.addEventListener("click", async (e) => {
   const btn = e.target.closest("button");
   if (!btn) return;
 
   const action = btn.dataset.action;
   const index = Number(btn.dataset.index);
-  if (!Number.isFinite(index)) return;
+  if (!Number.isFinite(index) || index < 0 || index >= cart.length) return;
 
-  let qty = getQty(cart[index]);
+  cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const item = cart[index];
+  let qty = getQty(item);
 
-  if (action === "plus") qty += 1;
+  // refresh stock if possible before changing
+  await ensureLiveStockMap();
+  const maxStock = getMaxStockForItem(item);
+
+  if (action === "plus") {
+    if (maxStock !== Infinity && qty >= maxStock) {
+      alert("Not enough stock for this item.");
+      renderCart();
+      return;
+    }
+    qty += 1;
+  }
+
   if (action === "minus") qty = Math.max(1, qty - 1);
+
   if (action === "remove") {
     cart.splice(index, 1);
     saveCart();
@@ -109,7 +228,10 @@ cartItemsContainer.addEventListener("click", (e) => {
     return;
   }
 
-  setQty(cart[index], qty);
+  // clamp
+  if (maxStock !== Infinity && qty > maxStock) qty = Math.max(1, maxStock);
+
+  setQty(item, qty);
   saveCart();
   renderCart();
 });
@@ -119,6 +241,9 @@ cartItemsContainer.addEventListener("click", (e) => {
 // ========================
 if (clearCartBtn) {
   clearCartBtn.addEventListener("click", () => {
+    if (!cart.length) return;
+    const ok = confirm("Clear all items in cart?");
+    if (!ok) return;
     cart = [];
     localStorage.removeItem("cart");
     renderCart();
@@ -126,24 +251,18 @@ if (clearCartBtn) {
 }
 
 // ========================
-// Safari-safe POST
+// Submit Order (Anti duplicate + server anti duplicate + stock recheck)
 // ========================
-function postToAPI(data) {
-  return fetch(API, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(data)
-  }).then(res => res.json());
-}
-
-// ========================
-// Submit Order
-// ========================
-checkoutForm.addEventListener("submit", (e) => {
+checkoutForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  if (isSubmitting) return; // anti double tap
+  isSubmitting = true;
+
+  cart = JSON.parse(localStorage.getItem("cart")) || [];
   if (!cart.length) {
     alert("Cart is empty!");
+    isSubmitting = false;
     return;
   }
 
@@ -154,7 +273,26 @@ checkoutForm.addEventListener("submit", (e) => {
 
   if (!name || !phone || !address || !payment) {
     alert("Please complete all fields.");
+    isSubmitting = false;
     return;
+  }
+
+  // refresh live stock and validate ALL items before submit
+  await ensureLiveStockMap();
+  for (const it of cart) {
+    const maxStock = getMaxStockForItem(it);
+    if (maxStock !== Infinity && getQty(it) > maxStock) {
+      alert(`Quantity exceeds stock for: ${it.name} (Stock ${maxStock})`);
+      renderCart();
+      isSubmitting = false;
+      return;
+    }
+    if (maxStock !== Infinity && maxStock <= 0) {
+      alert(`Out of stock: ${it.name}`);
+      renderCart();
+      isSubmitting = false;
+      return;
+    }
   }
 
   const total = formatBND(calcTotal());
@@ -162,25 +300,45 @@ checkoutForm.addEventListener("submit", (e) => {
   placeOrderBtn.disabled = true;
   placeOrderBtn.textContent = "Processing...";
 
-  // 1️⃣ Save Order
-  postToAPI({
-    type: "order",
-    cart,
-    total,
-    customer: { name, phone, address, payment }
-  })
-  .then(orderRes => {
+  // unique client token helps server anti-duplicate too
+  const submitToken = `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+
+  try {
+    // 1) Save order (server will also generate PDF + return pdfUrl)
+    const orderRes = await postToAPI({
+      type: "order",
+      token: submitToken,                 // ✅ anti duplicate key
+      cart,
+      total,
+      customer: { name, phone, address, payment },
+      sellerSignature: "MIDBN Official",  // ✅ sheet only
+      status: "Pending Verification"      // ✅ sheet only
+    });
+
+    if (orderRes.status === "duplicate") {
+      alert("This order was already submitted. Opening your receipt.");
+      // save lastOrder (so success can show it)
+      localStorage.setItem("lastOrder", JSON.stringify({
+        orderId: orderRes.orderId,
+        pdfUrl: orderRes.pdfUrl || "",
+        customer: { name, phone, address, payment },
+        cart,
+        total
+      }));
+      localStorage.removeItem("cart");
+      window.location.href = "success.html";
+      return;
+    }
+
     if (orderRes.status !== "success") throw new Error("Order failed");
 
-    // 2️⃣ Deduct Stock
-    return postToAPI({
-      type: "stock",
-      cart
-    }).then(() => orderRes);
-  })
-  .then(orderRes => {
+    // 2) Deduct stock
+    await postToAPI({ type: "stock", cart });
+
+    // Save for success
     localStorage.setItem("lastOrder", JSON.stringify({
       orderId: orderRes.orderId,
+      pdfUrl: orderRes.pdfUrl || "",
       customer: { name, phone, address, payment },
       cart,
       total
@@ -188,11 +346,11 @@ checkoutForm.addEventListener("submit", (e) => {
 
     localStorage.removeItem("cart");
     window.location.href = "success.html";
-  })
-  .catch(err => {
+  } catch (err) {
     console.error(err);
-    alert("Server error. Check deployment.");
+    alert("Server error. Check deployment / permissions.");
     placeOrderBtn.disabled = false;
     placeOrderBtn.textContent = "Place Order";
-  });
+    isSubmitting = false;
+  }
 });
