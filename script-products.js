@@ -1,8 +1,6 @@
 // ==========================================
 // CONFIG
 // ==========================================
-
-// ✅ Your Apps Script endpoint (optional for live stock/price)
 const API = "https://script.google.com/macros/s/AKfycbwzKvHmOeestXmMxg-_mQitkAELdSSxZdz1TMTnSUABdmZu7YenCD2zLDBESHV5wBbX/exec";
 
 // ==========================================
@@ -61,35 +59,8 @@ const products = [
   {id:37, name:"Couple (White/Silver)", brand:"Rolex", category:"couple", grade:"A", price:40, stock:0, label:"NEW", img:"images/couple/couple-4.png", details:"Quartz, stainless steel case, couple watch, Grade A"},
   {id:38, name:"Couple (Yellow)",       brand:"Rolex", category:"couple", grade:"A", price:40, stock:1, label:"NEW", img:"images/couple/couple-5.png", details:"Quartz, stainless steel case, couple watch, Grade A"},
 
-  // ===== COMING SOON (G-Shock Premium) =====
-  {id:39, name:"GA2100 (Manga Green)",     brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:40, name:"GA2100 (Manga D.Green)",   brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:41, name:"GA2100 (Manga Gray)",      brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:42, name:"GA2100 (Manga D.gray)",    brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:43, name:"GA2100 (Manga Beach)",     brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:44, name:"GA2100 (Manga Brown)",     brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:45, name:"GA2100 (Manga Blue)",      brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:46, name:"GA2100 (TP all Red)",      brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:47, name:"GA2100 (TP all Yellow)",   brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:48, name:"GA2100 (TP all Gray)",     brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:49, name:"GA2100 (TP White/Blue)",   brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:50, name:"GA2100 (TP Black/Gold)",   brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:51, name:"GA2100 (TP Yellow/rbw)",   brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:52, name:"GA2100 (TP Blue/rbw)",     brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:53, name:"GA2100 (TP White Rbw)",    brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:54, name:"GA2100 (Solid Black/Rbw)", brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:55, name:"GA2100 (Solid Red/Black)", brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:56, name:"GA2100 (Solid White/Black)",brand:"G-Shock",category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:57, name:"GA2100 (Solid Black/Gold)", brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:58, name:"GA2100 (Solid Salmon/Black)",brand:"G-Shock",category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:59, name:"GA2100 (Solid Gray/Black)", brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:60, name:"GA2100 (Solid all Gray)",   brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:61, name:"GA2100 (Solid TP Rainbow)", brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:62, name:"GA2100 (Abstract Tp Gold)",  brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:63, name:"GA2100 (Abstract TP Turquoise)",brand:"G-Shock",category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:64, name:"GA2100 (Abstract TP Rainbow)",   brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:65, name:"GA2100 (Abstract Blue/White)",   brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
-  {id:66, name:"GA2100 (Abstract Gray/Green)",   brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
+  // ===== COMING SOON =====
+  {id:39, name:"GA2100 (Manga Green)", brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
 
   // ===== DEFECTS / PROMO =====
   {id:67, name:"Nautilus (Black) — Defect", brand:"Patek Philippe", category:"promo", grade:"A", price:15, stock:1, label:"DEFECT", img:"images/defect/defect-1.PNG", details:"Complete with box, Grade A (Slight dent)"},
@@ -122,19 +93,28 @@ const modalStock = document.getElementById("modalStock");
 const modalDetails = document.getElementById("modalDetails");
 const closeModal = document.getElementById("closeModal");
 const modalAddCart = document.getElementById("modalAddCart");
-
 const goCheckoutBottom = document.getElementById("goCheckoutBottom");
 
-// Cart
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let currentQuickProduct = null;
 
 // ==========================================
-// HAMBURGER TOGGLE (click + keyboard)
+// CART COUNT (Upgrade #2)
 // ==========================================
-function toggleFilters(){
-  filters.classList.toggle("active");
+function cartCount(){
+  return cart.reduce((sum, it) => sum + Number(it.qty || 0), 0);
 }
+function updateCheckoutButton(){
+  if(!goCheckoutBottom) return;
+  const count = cartCount();
+  goCheckoutBottom.textContent = count > 0 ? `🛒 (${count}) Go to Checkout` : `🛒 Go to Checkout`;
+}
+updateCheckoutButton();
+
+// ==========================================
+// HAMBURGER TOGGLE
+// ==========================================
+function toggleFilters(){ filters.classList.toggle("active"); }
 if(hamburger && filters){
   hamburger.addEventListener("click", toggleFilters);
   hamburger.addEventListener("keydown", (e)=>{
@@ -162,8 +142,10 @@ function renderProducts(list){
     card.dataset.id = p.id;
 
     card.innerHTML = `
-      <img src="${p.img}" alt="${p.name}">
-      ${p.label ? `<div class="label">${p.label}</div>` : ""}
+      <div class="img-wrap">
+        <img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async">
+        ${p.label ? `<div class="label">${p.label}</div>` : ""}
+      </div>
 
       <div class="card-body">
         <div class="brand">${p.brand}</div>
@@ -174,7 +156,6 @@ function renderProducts(list){
       </div>
     `;
 
-    // Quick view
     card.querySelector("img").addEventListener("click", ()=>openQuickView(p));
     card.querySelector(".more-details-btn").addEventListener("click", (e)=>{
       e.preventDefault();
@@ -191,7 +172,7 @@ function renderProducts(list){
 function inStockFirstComparator(a, b){
   const aIn = Number(a.stock) > 0 ? 1 : 0;
   const bIn = Number(b.stock) > 0 ? 1 : 0;
-  if (aIn !== bIn) return bIn - aIn; // in-stock first
+  if (aIn !== bIn) return bIn - aIn;
   return 0;
 }
 
@@ -213,10 +194,8 @@ function filterSortProducts(){
     return searchMatch && brandMatch && categoryMatch && gradeMatch && minMatch && maxMatch;
   });
 
-  // ✅ ALWAYS in-stock first (default)
   filtered.sort(inStockFirstComparator);
 
-  // User sorting (still keeps in-stock first as priority)
   if(sortSelect.value === "az"){
     filtered.sort((a,b)=>{
       const pri = inStockFirstComparator(a,b);
@@ -243,7 +222,6 @@ gradeFilter.addEventListener("change", filterSortProducts);
 minPrice.addEventListener("input", filterSortProducts);
 maxPrice.addEventListener("input", filterSortProducts);
 
-// Initial render
 filterSortProducts();
 
 // ==========================================
@@ -268,6 +246,7 @@ function openQuickView(product){
   quickViewModal.style.display = "flex";
   quickViewModal.setAttribute("aria-hidden","false");
 }
+
 closeModal.addEventListener("click", ()=>{
   quickViewModal.style.display = "none";
   quickViewModal.setAttribute("aria-hidden","true");
@@ -280,60 +259,43 @@ window.addEventListener("click", (e)=>{
 });
 
 // ==========================================
-// LIVE API SAFE FETCH
+// ADD TO CART (Upgrade #1 - instant, no delay)
 // ==========================================
-async function getLiveProductsSafe(){
-  try{
-    const res = await fetch(API, { method:"GET" });
-    if(!res.ok) throw new Error("API not ok");
-    const data = await res.json();
-    if(!Array.isArray(data)) throw new Error("API not array");
-    return data;
-  }catch(err){
-    return null;
-  }
-}
+function addToCartInstant(product){
+  if(!product) return;
 
-// ==========================================
-// ADD TO CART (ONLY FROM MODAL NOW)
-// ==========================================
-async function addToCart(id, name, price){
-  // Try live stock check first
-  const live = await getLiveProductsSafe();
-  if(live){
-    const liveP = live.find(p=> String(p.id) === String(id));
-    if(!liveP || Number(liveP.stock) <= 0){
-      alert("Out of stock");
-      return;
-    }
-    const existing = cart.find(i=> String(i.id) === String(id));
-    const nextQty = existing ? existing.qty + 1 : 1;
-    if(nextQty > Number(liveP.stock)){
-      alert("Not enough stock");
-      return;
-    }
+  // enforce local stock (fast)
+  const stock = Number(product.stock || 0);
+  if(stock <= 0){
+    alert("Out of stock");
+    return false;
   }
 
-  const existing = cart.find(i=> String(i.id) === String(id));
+  const existing = cart.find(i => String(i.id) === String(product.id));
+  const currentQty = existing ? Number(existing.qty || 0) : 0;
+
+  if(currentQty + 1 > stock){
+    alert("Not enough stock");
+    return false;
+  }
+
   if(existing){
-    existing.qty += 1;
+    existing.qty = currentQty + 1;
   }else{
-    cart.push({ id:Number(id), name, price:Number(price), qty:1 });
+    cart.push({ id:Number(product.id), name:product.name, price:Number(product.price), qty:1 });
   }
 
   localStorage.setItem("cart", JSON.stringify(cart));
+  updateCheckoutButton();
+  return true;
 }
 
-// Modal add
 if(modalAddCart){
-  modalAddCart.addEventListener("click", async ()=>{
+  modalAddCart.addEventListener("click", ()=>{
     if(!currentQuickProduct) return;
 
-    await addToCart(
-      currentQuickProduct.id,
-      currentQuickProduct.name,
-      currentQuickProduct.price
-    );
+    const ok = addToCartInstant(currentQuickProduct);
+    if(!ok) return;
 
     modalAddCart.classList.add("added");
     modalAddCart.textContent = "✓ Added";
@@ -343,7 +305,7 @@ if(modalAddCart){
       modalAddCart.classList.remove("added");
       modalAddCart.textContent = "+ Add to Cart";
       modalAddCart.disabled = false;
-    }, 900);
+    }, 650);
   });
 }
 
@@ -395,8 +357,20 @@ spawnParticles();
 window.addEventListener("resize", spawnParticles);
 
 // ==========================================
-// LIVE STOCK/PRICE OVERRIDE ON LOAD
+// LIVE STOCK/PRICE OVERRIDE ON LOAD (kept)
 // ==========================================
+async function getLiveProductsSafe(){
+  try{
+    const res = await fetch(API, { method:"GET" });
+    if(!res.ok) throw new Error("API not ok");
+    const data = await res.json();
+    if(!Array.isArray(data)) throw new Error("API not array");
+    return data;
+  }catch(err){
+    return null;
+  }
+}
+
 (async function applyLiveStock(){
   const live = await getLiveProductsSafe();
   if(!live) return;
@@ -408,6 +382,5 @@ window.addEventListener("resize", spawnParticles);
     if(lp.stock != null) local.stock = Number(lp.stock);
   });
 
-  // ✅ re-render + keep in-stock first
   filterSortProducts();
 })();
