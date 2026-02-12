@@ -6,10 +6,13 @@
   <title>MIDBN.Timepieces</title>
 
   <link rel="stylesheet" href="style.css">
+
+  <!-- Preload hero poster for instant paint -->
+  <link rel="preload" as="image" href="./images/hero-poster.jpg">
 </head>
 <body>
 
-<!-- HEADER / NAVIGATION -->
+<!-- ================= HEADER ================= -->
 <header class="header">
   <nav>
     <div class="hamburger">
@@ -27,7 +30,7 @@
   </nav>
 </header>
 
-<!-- HERO -->
+<!-- ================= HERO ================= -->
 <section class="hero">
   <video
     class="hero-video"
@@ -35,13 +38,14 @@
     muted
     loop
     playsinline
-    preload="metadata"
+    preload="none"
     poster="./images/hero-poster.jpg"
   >
     <source src="./images/video.mp4" type="video/mp4">
   </video>
 
   <div class="hero-overlay"></div>
+
   <div class="hero-content">
     <h1 class="hero-quote">
       MAKE EVERY<br>
@@ -51,64 +55,73 @@
   </div>
 </section>
 
-<!-- INTRO -->
+<!-- ================= INTRO ================= -->
 <section id="intro" class="intro">
   <div class="intro-content">
     <h2>About MIDBN.Timepieces</h2>
     <hr class="intro-divider">
     <p>
-      At <strong>MIDBN.Timepieces</strong>, we bring <span class="highlight">timeless elegance</span> to your wrist.
-      Offering a curated selection of <span class="highlight">quality watches</span> for all ages, we combine style,
-      functionality, and affordability. Whether you’re looking for a <span class="highlight">classic design</span>,
-      a <span class="highlight">modern statement piece</span>, or a gift for someone special,
-      MIDBN.Timepieces has the perfect watch for every occasion. Your time, your style—elevated.
+      At <strong>MIDBN.Timepieces</strong>, we bring 
+      <span class="highlight">timeless elegance</span> to your wrist.
+      Offering a curated selection of 
+      <span class="highlight">quality watches</span> for all ages, 
+      we combine style, functionality, and affordability.
+      Whether you’re looking for a 
+      <span class="highlight">classic design</span>, 
+      a <span class="highlight">modern statement piece</span>, 
+      or a gift for someone special,
+      MIDBN.Timepieces has the perfect watch for every occasion.
+      Your time, your style—elevated.
     </p>
     <hr class="intro-divider">
   </div>
 </section>
 
-<!-- NEW ARRIVALS -->
+<!-- ================= NEW ARRIVALS ================= -->
 <section id="arrivals" class="arrivals">
   <h2>New Arrivals</h2>
+
   <div class="arrival-scroll">
+
     <div>
       <div class="arrival-card">
-        <img src="./images/watch5.webp" loading="lazy" decoding="async" alt="Watch 1">
+        <img src="./images/watch5.webp" loading="lazy" decoding="async" alt="Nautilus Black">
       </div>
       <p class="arrival-name">Nautilus Black</p>
     </div>
 
     <div>
       <div class="arrival-card">
-        <img src="./images/watch1.webp" loading="lazy" decoding="async" alt="Watch 2">
+        <img src="./images/watch1.webp" loading="lazy" decoding="async" alt="Oalet Black">
       </div>
       <p class="arrival-name">Oalet Black</p>
     </div>
 
     <div>
       <div class="arrival-card">
-        <img src="./images/watch2.webp" loading="lazy" decoding="async" alt="Watch 3">
+        <img src="./images/watch2.webp" loading="lazy" decoding="async" alt="Rolex Couple Green">
       </div>
       <p class="arrival-name">Rolex Couple Green</p>
     </div>
 
     <div>
       <div class="arrival-card">
-        <img src="./images/watch3.webp" loading="lazy" decoding="async" alt="Watch 4">
+        <img src="./images/watch3.webp" loading="lazy" decoding="async" alt="Rolex Daytona Black">
       </div>
       <p class="arrival-name">Rolex Daytona Black</p>
     </div>
 
     <div>
       <div class="arrival-card">
-        <img src="./images/watch4.webp" loading="lazy" decoding="async" alt="Watch 5">
+        <img src="./images/watch4.webp" loading="lazy" decoding="async" alt="Franc Muller">
       </div>
       <p class="arrival-name">Franc Muller</p>
     </div>
+
   </div>
 </section>
 
-<!-- FAQ -->
+<!-- ================= FAQ ================= -->
 <section id="faq" class="faq">
   <div class="glass-card faq-card">
     <h2>F.A.Q</h2>
@@ -124,10 +137,8 @@
     <div class="faq-item">
       <button class="faq-question">Warranty</button>
       <div class="faq-answer">
-        We will provide 7 days warranty which includes battery and internal defect.
+        We provide 7 days warranty which includes battery and internal defect.
         (Scratches, dents & water damage are not included.)
-        <br><br>
-        <strong>NOTE:</strong> Before handing the watch, we will ask you to inspect first.
       </div>
     </div>
 
@@ -146,29 +157,29 @@
         International shipping calculated separately
       </div>
     </div>
-
   </div>
 </section>
 
-<!-- BRANDS -->
+<!-- ================= BRANDS ================= -->
 <section id="brands" class="brands">
   <h2>BRANDS</h2>
+
   <div class="brand-scroll">
-    <div class="brand-card"><img src="./images/men-1.png" loading="lazy" decoding="async" alt="Rolex"><div class="brand-name">Rolex</div></div>
-    <div class="brand-card"><img src="./images/men-2.png" loading="lazy" decoding="async" alt="Omega"><div class="brand-name">Omega</div></div>
-    <div class="brand-card"><img src="./images/men-3.png" loading="lazy" decoding="async" alt="Casio"><div class="brand-name">Casio</div></div>
-    <div class="brand-card"><img src="./images/men-7.png" loading="lazy" decoding="async" alt="Cartier"><div class="brand-name">Cartier</div></div>
-    <div class="brand-card"><img src="./images/men-8.png" loading="lazy" decoding="async" alt="Patek Philippe"><div class="brand-name">Patek Philippe</div></div>
-    <div class="brand-card"><img src="./images/men-9.png" loading="lazy" decoding="async" alt="G-Shock"><div class="brand-name">G-Shock</div></div>
-    <div class="brand-card"><img src="./images/women-1.png" loading="lazy" decoding="async" alt="Swarovski"><div class="brand-name">Swarovski</div></div>
-    <div class="brand-card"><img src="./images/women-2.png" loading="lazy" decoding="async" alt="Franck Muller"><div class="brand-name">Franck Muller</div></div>
-    <div class="brand-card"><img src="./images/women-3.png" loading="lazy" decoding="async" alt="Audemars Piguet"><div class="brand-name">Audemars Piguet</div></div>
-    <div class="brand-card"><img src="./images/couple-1.png" loading="lazy" decoding="async" alt="Seiko"><div class="brand-name">Seiko</div></div>
-    <div class="brand-card"><img src="./images/couple-2.png" loading="lazy" decoding="async" alt="Michael Kors"><div class="brand-name">Michael Kors</div></div>
+    <div class="brand-card"><img src="./images/men-1.png" loading="lazy" decoding="async"><div class="brand-name">Rolex</div></div>
+    <div class="brand-card"><img src="./images/men-2.png" loading="lazy" decoding="async"><div class="brand-name">Omega</div></div>
+    <div class="brand-card"><img src="./images/men-3.png" loading="lazy" decoding="async"><div class="brand-name">Casio</div></div>
+    <div class="brand-card"><img src="./images/men-7.png" loading="lazy" decoding="async"><div class="brand-name">Cartier</div></div>
+    <div class="brand-card"><img src="./images/men-8.png" loading="lazy" decoding="async"><div class="brand-name">Patek Philippe</div></div>
+    <div class="brand-card"><img src="./images/men-9.png" loading="lazy" decoding="async"><div class="brand-name">G-Shock</div></div>
+    <div class="brand-card"><img src="./images/women-1.png" loading="lazy" decoding="async"><div class="brand-name">Swarovski</div></div>
+    <div class="brand-card"><img src="./images/women-2.png" loading="lazy" decoding="async"><div class="brand-name">Franck Muller</div></div>
+    <div class="brand-card"><img src="./images/women-3.png" loading="lazy" decoding="async"><div class="brand-name">Audemars Piguet</div></div>
+    <div class="brand-card"><img src="./images/couple-1.png" loading="lazy" decoding="async"><div class="brand-name">Seiko</div></div>
+    <div class="brand-card"><img src="./images/couple-2.png" loading="lazy" decoding="async"><div class="brand-name">Michael Kors</div></div>
   </div>
 </section>
 
-<!-- CATALOGUE CTA -->
+<!-- ================= CATALOG ================= -->
 <section id="catalog" class="catalog">
   <div class="catalog-content">
     <h2>Explore Our Collection</h2>
@@ -177,53 +188,47 @@
   </div>
 </section>
 
-<!-- CONTACT -->
+<!-- ================= CONTACT ================= -->
 <section class="contact-section">
   <h2>Contact Us</h2>
 
-  <!-- CDN icons (no missing files) -->
   <div class="contact-links">
-    <a class="social-btn instagram" href="https://instagram.com/YOURIG" target="_blank" aria-label="Instagram">
-      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" loading="lazy" decoding="async">
+    <a class="social-btn" href="https://instagram.com/YOURIG" target="_blank">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg">
     </a>
 
-    <a class="social-btn tiktok" href="https://tiktok.com/@YOURTIKTOK" target="_blank" aria-label="TikTok">
-      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="TikTok" loading="lazy" decoding="async">
+    <a class="social-btn" href="https://tiktok.com/@YOURTIKTOK" target="_blank">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg">
     </a>
 
-    <a class="social-btn whatsapp" href="https://wa.me/6738908960" target="_blank" aria-label="WhatsApp">
-      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp" loading="lazy" decoding="async">
+    <a class="social-btn" href="https://wa.me/6738908960" target="_blank">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg">
     </a>
   </div>
 
-  <form class="contact-form" action="#" method="POST">
-    <input type="text" name="name" placeholder="Your Name" required>
-    <input type="email" name="email" placeholder="Your Email" required>
-    <textarea name="message" placeholder="Your Message" required></textarea>
+  <form class="contact-form">
+    <input type="text" placeholder="Your Name" required>
+    <input type="email" placeholder="Your Email" required>
+    <textarea placeholder="Your Message" required></textarea>
     <button type="submit">Send Message</button>
   </form>
 </section>
 
-<!-- FOOTER -->
 <footer class="footer">
   <p>&copy; 2026 MIDBN.Timepieces. All rights reserved.</p>
 </footer>
 
 <script src="script.js" defer></script>
 
-<!-- If hero poster missing, still try to play video -->
+<!-- Smooth video autoplay after first paint -->
 <script>
-  (function(){
-    const v = document.querySelector('.hero-video');
-    if (!v) return;
-
-    // Mobile: keep poster for speed
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    if (isMobile) {
-      v.pause();
-      v.removeAttribute('autoplay');
-    }
-  })();
+window.addEventListener("load", () => {
+  const v = document.querySelector(".hero-video");
+  if (!v) return;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    v.play().catch(()=>{});
+  }));
+});
 </script>
 
 </body>
