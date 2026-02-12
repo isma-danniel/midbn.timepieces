@@ -1,9 +1,9 @@
 // ==========================================
-// MIDBN CHECKOUT.JS - FINAL (FIXED)
-// - Correct products endpoint: GET ?action=products
-// - Live stock limit on +/- and submit
-// - Anti double submit (client)
-// - Supports server fields: receiptPdfUrl (and pdfUrl fallback)
+// MIDBN CHECKOUT.JS - FINAL (UPDATED for new Code.gs)
+// ✅ Anti duplicate submit (client token)
+// ✅ Live stock limit (GET ?action=products)
+// ✅ Server-side order creates PDF + deducts stock (no need POST type:'stock')
+// ✅ Saves pdfUrl from (pdfUrl OR receiptPdfUrl) into lastOrder
 // ==========================================
 
 const API =
@@ -17,33 +17,42 @@ const placeOrderBtn = document.getElementById("placeOrderBtn");
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-// --- Anti double submit (client) ---
+// ---------- Anti duplicate (client) ----------
 let isSubmitting = false;
 
-// --- Live stock cache ---
+// ---------- Live stock cache ----------
 let liveStockMap = null; // { "id": stockNumber }
 let lastStockFetchAt = 0;
 
+// ========================
+// Helpers
+// ========================
 function toNumber(v) {
   const n = Number(v);
   return Number.isFinite(n) ? n : 0;
 }
+
 function formatBND(n) {
   return "BND " + toNumber(n).toFixed(2);
 }
+
 function getQty(item) {
   return Math.max(1, toNumber(item.qty ?? item.quantity ?? 1));
 }
+
 function setQty(item, qty) {
   item.qty = qty;
   if ("quantity" in item) item.quantity = qty;
 }
+
 function saveCart() {
   localStorage.setItem("cart", JSON.stringify(cart));
 }
+
 function calcTotal() {
   return cart.reduce((sum, it) => sum + getQty(it) * toNumber(it.price), 0);
 }
+
 function escapeHtml(str) {
   return String(str ?? "")
     .replaceAll("&", "&amp;")
@@ -53,30 +62,41 @@ function escapeHtml(str) {
     .replaceAll("'", "&#039;");
 }
 
-// ---------- Safari-safe POST ----------
+// ========================
+// Safari-safe POST
+// ========================
 function postToAPI(data) {
   return fetch(API, {
     method: "POST",
     headers: { "Content-Type": "text/plain;charset=utf-8" },
     body: JSON.stringify(data)
-  }).then((res) => res.json());
+  }).then(async (res) => {
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const msg = json?.message || `HTTP ${res.status}`;
+      throw new Error(msg);
+    }
+    return json;
+  });
 }
 
-// ---------- GET live products (MUST use ?action=products) ----------
+// ========================
+// Live stock fetch (GET ?action=products)
+// ========================
 async function getLiveProductsSafe() {
   try {
-    const res = await fetch(API + "?action=products", { method: "GET", cache: "no-store" });
+    const url = API + "?action=products";
+    const res = await fetch(url, { method: "GET", cache: "no-store" });
     if (!res.ok) throw new Error("API not ok");
     const data = await res.json();
     if (!Array.isArray(data)) throw new Error("API not array");
     return data;
-  } catch (err) {
+  } catch {
     return null;
   }
 }
 
 async function ensureLiveStockMap() {
-  // refresh every 30 seconds
   const now = Date.now();
   if (liveStockMap && (now - lastStockFetchAt) < 30000) return liveStockMap;
 
@@ -85,7 +105,8 @@ async function ensureLiveStockMap() {
 
   const map = {};
   live.forEach((p) => {
-    if (p && p.id != null) map[String(p.id)] = toNumber(p.stock);
+    if (!p || p.id == null) return;
+    map[String(p.id)] = toNumber(p.stock);
   });
 
   liveStockMap = map;
@@ -96,14 +117,12 @@ async function ensureLiveStockMap() {
 function getMaxStockForItem(item) {
   const id = String(item.id ?? "");
   if (liveStockMap && id in liveStockMap) return liveStockMap[id];
-
-  // fallback: if item has stock field
   const fallback = toNumber(item.stock);
   return fallback > 0 ? fallback : Infinity;
 }
 
 // ========================
-// Render Cart (clamp + disable plus)
+// Render Cart (with stock clamp)
 // ========================
 function renderCart() {
   cartItemsContainer.innerHTML = "";
@@ -118,8 +137,6 @@ function renderCart() {
     let qty = getQty(item);
 
     const maxStock = getMaxStockForItem(item);
-
-    // clamp qty if maxStock known
     if (maxStock !== Infinity && qty > maxStock) {
       qty = Math.max(1, maxStock);
       setQty(item, qty);
@@ -147,9 +164,9 @@ function renderCart() {
         <div class="cart-right">
           <div class="line-price">${formatBND(lineTotal)}</div>
 
-          <div class="qty-controls" aria-label="Quantity controls">
+          <div class="qty-controls">
             <button type="button" class="qty-btn" data-action="minus" data-index="${index}" ${minusDisabled ? "disabled" : ""}>−</button>
-            <span class="qty-number" aria-live="polite">${qty}</span>
+            <span class="qty-number">${qty}</span>
             <button type="button" class="qty-btn" data-action="plus" data-index="${index}" ${plusDisabled ? "disabled" : ""}>+</button>
             <button type="button" class="remove-btn" data-action="remove" data-index="${index}">Remove</button>
           </div>
@@ -161,10 +178,10 @@ function renderCart() {
   cartTotalEl.innerText = formatBND(calcTotal());
 }
 
-// initial render
+// Initial render
 renderCart();
 
-// boot live stock once
+// Boot stock once (so clamp works quickly)
 (async function bootStock() {
   await ensureLiveStockMap();
   renderCart();
@@ -179,26 +196,16 @@ cartItemsContainer.addEventListener("click", async (e) => {
 
   const action = btn.dataset.action;
   const index = Number(btn.dataset.index);
-  if (!Number.isFinite(index) || index < 0) return;
+  if (!Number.isFinite(index) || index < 0 || index >= cart.length) return;
 
   cart = JSON.parse(localStorage.getItem("cart")) || [];
-  if (!cart[index]) return;
-
-  await ensureLiveStockMap();
-
   const item = cart[index];
-  const maxStock = getMaxStockForItem(item);
-
   let qty = getQty(item);
 
-  if (action === "plus") {
-    if (maxStock !== Infinity && qty + 1 > maxStock) {
-      alert("Maximum stock reached.");
-      return;
-    }
-    qty += 1;
-  }
+  await ensureLiveStockMap();
+  const maxStock = getMaxStockForItem(item);
 
+  if (action === "plus") qty += 1;
   if (action === "minus") qty = Math.max(1, qty - 1);
 
   if (action === "remove") {
@@ -208,7 +215,10 @@ cartItemsContainer.addEventListener("click", async (e) => {
     return;
   }
 
-  if (maxStock !== Infinity && qty > maxStock) qty = Math.max(1, maxStock);
+  if (maxStock !== Infinity && qty > maxStock) {
+    alert("Maximum stock reached.");
+    qty = Math.max(1, maxStock);
+  }
 
   setQty(item, qty);
   saveCart();
@@ -221,8 +231,7 @@ cartItemsContainer.addEventListener("click", async (e) => {
 if (clearCartBtn) {
   clearCartBtn.addEventListener("click", () => {
     if (!cart.length) return;
-    const ok = confirm("Clear all items in cart?");
-    if (!ok) return;
+    if (!confirm("Clear all items in cart?")) return;
     cart = [];
     localStorage.removeItem("cart");
     renderCart();
@@ -230,7 +239,8 @@ if (clearCartBtn) {
 }
 
 // ========================
-// Submit Order (anti duplicate + stock recheck)
+// Submit Order
+// IMPORTANT: Order endpoint already deducts stock in Code.gs
 // ========================
 checkoutForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -257,11 +267,9 @@ checkoutForm.addEventListener("submit", async (e) => {
   }
 
   await ensureLiveStockMap();
-
-  // Validate all items against live stock
   for (const it of cart) {
     const maxStock = getMaxStockForItem(it);
-    const qty = getQty(it);
+    const q = getQty(it);
 
     if (maxStock !== Infinity && maxStock <= 0) {
       alert(`Out of stock: ${it.name}`);
@@ -269,7 +277,7 @@ checkoutForm.addEventListener("submit", async (e) => {
       isSubmitting = false;
       return;
     }
-    if (maxStock !== Infinity && qty > maxStock) {
+    if (maxStock !== Infinity && q > maxStock) {
       alert(`Quantity exceeds stock for: ${it.name} (Stock ${maxStock})`);
       renderCart();
       isSubmitting = false;
@@ -282,13 +290,13 @@ checkoutForm.addEventListener("submit", async (e) => {
   placeOrderBtn.disabled = true;
   placeOrderBtn.textContent = "Processing...";
 
-  // unique token for anti duplicate server
-  const submitToken = `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+  // Unique token (anti double submit + server dup key)
+  const token = `${Date.now()}_${Math.random().toString(16).slice(2)}`;
 
   try {
-    const orderRes = await postToAPI({
+    const res = await postToAPI({
       type: "order",
-      token: submitToken, // server uses token/clientOrderId
+      token,                      // server anti-duplicate key
       cart,
       total,
       customer: { name, phone, address, payment },
@@ -296,28 +304,17 @@ checkoutForm.addEventListener("submit", async (e) => {
       status: "Pending Verification"
     });
 
-    // IMPORTANT: your server returns "receiptPdfUrl"
-    const pdfUrl = orderRes.receiptPdfUrl || orderRes.pdfUrl || "";
+    // Server returns: status, orderId, pdfUrl + receiptPdfUrl
+    const pdfUrl = res.pdfUrl || res.receiptPdfUrl || "";
 
-    if (orderRes.status === "duplicate") {
-      localStorage.setItem("lastOrder", JSON.stringify({
-        orderId: orderRes.orderId,
-        pdfUrl,
-        customer: { name, phone, address, payment },
-        cart,
-        total
-      }));
-      localStorage.removeItem("cart");
-      window.location.href = "success.html";
-      return;
-    }
-
-    if (orderRes.status !== "success") {
-      throw new Error(orderRes.message || "Order failed");
+    if (res.status === "duplicate") {
+      alert("This order was already submitted. Opening your receipt.");
+    } else if (res.status !== "success") {
+      throw new Error(res.message || "Order failed");
     }
 
     localStorage.setItem("lastOrder", JSON.stringify({
-      orderId: orderRes.orderId,
+      orderId: res.orderId || "-",
       pdfUrl,
       customer: { name, phone, address, payment },
       cart,
@@ -328,7 +325,7 @@ checkoutForm.addEventListener("submit", async (e) => {
     window.location.href = "success.html";
   } catch (err) {
     console.error(err);
-    alert("Server error. Check deployment / permissions.");
+    alert("Server error: " + (err?.message || "Check deployment / permissions."));
     placeOrderBtn.disabled = false;
     placeOrderBtn.textContent = "Place Order";
     isSubmitting = false;
