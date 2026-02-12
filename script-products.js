@@ -1,7 +1,7 @@
 // ==========================================
 // CONFIG
 // ==========================================
-const API = "https://script.google.com/macros/s/AKfycbxj193cocuNbBO03ROSZpDIfomgZxwcYTuXOppf_KnpGZMbeSNst7nJvQCmxRWkESup/exec";
+const API = "https://script.google.com/macros/s/AKfycbxPBR09YFOCTy_YTWn-gCybE8B5awe09zDS7ArXKpWthULDerPpqDGzunViAoPKH3nr/exec";
 
 // ==========================================
 // PRODUCT DATA (YOUR REAL PRODUCTS)
