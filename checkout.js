@@ -7,7 +7,7 @@
 // ==========================================
 
 const API =
-  "https://script.google.com/macros/s/AKfycbxPBR09YFOCTy_YTWn-gCybE8B5awe09zDS7ArXKpWthULDerPpqDGzunViAoPKH3nr/exec";
+  "https://script.google.com/macros/s/AKfycbzWf_6LH3bahkpuxMGVizwU--mwRBKqEm32bubQ1DhLdn3ugHmuK-9yToOZ_0i5pTe9ew/exec";
 
 const cartItemsContainer = document.getElementById("cartItems");
 const cartTotalEl = document.getElementById("cartTotal");
