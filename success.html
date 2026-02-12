@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Order Successful</title>
+  <title>Order Received</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body{
       background:#0d0f10;
@@ -19,30 +20,43 @@
       border:1px solid rgba(220,251,255,.2);
       backdrop-filter:blur(12px);
     }
+
+    .brand{
+      text-align:center;
+      color:#DCFBFF;
+      font-weight:800;
+      letter-spacing:.8px;
+      margin-bottom:6px;
+      font-size:16px;
+    }
     h2{
       text-align:center;
       color:#DCFBFF;
       margin-bottom:12px;
       letter-spacing:.4px;
+      font-size:20px;
     }
+
     .order-id{
       text-align:center;
-      font-weight:600;
-      margin-bottom:10px;
+      font-weight:700;
+      margin:8px 0 10px;
       opacity:.95;
+      letter-spacing:.3px;
     }
+
+    .statusRow{ text-align:center; margin-bottom:14px; }
     .status{
       text-align:center;
       font-size:13px;
       padding:8px 12px;
       border-radius:999px;
       display:inline-block;
-      margin:0 auto 16px;
       border:1px solid rgba(220,251,255,.22);
       background:rgba(255,255,255,.03);
       color:#DCFBFF;
     }
-    .statusRow{ text-align:center; }
+
     .item{
       display:flex;
       justify-content:space-between;
@@ -58,19 +72,17 @@
       color:#DCFBFF;
       letter-spacing:.2px;
     }
-    .signature{
-      margin-top:18px;
+
+    .note{
+      margin-top:16px;
       padding-top:14px;
       border-top:1px solid rgba(255,255,255,.10);
-      font-size:14px;
-      opacity:.95;
-    }
-    .note{
-      margin-top:10px;
       font-size:12.5px;
       line-height:1.45;
-      opacity:.7;
+      opacity:.72;
+      text-align:center;
     }
+
     .btn{
       display:block;
       margin-top:16px;
@@ -83,6 +95,7 @@
       transition:.25s;
     }
     .btn:hover{ background:#DCFBFF; color:#000; }
+
     .btn.secondary{
       border:1px solid rgba(220,251,255,.35);
       color:#DCFBFF;
@@ -92,6 +105,7 @@
       background:rgba(220,251,255,.12);
       color:#DCFBFF;
     }
+
     .mini{
       margin-top:10px;
       font-size:12px;
@@ -103,32 +117,37 @@
 <body>
 
 <div class="box">
-  <h2>✅ Order Received</h2>
+  <div class="brand">MIDBN.Timepieces</div>
+  <h2>Order Received</h2>
 
   <div class="order-id" id="orderId"></div>
-  <div class="statusRow"><span class="status" id="orderStatus">Status: Pending Verification</span></div>
+
+  <div class="statusRow">
+    <span class="status" id="orderStatus">Status: Pending Verification</span>
+  </div>
 
   <div id="orderItems"></div>
   <div class="total" id="orderTotal"></div>
 
-  <div class="signature">
-    <p><strong>Authorized Initial:</strong> ____________</p>
-    <div class="note">
-      *Valid upon seller verification and official confirmation.<br>
-      Please forward a screenshot of this receipt to our official WhatsApp for validation and processing.<br>
-      Orders are only confirmed after seller approval.
-    </div>
+  <div class="note">
+    *Your order will be verified by the seller before confirmation.<br>
+    For faster processing, please send your <strong>Order ID</strong> to our official WhatsApp.
   </div>
 
-  <a id="pdfBtn" href="#" target="_blank" class="btn secondary" style="display:none;">View PDF Receipt</a>
+  <!-- ✅ WhatsApp replaces PDF button -->
+  <a id="waBtn" href="#" target="_blank" class="btn secondary">Send Order ID to WhatsApp</a>
+
   <a href="products.html" class="btn">Continue Shopping</a>
 
-  <div class="mini">This page will auto-refresh status until approved.</div>
+  <div class="mini">Status updates automatically after seller approval.</div>
 </div>
 
 <script>
-  // ✅ Your Apps Script Web App URL
+  // ✅ Replace with your Apps Script Web App URL (/exec)
   const API = "PASTE_YOUR_WEBAPP_URL_HERE";
+
+  // ✅ Your seller WhatsApp number
+  const SELLER_WA = "6738908960";
 
   const order = JSON.parse(localStorage.getItem("lastOrder"));
   const box = document.querySelector(".box");
@@ -137,12 +156,20 @@
     return String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
   }
 
+  function setWhatsAppLink(orderIdDisplay){
+    const msg =
+      "Hi MIDBN.Timepieces, I just placed an order.\n" +
+      "Order ID: " + orderIdDisplay + "\n" +
+      "Please verify and confirm. Thank you.";
+    const url = "https://wa.me/" + SELLER_WA + "?text=" + encodeURIComponent(msg);
+    const waBtn = document.getElementById("waBtn");
+    waBtn.href = url;
+  }
+
   if(!order || !order.orderId){
     box.innerHTML = "<h2>No order found</h2>";
   } else {
-    document.getElementById("orderId").innerText = "Order ID: " + order.orderId;
-
-    // Render items from localStorage first (instant UI)
+    // Render items immediately from localStorage
     const container = document.getElementById("orderItems");
     (order.cart || []).forEach(item=>{
       const qty = Number(item.qty || item.quantity || 1);
@@ -156,40 +183,42 @@
       container.appendChild(div);
     });
 
-    document.getElementById("orderTotal").innerText = "Total: " + (order.total || "BND 0");
+    document.getElementById("orderTotal").innerText =
+      "Total: " + (order.total || "BND 0");
 
-    // PDF link from localStorage (if available)
-    if (order.pdfUrl) {
-      const pdfBtn = document.getElementById("pdfBtn");
-      pdfBtn.href = order.pdfUrl;
-      pdfBtn.style.display = "block";
-    }
+    // Default display = existing orderId (fallback)
+    let displayId = order.orderId;
+    document.getElementById("orderId").innerText = "Order ID: " + displayId;
+    setWhatsAppLink(displayId);
 
-    // ✅ Auto-refresh status from sheet
+    // Auto-refresh status from sheet
     async function refreshStatus(){
       try{
-        const res = await fetch(API + "?action=order&orderId=" + encodeURIComponent(order.orderId), { cache: "no-store" });
+        const res = await fetch(
+          API + "?action=order&orderId=" + encodeURIComponent(order.orderId),
+          { cache: "no-store" }
+        );
         const data = await res.json();
         if(!data || data.status !== "success" || !data.order) return;
 
         const o = data.order;
-        const statusText = o.status ? o.status : "Pending Verification";
+
+        // If server provides a simple order number (recommended), use it:
+        // o.simpleOrderId example: 20260212-0001
+        if (o.simpleOrderId) {
+          displayId = String(o.simpleOrderId);
+          document.getElementById("orderId").innerText = "Order ID: " + displayId;
+          setWhatsAppLink(displayId);
+        }
+
+        const statusText = o.status ? String(o.status) : "Pending Verification";
         document.getElementById("orderStatus").innerText = "Status: " + statusText;
 
-        // If server has PDF but client doesn't, update button
-        if (o.receiptPdfUrl) {
-          const pdfBtn = document.getElementById("pdfBtn");
-          pdfBtn.href = o.receiptPdfUrl;
-          pdfBtn.style.display = "block";
-        }
-
-        // Optional: stop refreshing once Approved
         if (String(statusText).toLowerCase() === "approved") {
-          // stop refreshing
           clearInterval(window.__midbnTimer);
         }
-      }catch(err){
-        // ignore
+      } catch(err){
+        // ignore refresh errors
       }
     }
 
