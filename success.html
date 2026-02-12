@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Order Successful</title>
+  <title>Order Successful | MIDBN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -13,13 +13,13 @@
     }
 
     .box{
-      max-width:500px;
+      max-width:520px;
       margin:40px auto;
       background:rgba(255,255,255,.05);
       padding:30px;
       border-radius:20px;
       border:1px solid rgba(220,251,255,.2);
-      backdrop-filter:blur(12px);
+      backdrop-filter:blur(14px);
     }
 
     h2{
@@ -32,6 +32,7 @@
       text-align:center;
       font-weight:600;
       margin-bottom:20px;
+      opacity:.9;
     }
 
     .item{
@@ -47,6 +48,25 @@
       font-weight:700;
       margin-top:15px;
       color:#DCFBFF;
+    }
+
+    .signature{
+      margin-top:30px;
+      padding-top:20px;
+      border-top:1px solid rgba(255,255,255,.1);
+      font-size:13px;
+      opacity:.85;
+    }
+
+    .signature strong{
+      color:#DCFBFF;
+    }
+
+    .note{
+      margin-top:10px;
+      font-size:12px;
+      opacity:.6;
+      line-height:1.5;
     }
 
     .btn{
@@ -65,18 +85,46 @@
       background:#DCFBFF;
       color:#000;
     }
+
+    .whatsapp-btn{
+      display:block;
+      margin-top:15px;
+      text-align:center;
+      padding:12px;
+      border-radius:30px;
+      background:#25D366;
+      color:#fff;
+      text-decoration:none;
+      font-weight:600;
+    }
   </style>
 </head>
 <body>
 
 <div class="box">
-  <h2>✅ Order Successful</h2>
+  <h2>✅ Order Successfully Placed</h2>
 
   <div class="order-id" id="orderId"></div>
 
   <div id="orderItems"></div>
 
   <div class="total" id="orderTotal"></div>
+
+  <!-- Signature / Initial Section -->
+  <div class="signature">
+    <p><strong>Authorized Initial:</strong> ____________</p>
+
+    <div class="note">
+      This receipt serves as a confirmation of your order request.<br>
+      Please send a screenshot of this receipt to our official WhatsApp for
+      verification and seller validation before processing.
+      Orders without confirmation may not be processed.
+    </div>
+  </div>
+
+  <a id="whatsappLink" class="whatsapp-btn" target="_blank">
+    Send to Seller via WhatsApp
+  </a>
 
   <a href="products.html" class="btn">Continue Shopping</a>
 </div>
@@ -106,10 +154,20 @@
     document.getElementById("orderTotal").innerText =
       "Total: " + order.total;
 
-    // Clear lastOrder after display (optional)
+    // WhatsApp message auto-fill
+    const phone = "6738908960"; // your number
+    const message =
+      "Hello MIDBN, I have placed an order.\n\n" +
+      "Order ID: " + order.orderId + "\n" +
+      "Total: " + order.total + "\n\n" +
+      "Please validate my order.";
+
+    document.getElementById("whatsappLink").href =
+      "https://wa.me/" + phone + "?text=" + encodeURIComponent(message);
+
     setTimeout(()=>{
       localStorage.removeItem("lastOrder");
-    }, 10000);
+    }, 15000);
   }
 </script>
 
