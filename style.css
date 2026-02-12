@@ -1,14 +1,36 @@
+/* ==========================================
+   MIDBN STYLE.CSS (FULL) - Optimized + Smooth
+   - Keeps your colors + glass concept
+   - Brands: no inner scroll + blur overlay (smoother)
+   - Mobile performance tweaks
+========================================== */
+
 :root {
   --primary: #DCFBFF;
   --secondary: #4E5D5D;
   --dark: #0d0f10;
   --text: #e6e6e6;
+
+  --glass: rgba(255,255,255,0.05);
+  --glass-strong: rgba(255,255,255,0.08);
+  --border-soft: rgba(220,251,255,0.18);
+  --shadow: 0 14px 40px rgba(0,0,0,.55);
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background: var(--dark); color: var(--text); font-family:-apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; line-height:1.6; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--dark);
+  color: var(--text);
+  font-family:-apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  line-height:1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
 
-/* HEADER */
+/* =========================
+   HEADER
+========================= */
 .header {
   position: sticky;
   top:0;
@@ -21,30 +43,42 @@ body { background: var(--dark); color: var(--text); font-family:-apple-system, B
 }
 .header nav { position: relative; }
 .header nav ul {
-  display:flex; justify-content:space-around; list-style:none; padding:10px 0;
+  display:flex;
+  justify-content:space-around;
+  list-style:none;
+  padding:10px 0;
 }
 .header nav ul li a {
-  color: var(--primary); text-decoration:none; font-weight:500; letter-spacing:0.5px;
+  color: var(--primary);
+  text-decoration:none;
+  font-weight:500;
+  letter-spacing:0.5px;
 }
 
-/* HERO */
+/* =========================
+   HERO
+========================= */
 .hero { position:relative; height:100svh; overflow:hidden; }
 .hero-video {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 100vh;      /* swap width & height */
+  width: 100vh;      /* swapped because rotate */
   height: 100vw;
-  transform: translate(-50%, -50%) rotate(-90deg);
+  transform: translate(-50%, -50%) rotate(-90deg) scale(1.08);
   object-fit: cover;
   filter: brightness(0.6);
+  will-change: transform;
 }
 .hero-overlay { position:absolute; inset:0; background: rgba(0,0,0,0.35); }
 .hero-content {
-  position:absolute; top:50%; left:50%;
+  position:absolute;
+  top:50%;
+  left:50%;
   transform: translate(-50%, -50%);
   z-index:2;
-  display:flex; flex-direction:column;
+  display:flex;
+  flex-direction:column;
   align-items:center;
   text-align:center;
   padding:20px;
@@ -61,12 +95,19 @@ body { background: var(--dark); color: var(--text); font-family:-apple-system, B
   color:var(--primary);
   text-decoration:none;
   letter-spacing:1px;
+  border-radius: 18px;
   opacity:0;
   transform:translateY(20px);
   transition: all 0.8s ease;
 }
+.hero-btn:hover{
+  background: rgba(220,251,255,0.08);
+  box-shadow: 0 0 16px rgba(220,251,255,0.18);
+}
 
-/* INTRO */
+/* =========================
+   INTRO
+========================= */
 .intro { padding:60px 20px; }
 .intro-content {
   position: relative;
@@ -78,49 +119,164 @@ body { background: var(--dark); color: var(--text); font-family:-apple-system, B
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   overflow: hidden;
+  border: 1px solid rgba(220,251,255,0.12);
+  box-shadow: var(--shadow);
 }
 .intro-content h2 { color:var(--primary); text-align:center; }
-.intro-divider { border:0; border-top:2px solid var(--secondary); width:50px; margin:10px auto; }
-.intro-content p { text-align: justify; line-height:1.6; }
+.intro-divider { border:0; border-top:2px solid var(--secondary); width:50px; margin:10px auto; opacity:.8; }
+.intro-content p { text-align: justify; line-height:1.7; }
 .highlight { color:var(--primary); font-weight:600; }
 
-/* NEW ARRIVALS */
+/* =========================
+   NEW ARRIVALS
+========================= */
 .arrivals { padding:20px 20px; }
 .arrivals h2 { text-align:center; color:var(--primary); margin-bottom:20px; }
-.arrival-scroll { display:flex; overflow-x:auto; gap:20px; padding:10px 0; cursor:grab; -ms-overflow-style: none; scrollbar-width: none; }
+.arrival-scroll {
+  display:flex;
+  overflow-x:auto;
+  gap:20px;
+  padding:10px 0;
+  cursor:grab;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
 .arrival-scroll::-webkit-scrollbar { display: none; }
-.arrival-card { flex: 0 0 auto; width:150px; height:180px; background: rgba(255,255,255,0.1); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border-radius:16px; display:flex; flex-direction:column; align-items:center; padding:0px; transition:0.3s ease; }
-.arrival-card img { width:100%; height:100%; object-fit:cover; border-radius:16px; }
-.arrival-card:hover { transform:scale(1.05); box-shadow:0 6px 20px rgba(0,0,0,0.3); }
 
-/* FAQ */
+.arrival-card {
+  flex: 0 0 auto;
+  width:150px;
+  height:180px;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-radius:16px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:0px;
+  transition: transform 0.3s ease, box-shadow .3s ease;
+  border: 1px solid rgba(220,251,255,0.10);
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  overflow:hidden;
+  scroll-snap-align: start;
+}
+.arrival-card img { width:100%; height:100%; object-fit:cover; border-radius:16px; display:block; }
+.arrival-card:hover { transform:scale(1.05); box-shadow:0 14px 34px rgba(0,0,0,0.45); }
+
+/* optional nicer name under card if you have .arrival-name in html */
+.arrival-name{
+  text-align:center;
+  margin-top:10px;
+  color: rgba(230,230,230,.9);
+  font-size: .95rem;
+}
+
+/* =========================
+   FAQ
+========================= */
 .faq { padding:40px 20px; }
-.faq-card { border:2px solid var(--secondary); border-radius:16px; padding:20px; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); background: rgba(255,255,255,0.1); }
+.faq-card {
+  border:2px solid var(--secondary);
+  border-radius:16px;
+  padding:20px;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  background: rgba(255,255,255,0.1);
+  box-shadow: var(--shadow);
+}
 .faq h2 { margin-bottom:20px; color:var(--primary); }
 .faq-item { margin-bottom:15px; }
-.faq-question { width:100%; padding:15px; background:none; border:1px solid var(--secondary); color:var(--text); text-align:left; font-weight:700; cursor:pointer; border-radius:12px; }
-.faq-answer { display:none; padding:15px; background: rgba(0,0,0,0.2); border-radius:12px; margin-top:10px; color: var(--text); }
+.faq-question {
+  width:100%;
+  padding:15px;
+  background:none;
+  border:1px solid var(--secondary);
+  color:var(--text);
+  text-align:left;
+  font-weight:700;
+  cursor:pointer;
+  border-radius:12px;
+}
+.faq-question:hover{
+  background: rgba(255,255,255,0.04);
+}
+.faq-answer {
+  display:none;
+  padding:15px;
+  background: rgba(0,0,0,0.2);
+  border-radius:12px;
+  margin-top:10px;
+  color: var(--text);
+  border: 1px solid rgba(220,251,255,0.08);
+}
 
-/* BRANDS */
+/* =========================
+   BRANDS (UPDATED)
+   - No inner scroll
+   - Keeps blur via overlay (smoother than filter blur)
+========================= */
 .brands { 
   padding:30px 20px; 
   border-radius:20px; 
   margin:40px 15px;
 }
 .brands h2 { margin-bottom:20px; color:var(--primary); text-align:center; }
-.brand-scroll { display:grid; grid-template-columns:1fr 1fr; gap:25px; max-height:400px; overflow-y:auto; }
+
+/* show all brands */
+.brand-scroll {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 25px;
+}
+
+/* desktop: more columns */
+@media (min-width: 900px){
+  .brand-scroll{
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 .brand-card { 
   position: relative; 
-  display:flex; justify-content:center; align-items:center; 
-  height:140px; overflow:hidden; border-radius:16px; 
-  transition: transform 0.3s ease; 
-  will-change: transform, filter;
+  display:flex; 
+  justify-content:center; 
+  align-items:center; 
+  height:140px; 
+  overflow:hidden; 
+  border-radius:16px; 
+  transition: transform 0.3s ease, box-shadow .3s ease;
+  cursor: pointer;
+  will-change: transform;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(220,251,255,0.12);
+  box-shadow: 0 10px 28px rgba(0,0,0,.35);
 }
+
+/* keep image sharp */
 .brand-card img { 
-  width:100%; height:100%; object-fit:cover; 
-  transition: filter 0.3s ease; 
-  filter: blur(2px); 
+  width:100%; 
+  height:100%; 
+  object-fit:cover; 
+  transform: scale(1.06);
+  transition: transform .35s ease;
+  display:block;
 }
+
+/* blur overlay */
+.brand-card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: rgba(0,0,0,0.18);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  transition: backdrop-filter .35s ease, background .35s ease;
+  pointer-events:none;
+}
+
+/* name stays crisp */
 .brand-card .brand-name {
   position: absolute;
   top: 50%; left: 50%;
@@ -132,20 +288,54 @@ body { background: var(--dark); color: var(--text); font-family:-apple-system, B
   max-width:90%;
   white-space: normal;
   word-break: break-word;
-}
-.brand-card:hover { 
-  transform:scale(1.05); 
-  box-shadow:0 6px 20px rgba(0,0,0,0.4); 
-  cursor: pointer;
-  filter: brightness(1.1);
+  z-index: 2;
 }
 
-/* CATALOGUE */
+/* hover: slightly reveal image */
+.brand-card:hover { 
+  transform: scale(1.05);
+  box-shadow:0 16px 40px rgba(0,0,0,0.45);
+}
+.brand-card:hover::after{
+  background: rgba(0,0,0,0.10);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.brand-card:hover img{
+  transform: scale(1.12);
+}
+
+@media (max-width: 480px){
+  .brand-scroll{
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+  .brand-card{ height: 125px; }
+}
+
+/* =========================
+   CATALOGUE
+========================= */
 .catalog { padding:20px 30px; text-align:center; }
 .catalog-content h2 { color:var(--primary); }
-.catalog-btn { padding:14px 32px; border:1px solid var(--primary); color:var(--primary); text-decoration:none; border-radius:18px; display:inline-block; }
+.catalog-btn {
+  padding:14px 32px;
+  border:1px solid var(--primary);
+  color:var(--primary);
+  text-decoration:none;
+  border-radius:18px;
+  display:inline-block;
+  transition: .25s ease;
+}
+.catalog-btn:hover{
+  background: rgba(220,251,255,0.08);
+  box-shadow: 0 0 16px rgba(220,251,255,0.18);
+  transform: translateY(-1px);
+}
 
-/* CONTACT SECTION - COMPACT LUXURY */
+/* =========================
+   CONTACT
+========================= */
 .contact-section {
   padding: 40px 20px;
   text-align: center;
@@ -155,8 +345,8 @@ body { background: var(--dark); color: var(--text); font-family:-apple-system, B
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(220,251,255,0.15);
+  box-shadow: var(--shadow);
 }
-
 .contact-section h2 {
   color: var(--primary);
   font-size: 1.6rem;
@@ -164,7 +354,7 @@ body { background: var(--dark); color: var(--text); font-family:-apple-system, B
   letter-spacing: 1px;
 }
 
-/* CONTACT ICON BUTTONS (LOGO ONLY) */
+/* LOGO ONLY buttons */
 .contact-links{
   display:flex;
   justify-content:center;
@@ -190,13 +380,11 @@ body { background: var(--dark); color: var(--text); font-family:-apple-system, B
   transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
   text-decoration:none;
 }
-
 .social-btn:hover{
   transform: translateY(-2px);
   background: rgba(220,251,255,0.08);
   box-shadow: 0 0 18px rgba(220,251,255,0.22);
 }
-
 .social-btn img{
   width:30px;
   height:30px;
@@ -205,7 +393,7 @@ body { background: var(--dark); color: var(--text); font-family:-apple-system, B
   opacity: 0.95;
 }
 
-/* CONTACT FORM - COMPACT */
+/* FORM */
 .contact-form {
   display: flex;
   flex-direction: column;
@@ -213,7 +401,6 @@ body { background: var(--dark); color: var(--text); font-family:-apple-system, B
   margin: 0 auto;
   gap: 12px;
 }
-
 .contact-form input,
 .contact-form textarea {
   padding: 10px 14px;
@@ -226,17 +413,13 @@ body { background: var(--dark); color: var(--text); font-family:-apple-system, B
   resize: none;
   transition: all 0.3s ease;
 }
-
 .contact-form input:focus,
 .contact-form textarea:focus {
   border-color: var(--primary);
   box-shadow: 0 0 8px rgba(220,251,255,0.5);
   background: rgba(255,255,255,0.1);
 }
-
-.contact-form textarea {
-  min-height: 100px;
-}
+.contact-form textarea { min-height: 100px; }
 
 .contact-form button {
   padding: 12px 24px;
@@ -248,7 +431,6 @@ body { background: var(--dark); color: var(--text); font-family:-apple-system, B
   cursor: pointer;
   transition: all 0.3s ease;
 }
-
 .contact-form button:hover {
   background: var(--primary);
   color: #000;
@@ -256,7 +438,9 @@ body { background: var(--dark); color: var(--text); font-family:-apple-system, B
   transform: translateY(-1px);
 }
 
-/* FOOTER */
+/* =========================
+   FOOTER
+========================= */
 .footer{
   padding: 18px 12px;
   text-align:center;
@@ -264,7 +448,9 @@ body { background: var(--dark); color: var(--text); font-family:-apple-system, B
   font-size: 0.9rem;
 }
 
-/* HAMBURGER MENU */
+/* =========================
+   HAMBURGER MENU
+========================= */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -292,7 +478,9 @@ body { background: var(--dark); color: var(--text); font-family:-apple-system, B
 .hamburger.active span:nth-child(2) { opacity: 0; }
 .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
 
-/* MOBILE */
+/* =========================
+   MOBILE NAV
+========================= */
 @media (max-width: 768px) {
   .hamburger { display: flex; }
   .header nav ul {
@@ -310,6 +498,29 @@ body { background: var(--dark); color: var(--text); font-family:-apple-system, B
     opacity: 0;
     transform: translateY(-10px);
     transition: max-height 0.4s ease, opacity 0.3s ease, transform 0.3s ease;
+    border-bottom: 1px solid rgba(220,251,255,0.18);
   }
   .header nav ul.active { max-height: 500px; opacity: 1; transform: translateY(0); }
+}
+
+/* =========================
+   PERFORMANCE: reduce blur on mobile (keeps look)
+   (Optional but recommended for smooth iPhone)
+========================= */
+@media (max-width: 768px){
+  .header,
+  .intro-content,
+  .faq-card,
+  .contact-section{
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(255,255,255,0.06);
+  }
+}
+
+/* =========================
+   ACCESSIBILITY: reduce motion
+========================= */
+@media (prefers-reduced-motion: reduce){
+  * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
