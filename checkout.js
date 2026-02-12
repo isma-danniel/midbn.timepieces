@@ -211,13 +211,26 @@ cartItemsContainer.addEventListener("click", async (e) => {
   const maxStock = getMaxStockForItem(item);
 
   if (action === "plus") {
-    if (maxStock !== Infinity && qty >= maxStock) {
-      alert("Not enough stock for this item.");
+  // Check stock from Products sheet via API before increasing
+  fetch(API + "?action=products")
+    .then(res => res.json())
+    .then(data => {
+      const product = data.find(p => String(p.id) === String(cart[index].id));
+      if (!product) return;
+
+      if (qty + 1 > Number(product.stock)) {
+        alert("Maximum stock reached.");
+        return;
+      }
+
+      qty += 1;
+      setQty(cart[index], qty);
+      saveCart();
       renderCart();
-      return;
-    }
-    qty += 1;
-  }
+    });
+
+  return; // stop normal flow
+}
 
   if (action === "minus") qty = Math.max(1, qty - 1);
 
