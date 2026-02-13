@@ -203,3 +203,27 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// CONTACT FORM -> WHATSAPP
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("waForm");
+  if (!form) return;
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("waName")?.value.trim() || "";
+    const email = document.getElementById("waEmail")?.value.trim() || "";
+    const msg = document.getElementById("waMsg")?.value.trim() || "";
+
+    const phone = "6738908960"; // your WhatsApp number (no +)
+    const text =
+      `Hi MIDBN.Timepieces, I want to enquire.\n\n` +
+      `Name: ${name}\n` +
+      (email ? `Email: ${email}\n` : "") +
+      `Message: ${msg}`;
+
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+    window.open(url, "_blank");
+  });
+});
