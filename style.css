@@ -1,6 +1,7 @@
 /* ==========================================
    MIDBN STYLE.CSS (FULL) - Optimized + Smooth
    - Keeps your colors + glass concept
+   - New Arrivals: FIX last card scroll (padding + end spacer)
    - Brands: no inner scroll + blur overlay (smoother)
    - Mobile performance tweaks
 ========================================== */
@@ -63,7 +64,7 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 100vh;      /* swapped because rotate */
+  width: 100vh;
   height: 100vw;
   transform: translate(-50%, -50%) rotate(-90deg) scale(1.08);
   object-fit: cover;
@@ -128,21 +129,33 @@ body {
 .highlight { color:var(--primary); font-weight:600; }
 
 /* =========================
-   NEW ARRIVALS
+   NEW ARRIVALS (UPGRADED)
+   - FIX: last card not reachable
 ========================= */
 .arrivals { padding:20px 20px; }
 .arrivals h2 { text-align:center; color:var(--primary); margin-bottom:20px; }
+
 .arrival-scroll {
   display:flex;
   overflow-x:auto;
   gap:20px;
-  padding:10px 0;
+
+  /* IMPORTANT: allow last item to fully scroll into view */
+  padding: 10px 20px;
+  scroll-padding: 0 20px;
+
   cursor:grab;
   -ms-overflow-style: none;
   scrollbar-width: none;
   scroll-snap-type: x proximity;
 }
 .arrival-scroll::-webkit-scrollbar { display: none; }
+
+/* end spacer so last card can sit fully */
+.arrival-scroll::after{
+  content:"";
+  flex: 0 0 20px;
+}
 
 .arrival-card {
   flex: 0 0 auto;
@@ -165,7 +178,6 @@ body {
 .arrival-card img { width:100%; height:100%; object-fit:cover; border-radius:16px; display:block; }
 .arrival-card:hover { transform:scale(1.05); box-shadow:0 14px 34px rgba(0,0,0,0.45); }
 
-/* optional nicer name under card if you have .arrival-name in html */
 .arrival-name{
   text-align:center;
   margin-top:10px;
@@ -214,8 +226,6 @@ body {
 
 /* =========================
    BRANDS (UPDATED)
-   - No inner scroll
-   - Keeps blur via overlay (smoother than filter blur)
 ========================= */
 .brands { 
   padding:30px 20px; 
@@ -224,14 +234,11 @@ body {
 }
 .brands h2 { margin-bottom:20px; color:var(--primary); text-align:center; }
 
-/* show all brands */
 .brand-scroll {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 25px;
 }
-
-/* desktop: more columns */
 @media (min-width: 900px){
   .brand-scroll{
     grid-template-columns: repeat(4, 1fr);
@@ -254,7 +261,6 @@ body {
   box-shadow: 0 10px 28px rgba(0,0,0,.35);
 }
 
-/* keep image sharp */
 .brand-card img { 
   width:100%; 
   height:100%; 
@@ -264,7 +270,6 @@ body {
   display:block;
 }
 
-/* blur overlay */
 .brand-card::after{
   content:"";
   position:absolute;
@@ -276,7 +281,6 @@ body {
   pointer-events:none;
 }
 
-/* name stays crisp */
 .brand-card .brand-name {
   position: absolute;
   top: 50%; left: 50%;
@@ -291,7 +295,6 @@ body {
   z-index: 2;
 }
 
-/* hover: slightly reveal image */
 .brand-card:hover { 
   transform: scale(1.05);
   box-shadow:0 16px 40px rgba(0,0,0,0.45);
@@ -354,7 +357,6 @@ body {
   letter-spacing: 1px;
 }
 
-/* LOGO ONLY buttons */
 .contact-links{
   display:flex;
   justify-content:center;
@@ -393,7 +395,6 @@ body {
   opacity: 0.95;
 }
 
-/* FORM */
 .contact-form {
   display: flex;
   flex-direction: column;
@@ -503,10 +504,6 @@ body {
   .header nav ul.active { max-height: 500px; opacity: 1; transform: translateY(0); }
 }
 
-/* =========================
-   PERFORMANCE: reduce blur on mobile (keeps look)
-   (Optional but recommended for smooth iPhone)
-========================= */
 @media (max-width: 768px){
   .header,
   .intro-content,
@@ -518,9 +515,6 @@ body {
   }
 }
 
-/* =========================
-   ACCESSIBILITY: reduce motion
-========================= */
 @media (prefers-reduced-motion: reduce){
   * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
