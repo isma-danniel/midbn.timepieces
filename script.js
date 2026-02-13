@@ -1,135 +1,205 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // HERO animation
+  /* =========================
+     HERO animation
+  ========================= */
   const quote = document.querySelector(".hero-quote");
-  const btn = document.querySelector(".hero-btn");
-  const lines = quote.innerHTML.split('<br>');
-  quote.innerHTML = '';
+  const heroBtn = document.querySelector(".hero-btn");
 
-  lines.forEach((lineText, i) => {
-    const line = document.createElement('div');
-    line.textContent = lineText;
-    line.style.opacity = '0';
-    line.style.transform = 'translateY(20px)';
-    line.style.transition = 'all 0.8s ease';
-    quote.appendChild(line);
+  if (quote && heroBtn) {
+    const lines = quote.innerHTML.split("<br>");
+    quote.innerHTML = "";
+
+    lines.forEach((lineText, i) => {
+      const line = document.createElement("div");
+      line.textContent = lineText.trim();
+      line.style.opacity = "0";
+      line.style.transform = "translateY(20px)";
+      line.style.transition = "all 0.8s ease";
+      quote.appendChild(line);
+
+      setTimeout(() => {
+        line.style.opacity = "1";
+        line.style.transform = "translateY(0)";
+      }, 400 * (i + 1));
+    });
 
     setTimeout(() => {
-      line.style.opacity = '1';
-      line.style.transform = 'translateY(0)';
-    }, 400 * (i + 1));
-  });
+      heroBtn.style.opacity = "1";
+      heroBtn.style.transform = "translateY(0)";
+    }, 400 * (lines.length + 1));
+  }
 
-  setTimeout(() => {
-    btn.style.opacity = '1';
-    btn.style.transform = 'translateY(0)';
-  }, 400 * (lines.length + 1));
-});
-
-// FAQ toggle with smoother animation
-document.querySelectorAll(".faq-question").forEach(btn => {
-  btn.addEventListener("click", () => {
+  /* =========================
+     FAQ toggle (smooth + safe)
+  ========================= */
+  document.querySelectorAll(".faq-question").forEach((btn) => {
     const answer = btn.nextElementSibling;
-    if (!answer.style.maxHeight || answer.style.maxHeight === '0px') {
-      answer.style.display = 'block';
-      answer.style.maxHeight = answer.scrollHeight + "px";
-    } else {
-      answer.style.maxHeight = '0px';
-      setTimeout(() => answer.style.display = 'none', 300);
-    }
+    if (!answer || !answer.classList.contains("faq-answer")) return;
+
+    btn.setAttribute("aria-expanded", "false");
+    answer.style.display = "none";
+    answer.style.maxHeight = "0px";
+    answer.style.overflow = "hidden";
+    answer.style.transition = "max-height 0.35s ease";
+
+    btn.addEventListener("click", () => {
+      const isOpen = btn.getAttribute("aria-expanded") === "true";
+
+      if (isOpen) {
+        btn.setAttribute("aria-expanded", "false");
+        answer.style.maxHeight = "0px";
+        setTimeout(() => {
+          answer.style.display = "none";
+        }, 350);
+        return;
+      }
+
+      btn.setAttribute("aria-expanded", "true");
+      answer.style.display = "block";
+      answer.style.maxHeight = "0px";
+      requestAnimationFrame(() => {
+        answer.style.maxHeight = answer.scrollHeight + "px";
+      });
+    });
   });
-});
 
-// NEW ARRIVALS horizontal drag/swipe
-const slider = document.querySelector('.arrival-scroll');
-let isDown = false, startX, scrollLeft, velocity = 0;
-let momentumID, pauseAutoScroll = false;
+  /* =========================
+     NEW ARRIVALS drag + momentum + auto-slide (UPGRADED)
+     - Fixes: can't reach last card
+     - Auto-scroll "bounces" instead of resetting to 0
+     - Pauses auto-scroll briefly after drag so it doesn't fight user
+  ========================= */
+  const slider = document.querySelector(".arrival-scroll");
+  if (slider) {
+    let isDown = false;
+    let startX = 0;
+    let scrollLeft = 0;
+    let velocity = 0;
+    let lastX = 0;
+    let momentumID = null;
+    let pauseAutoScroll = false;
 
-// Use requestAnimationFrame for drag updates
-function updateSlider(x) {
-  const walk = (x - startX) * 2;
-  slider.scrollLeft = scrollLeft - walk;
-}
+    // NEW: direction for auto-scroll bounce
+    let autoDir = 1; // 1 forward, -1 backward
 
-function endDrag() {
-  isDown = false;
-  pauseAutoScroll = false;
-  startMomentum(velocity);
-}
-
-function startMomentum(v) {
-  function momentum() {
-    slider.scrollLeft -= v;
-    v *= 0.92; // smoother friction
-    if (Math.abs(v) > 0.5) momentumID = requestAnimationFrame(momentum);
-  }
-  momentumID = requestAnimationFrame(momentum);
-}
-
-function cancelMomentum() {
-  if(momentumID) cancelAnimationFrame(momentumID);
-}
-
-// Desktop drag
-slider.addEventListener('mousedown', e => {
-  isDown = true; pauseAutoScroll = true;
-  startX = e.pageX - slider.offsetLeft;
-  scrollLeft = slider.scrollLeft;
-  lastX = e.pageX;
-  cancelMomentum();
-});
-slider.addEventListener('mousemove', e => {
-  if(!isDown) return;
-  updateSlider(e.pageX);
-  velocity = e.pageX - lastX; lastX = e.pageX;
-});
-slider.addEventListener('mouseup', endDrag);
-slider.addEventListener('mouseleave', endDrag);
-
-// Mobile drag
-slider.addEventListener('touchstart', e => {
-  isDown = true; pauseAutoScroll = true;
-  startX = e.touches[0].pageX - slider.offsetLeft;
-  scrollLeft = slider.scrollLeft;
-  lastX = e.touches[0].pageX;
-  cancelMomentum();
-});
-slider.addEventListener('touchmove', e => {
-  if(!isDown) return;
-  updateSlider(e.touches[0].pageX);
-  velocity = e.touches[0].pageX - lastX; lastX = e.touches[0].pageX;
-});
-slider.addEventListener('touchend', endDrag);
-
-// Smooth auto-slide
-function animateSlide() {
-  if (!pauseAutoScroll && !isDown) {
-    slider.scrollLeft += 0.3;
-    if (slider.scrollLeft >= slider.scrollWidth - slider.clientWidth) {
-      slider.scrollLeft = 0;
+    function updateSlider(x) {
+      const walk = (x - startX) * 2;
+      slider.scrollLeft = scrollLeft - walk;
     }
+
+    function startMomentum(v) {
+      function momentum() {
+        slider.scrollLeft -= v;
+        v *= 0.92;
+        if (Math.abs(v) > 0.5) momentumID = requestAnimationFrame(momentum);
+      }
+      momentumID = requestAnimationFrame(momentum);
+    }
+
+    function cancelMomentum() {
+      if (momentumID) cancelAnimationFrame(momentumID);
+      momentumID = null;
+    }
+
+    function endDrag() {
+      if (!isDown) return;
+      isDown = false;
+
+      // NEW: pause auto-scroll a bit after user interaction
+      pauseAutoScroll = true;
+      setTimeout(() => (pauseAutoScroll = false), 1200);
+
+      startMomentum(velocity);
+    }
+
+    // Desktop drag
+    slider.addEventListener("mousedown", (e) => {
+      isDown = true;
+      pauseAutoScroll = true;
+      startX = e.pageX - slider.offsetLeft;
+      scrollLeft = slider.scrollLeft;
+      lastX = e.pageX;
+      cancelMomentum();
+    });
+
+    slider.addEventListener("mousemove", (e) => {
+      if (!isDown) return;
+      updateSlider(e.pageX);
+      velocity = e.pageX - lastX;
+      lastX = e.pageX;
+    });
+
+    slider.addEventListener("mouseup", endDrag);
+    slider.addEventListener("mouseleave", endDrag);
+
+    // Mobile drag
+    slider.addEventListener(
+      "touchstart",
+      (e) => {
+        isDown = true;
+        pauseAutoScroll = true;
+        startX = e.touches[0].pageX - slider.offsetLeft;
+        scrollLeft = slider.scrollLeft;
+        lastX = e.touches[0].pageX;
+        cancelMomentum();
+      },
+      { passive: true }
+    );
+
+    slider.addEventListener(
+      "touchmove",
+      (e) => {
+        if (!isDown) return;
+        updateSlider(e.touches[0].pageX);
+        velocity = e.touches[0].pageX - lastX;
+        lastX = e.touches[0].pageX;
+      },
+      { passive: true }
+    );
+
+    slider.addEventListener("touchend", endDrag);
+
+    // Auto-slide (UPGRADED): bounce at ends instead of resetting
+    function animateSlide() {
+      if (!pauseAutoScroll && !isDown) {
+        const maxScroll = slider.scrollWidth - slider.clientWidth;
+
+        slider.scrollLeft += 0.35 * autoDir;
+
+        // bounce at ends (this allows reaching last card)
+        if (slider.scrollLeft >= maxScroll - 1) autoDir = -1;
+        if (slider.scrollLeft <= 0) autoDir = 1;
+      }
+      requestAnimationFrame(animateSlide);
+    }
+    requestAnimationFrame(animateSlide);
   }
-  requestAnimationFrame(animateSlide);
-}
-requestAnimationFrame(animateSlide);
 
-// HAMBURGER MENU
-const hamburger = document.querySelector(".hamburger");
-const navMenu = document.querySelector(".header nav ul");
+  /* =========================
+     HAMBURGER MENU (safe)
+  ========================= */
+  const hamburger = document.querySelector(".hamburger");
+  const navMenu = document.querySelector(".header nav ul");
 
-hamburger.addEventListener("click", e => {
-  e.stopPropagation();
-  hamburger.classList.toggle("active");
-  navMenu.classList.toggle("active");
-});
-navMenu.querySelectorAll("a").forEach(link => {
-  link.addEventListener("click", () => {
-    hamburger.classList.remove("active");
-    navMenu.classList.remove("active");
-  });
-});
-document.addEventListener("click", e => {
-  if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
-    hamburger.classList.remove("active");
-    navMenu.classList.remove("active");
+  if (hamburger && navMenu) {
+    hamburger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      hamburger.classList.toggle("active");
+      navMenu.classList.toggle("active");
+    });
+
+    navMenu.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        hamburger.classList.remove("active");
+        navMenu.classList.remove("active");
+      });
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
+        hamburger.classList.remove("active");
+        navMenu.classList.remove("active");
+      }
+    });
   }
 });
