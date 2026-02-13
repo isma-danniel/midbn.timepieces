@@ -518,3 +518,21 @@ body {
 @media (prefers-reduced-motion: reduce){
   * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+.arrival-scroll {
+  scroll-snap-type: x proximity;
+  scroll-padding: 0 20px;
+  padding: 10px 20px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+.arrival-scroll.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.arrival-scroll::after{
+  content:"";
+  flex: 0 0 20px; /* end spacer so last card shows fully */
+}
