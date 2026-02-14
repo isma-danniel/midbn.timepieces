@@ -258,7 +258,7 @@ body{
   color:#DCFBFF;
   font-weight:700;
   cursor:pointer;
-  white-space:nowrap;   /* ✅ SINGLE LINE */
+  white-space:nowrap;
   min-width:220px;
 }
 .modal-addcart.added{
@@ -279,11 +279,15 @@ body{
   font-weight:700;
   cursor:pointer;
   z-index:10000;
-  white-space:nowrap;   /* ✅ SINGLE LINE */
+  white-space:nowrap;
   min-width:260px;
 }
 
-/* ===== SOLD OUT SEPARATOR (FULL WIDTH) ===== */
+/* ==============================
+   ====== UPGRADE: SOLD OUT UI
+============================== */
+
+/* separator row */
 .soldout-sep{
   grid-column: 1 / -1;
   margin: 6px 0 2px;
@@ -298,7 +302,6 @@ body{
   box-shadow: 0 10px 26px rgba(0,0,0,.45);
   position: relative;
 }
-
 .soldout-sep::before,
 .soldout-sep::after{
   content:"";
@@ -311,15 +314,29 @@ body{
 .soldout-sep::before{ left:14px; }
 .soldout-sep::after{ right:14px; }
 
-/* ===== SOLD OUT CARD STYLE ===== */
+/* sold out card look */
 .product-card.soldout{
   opacity: 0.62;
   filter: grayscale(1);
 }
 .product-card.soldout:hover{ transform:none; }
+.product-card.soldout .more-details-btn{
+  opacity: .75;
+  border-color: rgba(220,251,255,.22);
+}
 
+/* sold out badge */
 .label.soldout-badge{
   border-color: rgba(255,90,90,0.55);
   background: rgba(255,90,90,0.10);
   color: rgba(255,170,170,0.95);
+}
+
+/* modal disabled look */
+.modal-addcart:disabled{
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(220,251,255,0.18);
+  box-shadow: none;
 }
