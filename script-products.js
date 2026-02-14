@@ -1,10 +1,10 @@
 // ==========================================
-// MIDBN script-products.js (FULL + FIX 1-3)
+// MIDBN script-products.js (FULL + FIX 1-3 + HEADER SYNC PILL)
 // ✅ Requires watchlist.js loaded FIRST (window.products)
 // ✅ FIX 1: Render instantly, then sync live stock AFTER first paint (less lag)
 // ✅ FIX 2: Particles delayed + fewer on mobile + resize throttle (faster load)
 // ✅ FIX 3: Image fetchpriority=low (smoother decode)
-// ✅ + NEW: Stock syncing floating note w/ 3s timer + auto hide
+// ✅ NEW: Header stock syncing pill w/ 3s timer + synced/fail message + auto hide
 // ✅ Sold out separator + badge
 // ✅ Cart count bottom button
 // ✅ Filters + sort
@@ -48,9 +48,9 @@ const closeModal = document.getElementById("closeModal");
 const modalAddCart = document.getElementById("modalAddCart");
 const goCheckoutBottom = document.getElementById("goCheckoutBottom");
 
-// ✅ NEW: Stock Notice (from your HTML)
-const stockNotice = document.getElementById("stockNotice");
-const stockTimerEl = stockNotice?.querySelector(".stock-timer") || null;
+// ✅ Header sync pill from your HTML
+const syncNotice = document.getElementById("stockSyncNotice");
+const syncTimer = document.getElementById("syncTimer");
 
 // ==========================================
 // State
@@ -58,50 +58,63 @@ const stockTimerEl = stockNotice?.querySelector(".stock-timer") || null;
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let currentQuickProduct = null;
 
-// ✅ NEW: Notice timer state
-let __noticeLeft = 3;
-let __noticeInterval = null;
-let __noticeTimeout = null;
-let __noticeDone = false;
+// ==========================================
+// HEADER SYNC PILL (SAFE)
+// ==========================================
+let __syncInterval = null;
+let __syncFadeTimeout = null;
 
-// ✅ NEW: Notice helpers
-function showStockNotice(){
-  if(!stockNotice) return;
-  stockNotice.style.display = "flex";
-  stockNotice.classList.remove("fade-out");
-  __noticeDone = false;
-
-  // reset timer
-  __noticeLeft = 3;
-  if(stockTimerEl) stockTimerEl.textContent = `${__noticeLeft}s`;
-
-  // clear old timers
-  clearInterval(__noticeInterval);
-  clearTimeout(__noticeTimeout);
-
-  __noticeInterval = setInterval(()=>{
-    __noticeLeft -= 1;
-    if(stockTimerEl) stockTimerEl.textContent = `${Math.max(0,__noticeLeft)}s`;
-    if(__noticeLeft <= 0){
-      clearInterval(__noticeInterval);
-    }
-  }, 1000);
-
-  // auto-hide after 3.2s if sync never finishes
-  __noticeTimeout = setTimeout(()=>hideStockNotice(), 3200);
+function setSyncText(text){
+  if(!syncNotice) return;
+  // Your HTML: <div><span>Syncing latest stock</span><span id="syncTimer">3</span></div>
+  const firstSpan = syncNotice.querySelector("span");
+  if(firstSpan) firstSpan.textContent = text;
 }
 
-function hideStockNotice(){
-  if(!stockNotice || __noticeDone) return;
-  __noticeDone = true;
+function startHeaderSyncPill(){
+  if(!syncNotice || !syncTimer) return;
 
-  clearInterval(__noticeInterval);
-  clearTimeout(__noticeTimeout);
+  // reset
+  syncNotice.style.opacity = "1";
+  syncNotice.style.transform = "none";
+  syncNotice.classList.remove("done");
+  setSyncText("Syncing latest stock");
 
-  stockNotice.classList.add("fade-out");
-  setTimeout(()=>{
-    if(stockNotice) stockNotice.style.display = "none";
-  }, 380);
+  let count = 3;
+  syncTimer.textContent = String(count);
+
+  clearInterval(__syncInterval);
+  clearTimeout(__syncFadeTimeout);
+
+  __syncInterval = setInterval(() => {
+    count -= 1;
+    syncTimer.textContent = String(Math.max(0, count));
+    if(count <= 0){
+      clearInterval(__syncInterval);
+      // keep showing until we actually finish sync (success/fail)
+    }
+  }, 1000);
+}
+
+function finishHeaderSyncPill(success){
+  if(!syncNotice || !syncTimer) return;
+
+  clearInterval(__syncInterval);
+  clearTimeout(__syncFadeTimeout);
+
+  if(success){
+    syncNotice.classList.add("done");
+    setSyncText("Stock synced");
+  }else{
+    // no extra css needed, just text
+    setSyncText("Sync failed");
+  }
+
+  // hide after a moment
+  __syncFadeTimeout = setTimeout(() => {
+    syncNotice.style.opacity = "0";
+    syncNotice.style.transform = "translateY(-6px)";
+  }, 900);
 }
 
 // ==========================================
@@ -426,10 +439,11 @@ function safeInitialRender(){
   if(hasRenderedOnce) return;
   hasRenderedOnce = true;
 
-  // ✅ NEW: show notice when page loads
-  showStockNotice();
+  // ✅ Start header pill immediately
+  startHeaderSyncPill();
 
-  filterSortProducts(); // instant render
+  // Instant render from watchlist.js
+  filterSortProducts();
 }
 safeInitialRender();
 
@@ -456,12 +470,12 @@ function buildLiveMap(liveArr){
   return map;
 }
 
+// fetch AFTER first paint
 requestAnimationFrame(() => {
   requestAnimationFrame(async () => {
     const live = await getLiveProductsSafe();
     if(!live || !Array.isArray(window.products)) {
-      // ✅ NEW: hide notice even if live fails
-      hideStockNotice();
+      finishHeaderSyncPill(false);
       return;
     }
 
@@ -481,35 +495,6 @@ requestAnimationFrame(() => {
 
     if(changed) filterSortProducts();
 
-    // ✅ NEW: hide notice when sync done
-    hideStockNotice();
+    finishHeaderSyncPill(true);
   });
 });
-
-// ==========================================
-// HEADER STOCK SYNC TIMER
-// ==========================================
-
-const syncNotice = document.getElementById("stockSyncNotice");
-const syncTimer = document.getElementById("syncTimer");
-
-if(syncNotice && syncTimer){
-  let count = 3;
-
-  const interval = setInterval(() => {
-    count--;
-    syncTimer.textContent = count;
-
-    if(count <= 0){
-      clearInterval(interval);
-
-      syncNotice.classList.add("done");
-      syncNotice.querySelector(".sync-text").textContent = "Stock synced";
-
-      setTimeout(()=>{
-        syncNotice.style.opacity = "0";
-        syncNotice.style.transform = "translateX(-50%) translateY(-5px)";
-      }, 1000);
-    }
-  }, 1000);
-}
