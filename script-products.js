@@ -1,7 +1,9 @@
 // ==========================================
-// MIDBN script-products.js (FULL + STOCK SYNC FIX)
+// MIDBN script-products.js (FULL + FIX 1-3)
 // ✅ Requires watchlist.js loaded FIRST (window.products)
-// ✅ Fetches LIVE stock/price FIRST (no flicker / no millisecond mismatch)
+// ✅ FIX 1: Render instantly, then sync live stock AFTER first paint (less lag)
+// ✅ FIX 2: Particles delayed + fewer on mobile + resize throttle (faster load)
+// ✅ FIX 3: Image fetchpriority=low (smoother decode)
 // ✅ Sold out separator + badge
 // ✅ Cart count bottom button
 // ✅ Filters + sort
@@ -105,7 +107,7 @@ function renderProducts(list){
 
     card.innerHTML = `
       <div class="img-wrap">
-        <img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async">
+        <img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" fetchpriority="low">
         ${labelHtml}
       </div>
 
@@ -202,8 +204,6 @@ categoryFilter?.addEventListener("change", filterSortProducts);
 gradeFilter?.addEventListener("change", filterSortProducts);
 minPrice?.addEventListener("input", filterSortProducts);
 maxPrice?.addEventListener("input", filterSortProducts);
-
-// ❌ DO NOT CALL filterSortProducts() HERE (we render after live stock)
 
 // ==========================================
 // QUICK VIEW MODAL
@@ -331,10 +331,10 @@ goCheckoutBottom?.addEventListener("click", ()=>{
 });
 
 // ==========================================
-// WATERFALL PARTICLES
+// FIX 2: WATERFALL PARTICLES (delay + fewer on mobile + throttle)
 // ==========================================
 const particleContainer = document.getElementById("particleContainer");
-const particleCount = 55;
+const __particleCount = window.innerWidth < 768 ? 28 : 55;
 
 function spawnParticles(){
   if(!particleContainer) return;
@@ -342,7 +342,7 @@ function spawnParticles(){
 
   const w = window.innerWidth;
 
-  for(let i=0;i<particleCount;i++){
+  for(let i=0;i<__particleCount;i++){
     const p = document.createElement("div");
     p.className = "particle";
 
@@ -360,45 +360,73 @@ function spawnParticles(){
     particleContainer.appendChild(p);
   }
 }
-spawnParticles();
-window.addEventListener("resize", spawnParticles);
+
+// delay particle boot (prevents load stutter)
+setTimeout(() => spawnParticles(), 300);
+
+window.addEventListener("resize", () => {
+  clearTimeout(window.__pt);
+  window.__pt = setTimeout(spawnParticles, 200);
+});
 
 // ==========================================
-// ✅ LIVE STOCK LOAD FIRST (NO FLICKER)
+// FIX 1: FAST FIRST RENDER + LIVE STOCK SYNC (no lag)
+// - Render immediately from watchlist.js
+// - Then fetch live stock AFTER first paint
+// - Only re-render if live changes something
 // ==========================================
-async function loadProductsWithLiveStock(){
+let hasRenderedOnce = false;
+
+function safeInitialRender(){
+  if(hasRenderedOnce) return;
+  hasRenderedOnce = true;
+  filterSortProducts(); // instant render
+}
+safeInitialRender();
+
+async function getLiveProductsSafe(){
   try{
     const res = await fetch(`${API}?action=products&t=${Date.now()}`, {
-      method: "GET",
-      cache: "no-store"
+      method:"GET",
+      cache:"no-store"
     });
-
-    if(res.ok){
-      const live = await res.json();
-
-      if(Array.isArray(live)){
-        const map = {};
-        live.forEach(lp=>{
-          if(lp && lp.id != null){
-            map[normId(lp.id)] = lp;
-          }
-        });
-
-        window.products.forEach(p=>{
-          const lp = map[normId(p.id)];
-          if(!lp) return;
-
-          if(lp.price != null) p.price = toNumber(lp.price);
-          if(lp.stock != null) p.stock = toNumber(lp.stock);
-        });
-      }
-    }
-  } catch(e){
-    console.warn("Live stock failed, fallback to watchlist stock", e);
+    if(!res.ok) return null;
+    const data = await res.json();
+    return Array.isArray(data) ? data : null;
+  }catch(e){
+    return null;
   }
-
-  // Render only after merge done
-  filterSortProducts();
 }
 
-loadProductsWithLiveStock();
+function buildLiveMap(liveArr){
+  const map = {};
+  liveArr.forEach(lp=>{
+    if(!lp || lp.id == null) return;
+    map[normId(lp.id)] = lp;
+  });
+  return map;
+}
+
+// fetch AFTER first paint
+requestAnimationFrame(() => {
+  requestAnimationFrame(async () => {
+    const live = await getLiveProductsSafe();
+    if(!live || !Array.isArray(window.products)) return;
+
+    const map = buildLiveMap(live);
+    let changed = false;
+
+    window.products.forEach(p=>{
+      const lp = map[normId(p.id)];
+      if(!lp) return;
+
+      const newStock = (lp.stock != null) ? toNumber(lp.stock) : toNumber(p.stock);
+      const newPrice = (lp.price != null) ? toNumber(lp.price) : toNumber(p.price);
+
+      if(toNumber(p.stock) !== newStock){ p.stock = newStock; changed = true; }
+      if(toNumber(p.price) !== newPrice){ p.price = newPrice; changed = true; }
+    });
+
+    if(changed) filterSortProducts();
+  });
+});
