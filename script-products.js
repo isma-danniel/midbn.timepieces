@@ -1,10 +1,10 @@
 // ==========================================
-// MIDBN script-products.js (COMPLETE + STOCK SYNC UPGRADE)
+// MIDBN script-products.js (NO-FLICKER UPGRADE)
 // - Requires watchlist.js loaded FIRST (window.products)
 // - Live stock/price from Code.gs: ?action=products
-// - Sold out separator + badge (based on AVAILABLE stock)
-// - Cart count bottom button
-// - FIX: Available stock = product.stock (live) - qty already in cart
+// - Renders ONLY AFTER live fetch (prevents “ms delay”)
+// - Available stock = live stock - qty already in cart
+// - Sold out separator + badge
 // ==========================================
 
 const API =
@@ -87,7 +87,6 @@ updateCheckoutButton();
 // HAMBURGER TOGGLE
 // ==========================================
 function toggleFilters(){ filters?.classList.toggle("active"); }
-
 if(hamburger && filters){
   hamburger.addEventListener("click", toggleFilters);
   hamburger.addEventListener("keydown", (e)=>{
@@ -189,7 +188,6 @@ function filterSortProducts(){
     return searchMatch && brandMatch && categoryMatch && gradeMatch && minMatch && maxMatch;
   });
 
-  // Default: in stock first (based on available)
   filtered.sort(inStockFirstComparator);
 
   if(sortSelect?.value === "az"){
@@ -199,7 +197,6 @@ function filterSortProducts(){
       return String(a.name || "").localeCompare(String(b.name || ""));
     });
   }
-
   if(sortSelect?.value === "priceLow"){
     filtered.sort((a,b)=>{
       const pri = inStockFirstComparator(a,b);
@@ -207,7 +204,6 @@ function filterSortProducts(){
       return toNumber(a.price) - toNumber(b.price);
     });
   }
-
   if(sortSelect?.value === "inStock"){
     filtered.sort(inStockFirstComparator);
   }
@@ -215,6 +211,7 @@ function filterSortProducts(){
   renderProducts(filtered);
 }
 
+// Bind filter events
 searchInput?.addEventListener("input", filterSortProducts);
 sortSelect?.addEventListener("change", filterSortProducts);
 brandFilter?.addEventListener("change", filterSortProducts);
@@ -223,15 +220,11 @@ gradeFilter?.addEventListener("change", filterSortProducts);
 minPrice?.addEventListener("input", filterSortProducts);
 maxPrice?.addEventListener("input", filterSortProducts);
 
-// Initial render from watchlist immediately
-filterSortProducts();
-
 // ==========================================
 // QUICK VIEW MODAL (uses AVAILABLE stock)
 // ==========================================
 function openQuickView(product){
   currentQuickProduct = product;
-
   refreshCartFromStorage();
 
   if(modalImg) modalImg.src = product.img || "";
@@ -258,7 +251,6 @@ closeModal?.addEventListener("click", ()=>{
   quickViewModal.style.display = "none";
   quickViewModal.setAttribute("aria-hidden","true");
 });
-
 window.addEventListener("click", (e)=>{
   if(e.target === quickViewModal){
     quickViewModal.style.display = "none";
@@ -291,7 +283,7 @@ function addToCartInstant(product){
   if(existing){
     existing.qty = currentQty + 1;
     existing.price = toNumber(product.price);
-    existing.stock = toNumber(product.stock); // raw live stock fallback
+    existing.stock = toNumber(product.stock);
     existing.brand = product.brand || existing.brand || "";
     existing.img = product.img || existing.img || "";
   }else{
@@ -308,7 +300,7 @@ function addToCartInstant(product){
 
   localStorage.setItem("cart", JSON.stringify(cart));
   updateCheckoutButton();
-  filterSortProducts(); // refresh visible stock instantly
+  filterSortProducts();
   return true;
 }
 
@@ -359,47 +351,25 @@ goCheckoutBottom?.addEventListener("click", ()=>{
 });
 
 // ==========================================
-// WATERFALL PARTICLES
+// LIVE STOCK/PRICE OVERRIDE (NO-FLICKER INIT)
+// - show loading
+// - wait for live fetch (or timeout), then render ONCE
 // ==========================================
-const particleContainer = document.getElementById("particleContainer");
-const particleCount = 55;
-
-function spawnParticles(){
-  if(!particleContainer) return;
-  particleContainer.innerHTML = "";
-
-  const w = window.innerWidth;
-
-  for(let i=0;i<particleCount;i++){
-    const p = document.createElement("div");
-    p.className = "particle";
-
-    const x = Math.random() * w;
-    const size = (Math.random() * 2.5 + 2).toFixed(2);
-    const duration = (Math.random() * 10 + 8).toFixed(2);
-    const delay = (Math.random() * 8).toFixed(2);
-
-    p.style.left = x + "px";
-    p.style.width = size + "px";
-    p.style.height = size + "px";
-    p.style.animationDuration = duration + "s";
-    p.style.animationDelay = delay + "s";
-
-    particleContainer.appendChild(p);
-  }
+function showLoading(){
+  if(!productGrid) return;
+  productGrid.innerHTML = `<p style="opacity:.7;text-align:center;padding:22px;">Loading products…</p>`;
 }
-spawnParticles();
-window.addEventListener("resize", spawnParticles);
 
-// ==========================================
-// LIVE STOCK/PRICE OVERRIDE ON LOAD (FIXED)
-// ==========================================
+function fetchWithTimeout(url, ms){
+  return Promise.race([
+    fetch(url, { method:"GET", cache:"no-store" }),
+    new Promise((_, reject)=>setTimeout(()=>reject(new Error("timeout")), ms))
+  ]);
+}
+
 async function getLiveProductsSafe(){
   try{
-    const res = await fetch(`${API}?action=products&t=${Date.now()}`, {
-      method:"GET",
-      cache:"no-store"
-    });
+    const res = await fetchWithTimeout(`${API}?action=products&t=${Date.now()}`, 2500);
     if(!res.ok) throw new Error("API not ok");
     const data = await res.json();
     if(!Array.isArray(data)) throw new Error("API not array");
@@ -410,22 +380,27 @@ async function getLiveProductsSafe(){
   }
 }
 
-(async function applyLiveStock(){
+async function init(){
+  showLoading();
+
   const live = await getLiveProductsSafe();
-  if(!live || !Array.isArray(window.products)) return;
+  if(live && Array.isArray(window.products)){
+    const map = {};
+    live.forEach(lp => {
+      if (!lp || lp.id == null) return;
+      map[normId(lp.id)] = lp;
+    });
 
-  const map = {};
-  live.forEach(lp => {
-    if (!lp || lp.id == null) return;
-    map[normId(lp.id)] = lp;
-  });
+    window.products.forEach(p=>{
+      const lp = map[normId(p.id)];
+      if(!lp) return;
+      if(lp.price != null) p.price = toNumber(lp.price);
+      if(lp.stock != null) p.stock = toNumber(lp.stock);
+    });
+  }
 
-  window.products.forEach(p=>{
-    const lp = map[normId(p.id)];
-    if(!lp) return;
-    if(lp.price != null) p.price = toNumber(lp.price);
-    if(lp.stock != null) p.stock = toNumber(lp.stock);
-  });
-
+  // Render ONCE (no flicker)
   filterSortProducts();
-})();
+}
+
+init();
