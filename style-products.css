@@ -67,7 +67,7 @@ body{
 /* center pill inside header */
 .stock-notice{
   position: absolute;
-  left: 25%;
+  left: 30%;
   transform: translateX(-50%);
   top: 50%;
   translate: 0 -50%;
@@ -85,7 +85,7 @@ body{
   -webkit-backdrop-filter: blur(16px);
 
   color: rgba(220,251,255,0.95);
-  font-size: 12px;
+  font-size: 10px;
   letter-spacing: .3px;
   box-shadow: 0 10px 26px rgba(0,0,0,.35);
 
