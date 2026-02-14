@@ -67,7 +67,7 @@ body{
 /* center pill inside header */
 .stock-notice{
   position: absolute;
-  left: 50%;
+  left: 70%;
   transform: translateX(-50%);
   top: 50%;
   translate: 0 -50%;
