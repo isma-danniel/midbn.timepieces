@@ -1,9 +1,10 @@
 // ==========================================
-// MIDBN script-products.js (NO-FLICKER STOCK LINE)
-// - Renders products immediately
-// - Hides ONLY stock line until live stock loaded
-// - Available stock = live stock - qty in cart
-// - Requires watchlist.js first (window.products)
+// MIDBN script-products.js (FULL + STOCK SYNC FIX)
+// ✅ Requires watchlist.js loaded FIRST (window.products)
+// ✅ Fetches LIVE stock/price FIRST (no flicker / no millisecond mismatch)
+// ✅ Sold out separator + badge
+// ✅ Cart count bottom button
+// ✅ Filters + sort
 // ==========================================
 
 const API =
@@ -13,7 +14,7 @@ const API =
 function normId(v){ return String(v ?? "").trim(); }
 function toNumber(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
 
-// ---------- Safety ----------
+// ---------- Safety: watchlist.js must load first ----------
 if (!Array.isArray(window.products)) {
   console.error("watchlist.js not loaded or window.products is not an array");
   window.products = [];
@@ -50,30 +51,11 @@ const goCheckoutBottom = document.getElementById("goCheckoutBottom");
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let currentQuickProduct = null;
 
-// IMPORTANT: controls flicker
-let liveReady = false;   // false until live stock fetched (or failed)
-
-// ==========================================
-// Cart helpers
-// ==========================================
-function refreshCartFromStorage(){
-  cart = JSON.parse(localStorage.getItem("cart")) || [];
-}
-function getCartQtyById(id){
-  const cid = normId(id);
-  const c = JSON.parse(localStorage.getItem("cart")) || [];
-  return c.reduce((sum, it) => sum + (normId(it.id) === cid ? toNumber(it.qty || 0) : 0), 0);
-}
-function availableStock(product){
-  return Math.max(0, toNumber(product.stock) - getCartQtyById(product.id));
-}
-
 // ==========================================
 // CART COUNT
 // ==========================================
 function cartCount(){
-  refreshCartFromStorage();
-  return cart.reduce((sum, it) => sum + toNumber(it.qty || 0), 0);
+  return cart.reduce((sum, it) => sum + Number(it.qty || 0), 0);
 }
 function updateCheckoutButton(){
   if(!goCheckoutBottom) return;
@@ -97,7 +79,7 @@ if(hamburger && filters){
 }
 
 // ==========================================
-// RENDER (stock line hidden until liveReady)
+// RENDER (SOLD OUT SEPARATOR + BADGE)
 // ==========================================
 function renderProducts(list){
   if(!productGrid) return;
@@ -108,33 +90,18 @@ function renderProducts(list){
     return;
   }
 
-  // If live not ready yet, we DO NOT separate sold out (because stock not trusted yet).
-  // Once liveReady=true, we separate properly using availableStock.
   const inStock = [];
   const soldOut = [];
-
-  if(!liveReady){
-    // keep original order, no sold out section yet
-    list.forEach(p => inStock.push(p));
-  }else{
-    list.forEach(p => (availableStock(p) > 0 ? inStock : soldOut).push(p));
-  }
+  list.forEach(p => (toNumber(p.stock) > 0 ? inStock : soldOut).push(p));
 
   function makeCard(p, isSold){
     const card = document.createElement("div");
     card.className = "product-card" + (isSold ? " soldout" : "");
     card.dataset.id = p.id;
 
-    const labelHtml = (liveReady && isSold)
+    const labelHtml = isSold
       ? `<div class="label soldout-badge">SOLD OUT</div>`
       : (p.label ? `<div class="label">${p.label}</div>` : "");
-
-    const stockHtml = liveReady
-      ? `Stock: ${availableStock(p)}`
-      : `Stock: —`; // placeholder
-
-    // hide ONLY stock line until liveReady
-    const stockStyle = liveReady ? "" : `style="opacity:0; height:0; margin:0; padding:0; overflow:hidden;"`;
 
     card.innerHTML = `
       <div class="img-wrap">
@@ -146,8 +113,8 @@ function renderProducts(list){
         <div class="brand">${p.brand || ""}</div>
         <div class="name product-name">${p.name || ""}</div>
         <div class="price">BND ${toNumber(p.price).toFixed(2)}</div>
-        <div class="stock" ${stockStyle}>${stockHtml}</div>
-        <a href="#" class="more-details-btn">${(liveReady && isSold) ? "View Details →" : "More Details →"}</a>
+        <div class="stock">Stock: ${toNumber(p.stock)}</div>
+        <a href="#" class="more-details-btn">${isSold ? "View Details →" : "More Details →"}</a>
       </div>
     `;
 
@@ -162,11 +129,12 @@ function renderProducts(list){
 
   inStock.forEach(p => productGrid.appendChild(makeCard(p, false)));
 
-  if(liveReady && soldOut.length){
+  if(soldOut.length){
     const sep = document.createElement("div");
     sep.className = "soldout-sep";
     sep.textContent = "SOLD OUT";
     productGrid.appendChild(sep);
+
     soldOut.forEach(p => productGrid.appendChild(makeCard(p, true)));
   }
 }
@@ -175,8 +143,8 @@ function renderProducts(list){
 // FILTER + SORT
 // ==========================================
 function inStockFirstComparator(a, b){
-  const aIn = availableStock(a) > 0 ? 1 : 0;
-  const bIn = availableStock(b) > 0 ? 1 : 0;
+  const aIn = toNumber(a.stock) > 0 ? 1 : 0;
+  const bIn = toNumber(b.stock) > 0 ? 1 : 0;
   if (aIn !== bIn) return bIn - aIn;
   return 0;
 }
@@ -201,32 +169,26 @@ function filterSortProducts(){
     return searchMatch && brandMatch && categoryMatch && gradeMatch && minMatch && maxMatch;
   });
 
-  // Only do stock-based sorting AFTER liveReady
-  if(liveReady){
-    filtered.sort(inStockFirstComparator);
-  }
+  // Default: in stock first
+  filtered.sort(inStockFirstComparator);
 
   if(sortSelect?.value === "az"){
     filtered.sort((a,b)=>{
-      if(liveReady){
-        const pri = inStockFirstComparator(a,b);
-        if(pri !== 0) return pri;
-      }
+      const pri = inStockFirstComparator(a,b);
+      if(pri !== 0) return pri;
       return String(a.name || "").localeCompare(String(b.name || ""));
     });
   }
 
   if(sortSelect?.value === "priceLow"){
     filtered.sort((a,b)=>{
-      if(liveReady){
-        const pri = inStockFirstComparator(a,b);
-        if(pri !== 0) return pri;
-      }
+      const pri = inStockFirstComparator(a,b);
+      if(pri !== 0) return pri;
       return toNumber(a.price) - toNumber(b.price);
     });
   }
 
-  if(sortSelect?.value === "inStock" && liveReady){
+  if(sortSelect?.value === "inStock"){
     filtered.sort(inStockFirstComparator);
   }
 
@@ -241,41 +203,25 @@ gradeFilter?.addEventListener("change", filterSortProducts);
 minPrice?.addEventListener("input", filterSortProducts);
 maxPrice?.addEventListener("input", filterSortProducts);
 
-// Render immediately (no flicker — stock hidden)
-filterSortProducts();
+// ❌ DO NOT CALL filterSortProducts() HERE (we render after live stock)
 
 // ==========================================
-// QUICK VIEW MODAL (uses availableStock once liveReady)
+// QUICK VIEW MODAL
 // ==========================================
 function openQuickView(product){
   currentQuickProduct = product;
-  refreshCartFromStorage();
 
   if(modalImg) modalImg.src = product.img || "";
   if(modalName) modalName.textContent = product.name || "";
   if(modalPrice) modalPrice.textContent = `BND ${toNumber(product.price).toFixed(2)}`;
-
-  // show stock only if liveReady, else show “Checking…”
-  if(modalStock){
-    modalStock.textContent = liveReady
-      ? `Stock: ${availableStock(product)}`
-      : `Stock: Checking…`;
-  }
-
+  if(modalStock) modalStock.textContent = `Stock: ${toNumber(product.stock)}`;
   if(modalDetails) modalDetails.textContent = product.details || "";
 
   if(modalAddCart){
-    // disable add to cart until liveReady (prevents wrong add)
-    if(!liveReady){
-      modalAddCart.disabled = true;
-      modalAddCart.textContent = "Checking stock…";
-      modalAddCart.classList.remove("added");
-    }else{
-      const out = availableStock(product) <= 0;
-      modalAddCart.disabled = out;
-      modalAddCart.textContent = out ? "Out of Stock" : "+ Add to Cart";
-      modalAddCart.classList.remove("added");
-    }
+    const out = toNumber(product.stock) <= 0;
+    modalAddCart.disabled = out;
+    modalAddCart.textContent = out ? "Out of Stock" : "+ Add to Cart";
+    modalAddCart.classList.remove("added");
   }
 
   if(quickViewModal){
@@ -289,6 +235,7 @@ closeModal?.addEventListener("click", ()=>{
   quickViewModal.style.display = "none";
   quickViewModal.setAttribute("aria-hidden","true");
 });
+
 window.addEventListener("click", (e)=>{
   if(e.target === quickViewModal){
     quickViewModal.style.display = "none";
@@ -297,14 +244,13 @@ window.addEventListener("click", (e)=>{
 });
 
 // ==========================================
-// ADD TO CART (only when liveReady)
+// ADD TO CART
+// ✅ Saves stock + brand + img into cart as fallback
 // ==========================================
 function addToCartInstant(product){
   if(!product) return false;
 
-  refreshCartFromStorage();
-
-  const stock = availableStock(product);
+  const stock = toNumber(product.stock);
   if(stock <= 0){
     alert("Out of stock");
     return false;
@@ -321,7 +267,7 @@ function addToCartInstant(product){
   if(existing){
     existing.qty = currentQty + 1;
     existing.price = toNumber(product.price);
-    existing.stock = toNumber(product.stock);
+    existing.stock = stock;
     existing.brand = product.brand || existing.brand || "";
     existing.img = product.img || existing.img || "";
   }else{
@@ -330,7 +276,7 @@ function addToCartInstant(product){
       name: product.name,
       price: toNumber(product.price),
       qty: 1,
-      stock: toNumber(product.stock),
+      stock,
       brand: product.brand || "",
       img: product.img || ""
     });
@@ -338,7 +284,6 @@ function addToCartInstant(product){
 
   localStorage.setItem("cart", JSON.stringify(cart));
   updateCheckoutButton();
-  filterSortProducts();
   return true;
 }
 
@@ -346,8 +291,9 @@ if(modalAddCart){
   modalAddCart.addEventListener("click", ()=>{
     if(!currentQuickProduct) return;
 
-    if(!liveReady){
-      alert("Checking stock… please wait a moment.");
+    if(toNumber(currentQuickProduct.stock) <= 0){
+      modalAddCart.disabled = true;
+      modalAddCart.textContent = "Out of Stock";
       return;
     }
 
@@ -359,8 +305,7 @@ if(modalAddCart){
     modalAddCart.disabled = true;
 
     setTimeout(()=>{
-      refreshCartFromStorage();
-      if(availableStock(currentQuickProduct) <= 0){
+      if(toNumber(currentQuickProduct.stock) <= 0){
         modalAddCart.disabled = true;
         modalAddCart.textContent = "Out of Stock";
         modalAddCart.classList.remove("added");
@@ -386,52 +331,74 @@ goCheckoutBottom?.addEventListener("click", ()=>{
 });
 
 // ==========================================
-// LIVE STOCK/PRICE OVERRIDE (fast timeout)
+// WATERFALL PARTICLES
 // ==========================================
-function fetchWithTimeout(url, ms){
-  return Promise.race([
-    fetch(url, { method:"GET", cache:"no-store" }),
-    new Promise((_, reject)=>setTimeout(()=>reject(new Error("timeout")), ms))
-  ]);
-}
+const particleContainer = document.getElementById("particleContainer");
+const particleCount = 55;
 
-async function getLiveProductsSafe(){
+function spawnParticles(){
+  if(!particleContainer) return;
+  particleContainer.innerHTML = "";
+
+  const w = window.innerWidth;
+
+  for(let i=0;i<particleCount;i++){
+    const p = document.createElement("div");
+    p.className = "particle";
+
+    const x = Math.random() * w;
+    const size = (Math.random() * 2.5 + 2).toFixed(2);
+    const duration = (Math.random() * 10 + 8).toFixed(2);
+    const delay = (Math.random() * 8).toFixed(2);
+
+    p.style.left = x + "px";
+    p.style.width = size + "px";
+    p.style.height = size + "px";
+    p.style.animationDuration = duration + "s";
+    p.style.animationDelay = delay + "s";
+
+    particleContainer.appendChild(p);
+  }
+}
+spawnParticles();
+window.addEventListener("resize", spawnParticles);
+
+// ==========================================
+// ✅ LIVE STOCK LOAD FIRST (NO FLICKER)
+// ==========================================
+async function loadProductsWithLiveStock(){
   try{
-    const res = await fetchWithTimeout(`${API}?action=products&t=${Date.now()}`, 2500);
-    if(!res.ok) throw new Error("API not ok");
-    const data = await res.json();
-    if(!Array.isArray(data)) throw new Error("API not array");
-    return data;
-  }catch(err){
-    console.warn("Live fetch failed:", err);
-    return null;
+    const res = await fetch(`${API}?action=products&t=${Date.now()}`, {
+      method: "GET",
+      cache: "no-store"
+    });
+
+    if(res.ok){
+      const live = await res.json();
+
+      if(Array.isArray(live)){
+        const map = {};
+        live.forEach(lp=>{
+          if(lp && lp.id != null){
+            map[normId(lp.id)] = lp;
+          }
+        });
+
+        window.products.forEach(p=>{
+          const lp = map[normId(p.id)];
+          if(!lp) return;
+
+          if(lp.price != null) p.price = toNumber(lp.price);
+          if(lp.stock != null) p.stock = toNumber(lp.stock);
+        });
+      }
+    }
+  } catch(e){
+    console.warn("Live stock failed, fallback to watchlist stock", e);
   }
+
+  // Render only after merge done
+  filterSortProducts();
 }
 
-(async function applyLiveStock(){
-  const live = await getLiveProductsSafe();
-  if(!live || !Array.isArray(window.products)){
-    // even if failed, mark ready so UI stops hiding forever
-    liveReady = true;
-    filterSortProducts();
-    return;
-  }
-
-  const map = {};
-  live.forEach(lp => {
-    if (!lp || lp.id == null) return;
-    map[normId(lp.id)] = lp;
-  });
-
-  window.products.forEach(p=>{
-    const lp = map[normId(p.id)];
-    if(!lp) return;
-    if(lp.price != null) p.price = toNumber(lp.price);
-    if(lp.stock != null) p.stock = toNumber(lp.stock);
-  });
-
-  liveReady = true;
-
-  // Now stock line appears + sold out separator works
-  filterSortProducts();
-})();
+loadProductsWithLiveStock();
