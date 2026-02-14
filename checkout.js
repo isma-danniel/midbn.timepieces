@@ -1,9 +1,10 @@
 // ==========================================
-// MIDBN CHECKOUT.JS - FINAL (UPDATED for new Code.gs)
+// MIDBN CHECKOUT.JS - FINAL (UPDATED)
 // ✅ Anti duplicate submit (client token)
 // ✅ Live stock limit (GET ?action=products)
 // ✅ Server-side order creates PDF + deducts stock (no need POST type:'stock')
 // ✅ Saves pdfUrl from (pdfUrl OR receiptPdfUrl) into lastOrder
+// ✅ FIXED: Stock mismatch (no Infinity fallback, trim IDs, strict sheet stock)
 // ==========================================
 
 const API =
@@ -27,6 +28,10 @@ let lastStockFetchAt = 0;
 // ========================
 // Helpers
 // ========================
+function normId(v){
+  return String(v ?? "").trim();
+}
+
 function toNumber(v) {
   const n = Number(v);
   return Number.isFinite(n) ? n : 0;
@@ -62,6 +67,14 @@ function escapeHtml(str) {
     .replaceAll("'", "&#039;");
 }
 
+function resetSubmitUI(){
+  isSubmitting = false;
+  if (placeOrderBtn){
+    placeOrderBtn.disabled = false;
+    placeOrderBtn.textContent = "Place Order";
+  }
+}
+
 // ========================
 // Safari-safe POST
 // ========================
@@ -85,7 +98,7 @@ function postToAPI(data) {
 // ========================
 async function getLiveProductsSafe() {
   try {
-    const url = API + "?action=products";
+    const url = API + "?action=products&t=" + Date.now();
     const res = await fetch(url, { method: "GET", cache: "no-store" });
     if (!res.ok) throw new Error("API not ok");
     const data = await res.json();
@@ -106,7 +119,7 @@ async function ensureLiveStockMap() {
   const map = {};
   live.forEach((p) => {
     if (!p || p.id == null) return;
-    map[String(p.id)] = toNumber(p.stock);
+    map[normId(p.id)] = toNumber(p.stock);
   });
 
   liveStockMap = map;
@@ -114,11 +127,13 @@ async function ensureLiveStockMap() {
   return map;
 }
 
+// ✅ IMPORTANT: never Infinity. If not loaded, treat as 0 (safe).
 function getMaxStockForItem(item) {
-  const id = String(item.id ?? "");
-  if (liveStockMap && id in liveStockMap) return liveStockMap[id];
-  const fallback = toNumber(item.stock);
-  return fallback > 0 ? fallback : Infinity;
+  const id = normId(item.id);
+  if (liveStockMap && Object.prototype.hasOwnProperty.call(liveStockMap, id)) {
+    return toNumber(liveStockMap[id]);
+  }
+  return 0;
 }
 
 // ========================
@@ -137,7 +152,7 @@ function renderCart() {
     let qty = getQty(item);
 
     const maxStock = getMaxStockForItem(item);
-    if (maxStock !== Infinity && qty > maxStock) {
+    if (qty > Math.max(1, maxStock)) {
       qty = Math.max(1, maxStock);
       setQty(item, qty);
       saveCart();
@@ -147,12 +162,10 @@ function renderCart() {
     const lineTotal = qty * price;
 
     const minusDisabled = qty <= 1;
-    const plusDisabled = (maxStock !== Infinity) ? qty >= maxStock : false;
+    const plusDisabled = qty >= maxStock; // maxStock may be 0 while loading → plus disabled
 
     const stockHint =
-      (maxStock !== Infinity)
-        ? `<small>${formatBND(price)} each • Stock ${maxStock}</small>`
-        : `<small>${formatBND(price)} each</small>`;
+      `<small>${formatBND(price)} each • Stock ${maxStock}</small>`;
 
     cartItemsContainer.innerHTML += `
       <div class="cart-item">
@@ -215,7 +228,7 @@ cartItemsContainer.addEventListener("click", async (e) => {
     return;
   }
 
-  if (maxStock !== Infinity && qty > maxStock) {
+  if (qty > maxStock) {
     alert("Maximum stock reached.");
     qty = Math.max(1, maxStock);
   }
@@ -251,7 +264,7 @@ checkoutForm.addEventListener("submit", async (e) => {
   cart = JSON.parse(localStorage.getItem("cart")) || [];
   if (!cart.length) {
     alert("Cart is empty!");
-    isSubmitting = false;
+    resetSubmitUI();
     return;
   }
 
@@ -262,25 +275,40 @@ checkoutForm.addEventListener("submit", async (e) => {
 
   if (!name || !phone || !address || !payment) {
     alert("Please complete all fields.");
-    isSubmitting = false;
+    resetSubmitUI();
     return;
   }
 
-  await ensureLiveStockMap();
-  for (const it of cart) {
-    const maxStock = getMaxStockForItem(it);
-    const q = getQty(it);
+  // Ensure we have live sheet stock before validating
+  const map = await ensureLiveStockMap();
+  if (!map) {
+    alert("Unable to load live stock. Please try again.");
+    resetSubmitUI();
+    return;
+  }
 
-    if (maxStock !== Infinity && maxStock <= 0) {
-      alert(`Out of stock: ${it.name}`);
-      renderCart();
-      isSubmitting = false;
+  for (const it of cart) {
+    const id = normId(it.id);
+
+    if (!Object.prototype.hasOwnProperty.call(map, id)) {
+      alert(`Stock not found in sheet for ID: ${id} (${it.name}).\nPlease fix the ID in Google Sheet.`);
+      resetSubmitUI();
       return;
     }
-    if (maxStock !== Infinity && q > maxStock) {
+
+    const maxStock = toNumber(map[id]);
+    const q = getQty(it);
+
+    if (maxStock <= 0) {
+      alert(`Out of stock: ${it.name}`);
+      renderCart();
+      resetSubmitUI();
+      return;
+    }
+    if (q > maxStock) {
       alert(`Quantity exceeds stock for: ${it.name} (Stock ${maxStock})`);
       renderCart();
-      isSubmitting = false;
+      resetSubmitUI();
       return;
     }
   }
@@ -326,8 +354,6 @@ checkoutForm.addEventListener("submit", async (e) => {
   } catch (err) {
     console.error(err);
     alert("Server error: " + (err?.message || "Check deployment / permissions."));
-    placeOrderBtn.disabled = false;
-    placeOrderBtn.textContent = "Place Order";
-    isSubmitting = false;
+    resetSubmitUI();
   }
 });
