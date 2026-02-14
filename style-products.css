@@ -53,45 +53,86 @@ body{
 /* ==============================
    STOCK SYNC NOTICE
 ============================== */
-.stock-notice{
+/* ==============================
+   STOCK SYNC NOTICE (HEADER MIDDLE)
+============================== */
+
+/* make header allow absolute center item */
+.header{
   position: sticky;
-  top: 64px;
-  z-index: 999;
-  margin: 10px 14px 0;
-  padding: 10px 14px;
-  border-radius: 16px;
+  top: 0;
+  z-index: 1000;
+}
+
+/* center pill inside header */
+.stock-notice{
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 50%;
+  translate: 0 -50%;
 
   display:flex;
   align-items:center;
-  justify-content: space-between;
+  gap:10px;
 
-  background: rgba(13,15,16,0.75);
-  border: 1px solid rgba(220,251,255,0.25);
+  padding: 7px 14px;
+  border-radius: 999px;
+
+  background: rgba(13,15,16,0.55);
+  border: 1px solid rgba(220,251,255,0.22);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 
   color: rgba(220,251,255,0.95);
   font-size: 12px;
   letter-spacing: .3px;
-  box-shadow: 0 10px 26px rgba(0,0,0,.45);
-  transition: opacity .4s ease;
+  box-shadow: 0 10px 26px rgba(0,0,0,.35);
+
+  transition: opacity .35s ease, transform .35s ease;
+  pointer-events: none; /* so it doesn't block clicks */
 }
 
+/* countdown bubble */
 .stock-timer{
   font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(220,251,255,0.22);
-  background: rgba(220,251,255,0.08);
-  min-width: 40px;
-  text-align:center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border: 1px solid rgba(220,251,255,0.25);
+  background: rgba(220,251,255,0.10);
+  color: rgba(220,251,255,0.95);
+  font-size: 11px;
 }
 
+/* done state */
 .stock-notice.done{
-  border-color: rgba(120,255,180,0.3);
+  border-color: rgba(120,255,180,0.35);
 }
 .stock-notice.done .stock-timer{
-  background: rgba(120,255,180,0.1);
+  background: rgba(120,255,180,0.14);
+  border-color: rgba(120,255,180,0.35);
   color: #8fffcf;
+}
+
+/* fade out */
+.stock-notice.hide{
+  opacity: 0;
+  transform: translateX(-50%) translateY(-6px);
+}
+
+/* mobile safety: don’t overflow header */
+@media (max-width: 380px){
+  .stock-notice{
+    max-width: 190px;
+    padding: 6px 10px;
+    font-size: 11px;
+  }
 }
 
 /* ===== HAMBURGER ===== */
