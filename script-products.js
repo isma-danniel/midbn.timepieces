@@ -1,9 +1,10 @@
 // ==========================================
-// MIDBN script-products.js (COMPLETE)
+// MIDBN script-products.js (COMPLETE + STOCK SYNC UPGRADE)
 // - Requires watchlist.js loaded FIRST (window.products)
 // - Live stock/price from Code.gs: ?action=products
-// - Sold out separator + badge
+// - Sold out separator + badge (based on AVAILABLE stock)
 // - Cart count bottom button
+// - FIX: Available stock = product.stock (live) - qty already in cart
 // ==========================================
 
 const API =
@@ -51,10 +52,28 @@ let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let currentQuickProduct = null;
 
 // ==========================================
+// STOCK SYNC (Available stock = Live stock - Qty in cart)
+// ==========================================
+function refreshCartFromStorage(){
+  cart = JSON.parse(localStorage.getItem("cart")) || [];
+}
+
+function getCartQtyById(id){
+  const cid = normId(id);
+  const c = JSON.parse(localStorage.getItem("cart")) || [];
+  return c.reduce((sum, it) => sum + (normId(it.id) === cid ? toNumber(it.qty || 0) : 0), 0);
+}
+
+function availableStock(product){
+  return Math.max(0, toNumber(product.stock) - getCartQtyById(product.id));
+}
+
+// ==========================================
 // CART COUNT
 // ==========================================
 function cartCount(){
-  return cart.reduce((sum, it) => sum + Number(it.qty || 0), 0);
+  refreshCartFromStorage();
+  return cart.reduce((sum, it) => sum + toNumber(it.qty || 0), 0);
 }
 
 function updateCheckoutButton(){
@@ -80,7 +99,7 @@ if(hamburger && filters){
 }
 
 // ==========================================
-// RENDER (SOLD OUT SEPARATOR + BADGE)
+// RENDER (SOLD OUT SEPARATOR + BADGE) - based on AVAILABLE stock
 // ==========================================
 function renderProducts(list){
   if(!productGrid) return;
@@ -93,7 +112,7 @@ function renderProducts(list){
 
   const inStock = [];
   const soldOut = [];
-  list.forEach(p => (toNumber(p.stock) > 0 ? inStock : soldOut).push(p));
+  list.forEach(p => (availableStock(p) > 0 ? inStock : soldOut).push(p));
 
   function makeCard(p, isSold){
     const card = document.createElement("div");
@@ -114,7 +133,7 @@ function renderProducts(list){
         <div class="brand">${p.brand || ""}</div>
         <div class="name product-name">${p.name || ""}</div>
         <div class="price">BND ${toNumber(p.price).toFixed(2)}</div>
-        <div class="stock">Stock: ${toNumber(p.stock)}</div>
+        <div class="stock">Stock: ${availableStock(p)}</div>
         <a href="#" class="more-details-btn">${isSold ? "View Details →" : "More Details →"}</a>
       </div>
     `;
@@ -144,8 +163,8 @@ function renderProducts(list){
 // FILTER + SORT
 // ==========================================
 function inStockFirstComparator(a, b){
-  const aIn = toNumber(a.stock) > 0 ? 1 : 0;
-  const bIn = toNumber(b.stock) > 0 ? 1 : 0;
+  const aIn = availableStock(a) > 0 ? 1 : 0;
+  const bIn = availableStock(b) > 0 ? 1 : 0;
   if (aIn !== bIn) return bIn - aIn;
   return 0;
 }
@@ -170,7 +189,7 @@ function filterSortProducts(){
     return searchMatch && brandMatch && categoryMatch && gradeMatch && minMatch && maxMatch;
   });
 
-  // Default: in stock first
+  // Default: in stock first (based on available)
   filtered.sort(inStockFirstComparator);
 
   if(sortSelect?.value === "az"){
@@ -189,7 +208,6 @@ function filterSortProducts(){
     });
   }
 
-  // If you keep the option in HTML, this makes it explicit:
   if(sortSelect?.value === "inStock"){
     filtered.sort(inStockFirstComparator);
   }
@@ -209,19 +227,21 @@ maxPrice?.addEventListener("input", filterSortProducts);
 filterSortProducts();
 
 // ==========================================
-// QUICK VIEW MODAL
+// QUICK VIEW MODAL (uses AVAILABLE stock)
 // ==========================================
 function openQuickView(product){
   currentQuickProduct = product;
 
+  refreshCartFromStorage();
+
   if(modalImg) modalImg.src = product.img || "";
   if(modalName) modalName.textContent = product.name || "";
   if(modalPrice) modalPrice.textContent = `BND ${toNumber(product.price).toFixed(2)}`;
-  if(modalStock) modalStock.textContent = `Stock: ${toNumber(product.stock)}`;
+  if(modalStock) modalStock.textContent = `Stock: ${availableStock(product)}`;
   if(modalDetails) modalDetails.textContent = product.details || "";
 
   if(modalAddCart){
-    const out = toNumber(product.stock) <= 0;
+    const out = availableStock(product) <= 0;
     modalAddCart.disabled = out;
     modalAddCart.textContent = out ? "Out of Stock" : "+ Add to Cart";
     modalAddCart.classList.remove("added");
@@ -247,12 +267,14 @@ window.addEventListener("click", (e)=>{
 });
 
 // ==========================================
-// ADD TO CART (UPGRADED: store stock+brand+img as fallback)
+// ADD TO CART (uses AVAILABLE stock + refresh UI)
 // ==========================================
 function addToCartInstant(product){
   if(!product) return false;
 
-  const stock = toNumber(product.stock);
+  refreshCartFromStorage();
+
+  const stock = availableStock(product);
   if(stock <= 0){
     alert("Out of stock");
     return false;
@@ -269,7 +291,7 @@ function addToCartInstant(product){
   if(existing){
     existing.qty = currentQty + 1;
     existing.price = toNumber(product.price);
-    existing.stock = stock; // fallback stability
+    existing.stock = toNumber(product.stock); // raw live stock fallback
     existing.brand = product.brand || existing.brand || "";
     existing.img = product.img || existing.img || "";
   }else{
@@ -278,7 +300,7 @@ function addToCartInstant(product){
       name: product.name,
       price: toNumber(product.price),
       qty: 1,
-      stock,
+      stock: toNumber(product.stock),
       brand: product.brand || "",
       img: product.img || ""
     });
@@ -286,6 +308,7 @@ function addToCartInstant(product){
 
   localStorage.setItem("cart", JSON.stringify(cart));
   updateCheckoutButton();
+  filterSortProducts(); // refresh visible stock instantly
   return true;
 }
 
@@ -293,7 +316,9 @@ if(modalAddCart){
   modalAddCart.addEventListener("click", ()=>{
     if(!currentQuickProduct) return;
 
-    if(toNumber(currentQuickProduct.stock) <= 0){
+    refreshCartFromStorage();
+
+    if(availableStock(currentQuickProduct) <= 0){
       modalAddCart.disabled = true;
       modalAddCart.textContent = "Out of Stock";
       return;
@@ -307,8 +332,8 @@ if(modalAddCart){
     modalAddCart.disabled = true;
 
     setTimeout(()=>{
-      // Re-check current product stock
-      if(toNumber(currentQuickProduct.stock) <= 0){
+      refreshCartFromStorage();
+      if(availableStock(currentQuickProduct) <= 0){
         modalAddCart.disabled = true;
         modalAddCart.textContent = "Out of Stock";
         modalAddCart.classList.remove("added");
@@ -389,7 +414,6 @@ async function getLiveProductsSafe(){
   const live = await getLiveProductsSafe();
   if(!live || !Array.isArray(window.products)) return;
 
-  // Build map for fast merge
   const map = {};
   live.forEach(lp => {
     if (!lp || lp.id == null) return;
