@@ -28,11 +28,7 @@
       </div>
 
       <div id="cartItems"></div>
-
-      <!-- ✅ totals breakdown -->
-      <div class="cart-total" id="cartSubtotal">Subtotal: BND 0.00</div>
-      <div class="cart-total" id="cartDelivery">Delivery charges: BND 0.00</div>
-      <div class="cart-total" id="cartTotal"><strong>Total: BND 0.00</strong></div>
+      <div class="cart-total" id="cartTotal">BND 0</div>
     </div>
 
     <!-- FORM -->
@@ -41,24 +37,32 @@
 
       <form id="checkoutForm" class="checkout-form">
         <input type="text" id="name" placeholder="Full Name" required />
-        <input type="text" id="phone" placeholder="Phone Number" required />
-
-        <!-- ✅ delivery option -->
-        <select id="deliveryOption" required>
-          <option value="0">Pickup (BND 0.00)</option>
-          <option value="5">Delivery (BND 5.00)</option>
-          <option value="10">Delivery (BND 10.00)</option>
-          <option value="15">Delivery (BND 15.00)</option>
-        </select>
-
-        <!-- ✅ address becomes optional unless delivery -->
-        <textarea id="address" placeholder="Delivery Address (only if delivery)"></textarea>
+        <input type="tel" id="phone" placeholder="Phone Number (e.g. 6731234567)" required />
 
         <select id="payment" required>
           <option value="">Select Payment Method</option>
           <option value="Cash">Cash</option>
           <option value="Bank Transfer">Bank Transfer</option>
         </select>
+
+        <select id="deliveryType" required>
+          <option value="Delivery">Delivery</option>
+          <option value="Pickup">Pickup</option>
+        </select>
+
+        <!-- shown only if Delivery -->
+        <div id="deliveryFields">
+          <select id="district" required>
+            <option value="">Select District</option>
+            <option value="bsb">BSB / Bandar Seri Begawan (BND 5)</option>
+            <option value="tutong">Tutong (BND 10)</option>
+            <option value="belait">Kuala Belait (BND 15)</option>
+            <option value="temburong">Temburong (BND 15)</option>
+          </select>
+
+          <textarea id="address" placeholder="Delivery Address"></textarea>
+          <div class="order-hint" id="deliveryFeeHint">Delivery charges: BND 0.00</div>
+        </div>
 
         <button id="placeOrderBtn" type="submit">Place Order</button>
         <p class="order-hint">Stock will be deducted after order is saved.</p>
