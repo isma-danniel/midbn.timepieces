@@ -1,15 +1,23 @@
 // ==========================================
-// MIDBN CHECKOUT.JS - FINAL (UPDATED + EMAIL)
+// MIDBN CHECKOUT.JS (FULL - Delivery + Email server)
+// ✅ Live stock limit (GET ?action=products)
+// ✅ Delivery type + district + auto delivery charges
+// ✅ Server deducts stock + creates PDF + emails seller
 // ==========================================
 
-const API =
-  "https://script.google.com/macros/s/AKfycbyovzomINZnABB1-DatSQgIA_OHu7OjuRD-D2yGMWU7i-xD7irSsXR1p2frILSv02eNxg/exec";
+const API = "PASTE_YOUR_WEBAPP_URL_HERE"; // <-- your /exec URL
 
 const cartItemsContainer = document.getElementById("cartItems");
 const cartTotalEl = document.getElementById("cartTotal");
 const clearCartBtn = document.getElementById("clearCartBtn");
 const checkoutForm = document.getElementById("checkoutForm");
 const placeOrderBtn = document.getElementById("placeOrderBtn");
+
+const deliveryTypeEl = document.getElementById("deliveryType");
+const deliveryFields = document.getElementById("deliveryFields");
+const districtEl = document.getElementById("district");
+const addressEl = document.getElementById("address");
+const deliveryFeeHint = document.getElementById("deliveryFeeHint");
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let isSubmitting = false;
@@ -20,26 +28,30 @@ let lastStockFetchAt = 0;
 function normId(v){ return String(v ?? "").trim(); }
 function toNumber(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
 function formatBND(n){ return "BND " + toNumber(n).toFixed(2); }
+
 function getQty(item){ return Math.max(1, toNumber(item.qty ?? item.quantity ?? 1)); }
 function setQty(item, qty){ item.qty = qty; if ("quantity" in item) item.quantity = qty; }
 function saveCart(){ localStorage.setItem("cart", JSON.stringify(cart)); }
-function calcTotal(){ return cart.reduce((sum, it) => sum + getQty(it) * toNumber(it.price), 0); }
+function calcSubtotal(){ return cart.reduce((sum, it) => sum + getQty(it) * toNumber(it.price), 0); }
 
 function escapeHtml(str){
   return String(str ?? "")
-    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function resetSubmitUI(){
   isSubmitting = false;
-  if (placeOrderBtn){
+  if(placeOrderBtn){
     placeOrderBtn.disabled = false;
     placeOrderBtn.textContent = "Place Order";
   }
 }
 
-function postToAPI(data) {
+function postToAPI(data){
   return fetch(API, {
     method: "POST",
     headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -51,7 +63,7 @@ function postToAPI(data) {
   });
 }
 
-async function getLiveProductsSafe() {
+async function getLiveProductsSafe(){
   try{
     const url = API + "?action=products&t=" + Date.now();
     const res = await fetch(url, { method:"GET", cache:"no-store" });
@@ -64,12 +76,12 @@ async function getLiveProductsSafe() {
   }
 }
 
-async function ensureLiveStockMap() {
+async function ensureLiveStockMap(){
   const now = Date.now();
   if (liveStockMap && (now - lastStockFetchAt) < 30000) return liveStockMap;
 
   const live = await getLiveProductsSafe();
-  if (!live) return null;
+  if(!live) return null;
 
   const map = {};
   live.forEach(p=>{
@@ -82,28 +94,70 @@ async function ensureLiveStockMap() {
   return map;
 }
 
-function getMaxStockForItem(item) {
+function getMaxStockForItem(item){
   const id = normId(item.id);
-  if (liveStockMap && Object.prototype.hasOwnProperty.call(liveStockMap, id)) {
+  if(liveStockMap && Object.prototype.hasOwnProperty.call(liveStockMap, id)){
     return toNumber(liveStockMap[id]);
   }
+  return 0; // safe default
+}
+
+// --------------------
+// Delivery charges (client)
+// --------------------
+function computeDeliveryFee(deliveryType, district){
+  if(deliveryType !== "Delivery") return 0;
+  const d = String(district || "").toLowerCase().trim();
+  if(d === "bsb" || d === "bandar seri begawan") return 5;
+  if(d === "tutong") return 10;
+  if(d === "belait" || d === "kuala belait" || d === "temburong") return 15;
   return 0;
 }
 
-function renderCart() {
+function updateDeliveryUI(){
+  const deliveryType = deliveryTypeEl?.value || "Delivery";
+  const show = deliveryType === "Delivery";
+
+  if(deliveryFields) deliveryFields.style.display = show ? "block" : "none";
+
+  if(districtEl){
+    districtEl.required = show;
+    if(!show) districtEl.value = "";
+  }
+  if(addressEl){
+    addressEl.required = show;
+    if(!show) addressEl.value = "";
+  }
+
+  const fee = computeDeliveryFee(deliveryType, districtEl?.value || "");
+  if(deliveryFeeHint) deliveryFeeHint.textContent = "Delivery charges: " + formatBND(fee);
+
+  // also refresh total display with fee
+  renderCart();
+}
+
+deliveryTypeEl?.addEventListener("change", updateDeliveryUI);
+districtEl?.addEventListener("change", updateDeliveryUI);
+
+// --------------------
+// Render cart
+// --------------------
+function renderCart(){
+  if(!cartItemsContainer) return;
+
   cartItemsContainer.innerHTML = "";
 
-  if (!cart.length) {
+  if(!cart.length){
     cartItemsContainer.innerHTML = `<div class="empty-cart">Your cart is empty</div>`;
-    cartTotalEl.innerText = "BND 0";
+    cartTotalEl.innerText = formatBND(0);
     return;
   }
 
-  cart.forEach((item, index) => {
+  cart.forEach((item, index)=>{
     let qty = getQty(item);
-
     const maxStock = getMaxStockForItem(item);
-    if (qty > Math.max(1, maxStock)) {
+
+    if(qty > Math.max(1, maxStock)){
       qty = Math.max(1, maxStock);
       setQty(item, qty);
       saveCart();
@@ -115,13 +169,11 @@ function renderCart() {
     const minusDisabled = qty <= 1;
     const plusDisabled = qty >= maxStock;
 
-    const stockHint = `<small>${formatBND(price)} each • Stock ${maxStock}</small>`;
-
     cartItemsContainer.innerHTML += `
       <div class="cart-item">
         <div class="cart-left">
           <strong>${escapeHtml(item.name)}</strong>
-          ${stockHint}
+          <small>${formatBND(price)} each • Stock ${maxStock}</small>
         </div>
 
         <div class="cart-right">
@@ -138,23 +190,32 @@ function renderCart() {
     `;
   });
 
-  cartTotalEl.innerText = formatBND(calcTotal());
+  const deliveryType = deliveryTypeEl?.value || "Delivery";
+  const district = districtEl?.value || "";
+  const deliveryFee = computeDeliveryFee(deliveryType, district);
+
+  const subtotal = calcSubtotal();
+  const grandTotal = subtotal + deliveryFee;
+
+  if(cartTotalEl) cartTotalEl.innerText = formatBND(grandTotal);
 }
 
+// initial render + load stock
 renderCart();
-
-(async function bootStock() {
+(async function bootStock(){
   await ensureLiveStockMap();
   renderCart();
+  updateDeliveryUI();
 })();
 
-cartItemsContainer.addEventListener("click", async (e) => {
+// qty controls
+cartItemsContainer?.addEventListener("click", async (e)=>{
   const btn = e.target.closest("button");
-  if (!btn) return;
+  if(!btn) return;
 
   const action = btn.dataset.action;
   const index = Number(btn.dataset.index);
-  if (!Number.isFinite(index) || index < 0 || index >= cart.length) return;
+  if(!Number.isFinite(index) || index < 0 || index >= cart.length) return;
 
   cart = JSON.parse(localStorage.getItem("cart")) || [];
   const item = cart[index];
@@ -163,17 +224,17 @@ cartItemsContainer.addEventListener("click", async (e) => {
   await ensureLiveStockMap();
   const maxStock = getMaxStockForItem(item);
 
-  if (action === "plus") qty += 1;
-  if (action === "minus") qty = Math.max(1, qty - 1);
+  if(action === "plus") qty += 1;
+  if(action === "minus") qty = Math.max(1, qty - 1);
 
-  if (action === "remove") {
+  if(action === "remove"){
     cart.splice(index, 1);
     saveCart();
     renderCart();
     return;
   }
 
-  if (qty > maxStock) {
+  if(qty > maxStock){
     alert("Maximum stock reached.");
     qty = Math.max(1, maxStock);
   }
@@ -183,24 +244,23 @@ cartItemsContainer.addEventListener("click", async (e) => {
   renderCart();
 });
 
-if (clearCartBtn) {
-  clearCartBtn.addEventListener("click", () => {
-    if (!cart.length) return;
-    if (!confirm("Clear all items in cart?")) return;
-    cart = [];
-    localStorage.removeItem("cart");
-    renderCart();
-  });
-}
+// clear cart
+clearCartBtn?.addEventListener("click", ()=>{
+  if(!cart.length) return;
+  if(!confirm("Clear all items in cart?")) return;
+  cart = [];
+  localStorage.removeItem("cart");
+  renderCart();
+});
 
-checkoutForm.addEventListener("submit", async (e) => {
+// submit order
+checkoutForm?.addEventListener("submit", async (e)=>{
   e.preventDefault();
-
-  if (isSubmitting) return;
+  if(isSubmitting) return;
   isSubmitting = true;
 
   cart = JSON.parse(localStorage.getItem("cart")) || [];
-  if (!cart.length) {
+  if(!cart.length){
     alert("Cart is empty!");
     resetSubmitUI();
     return;
@@ -208,42 +268,56 @@ checkoutForm.addEventListener("submit", async (e) => {
 
   const name = document.getElementById("name").value.trim();
   const phone = document.getElementById("phone").value.trim();
-  const email = (document.getElementById("email")?.value || "").trim(); // NEW
-  const address = document.getElementById("address").value.trim();
   const payment = document.getElementById("payment").value;
 
-  if (!name || !phone || !address || !payment) {
+  const deliveryType = deliveryTypeEl?.value || "Delivery";
+  const district = districtEl?.value || "";
+  const address = (addressEl?.value || "").trim();
+
+  if(!name || !phone || !payment){
     alert("Please complete all fields.");
     resetSubmitUI();
     return;
   }
 
+  if(deliveryType === "Delivery"){
+    if(!district){
+      alert("Please select district.");
+      resetSubmitUI();
+      return;
+    }
+    if(!address){
+      alert("Please enter delivery address.");
+      resetSubmitUI();
+      return;
+    }
+  }
+
+  // ensure live stock for strict validate
   const map = await ensureLiveStockMap();
-  if (!map) {
+  if(!map){
     alert("Unable to load live stock. Please try again.");
     resetSubmitUI();
     return;
   }
 
-  for (const it of cart) {
+  for(const it of cart){
     const id = normId(it.id);
-
-    if (!Object.prototype.hasOwnProperty.call(map, id)) {
-      alert(`Stock not found in sheet for ID: ${id} (${it.name}).`);
+    if(!Object.prototype.hasOwnProperty.call(map, id)){
+      alert(`Stock not found in sheet for ID: ${id} (${it.name}).\nPlease fix the ID in Google Sheet.`);
       resetSubmitUI();
       return;
     }
-
     const maxStock = toNumber(map[id]);
     const q = getQty(it);
 
-    if (maxStock <= 0) {
+    if(maxStock <= 0){
       alert(`Out of stock: ${it.name}`);
       renderCart();
       resetSubmitUI();
       return;
     }
-    if (q > maxStock) {
+    if(q > maxStock){
       alert(`Quantity exceeds stock for: ${it.name} (Stock ${maxStock})`);
       renderCart();
       resetSubmitUI();
@@ -251,38 +325,53 @@ checkoutForm.addEventListener("submit", async (e) => {
     }
   }
 
-  placeOrderBtn.disabled = true;
-  placeOrderBtn.textContent = "Processing...";
+  const subtotal = calcSubtotal();
+  const deliveryFee = computeDeliveryFee(deliveryType, district);
+  const grandTotal = subtotal + deliveryFee;
+
+  if(placeOrderBtn){
+    placeOrderBtn.disabled = true;
+    placeOrderBtn.textContent = "Processing...";
+  }
 
   const token = `${Date.now()}_${Math.random().toString(16).slice(2)}`;
 
-  try {
+  try{
     const res = await postToAPI({
       type: "order",
       token,
       cart,
-      customer: { name, phone, email, address, payment } // NEW
+      subtotal,
+      deliveryFee,
+      grandTotal,
+      customer: {
+        name,
+        phone,
+        payment,
+        deliveryType,
+        district,
+        address
+      }
     });
 
-    const pdfUrl = res.pdfUrl || res.receiptPdfUrl || "";
-
-    if (res.status === "duplicate") {
-      alert("This order was already submitted. Opening your receipt.");
-    } else if (res.status !== "success") {
+    if(res.status === "duplicate"){
+      alert("This order was already submitted.");
+    } else if(res.status !== "success"){
       throw new Error(res.message || "Order failed");
     }
 
+    const pdfUrl = res.pdfUrl || "";
     localStorage.setItem("lastOrder", JSON.stringify({
       orderId: res.orderId || "-",
       pdfUrl,
-      customer: { name, phone, email, address, payment },
+      customer: { name, phone, payment, deliveryType, district, address },
       cart,
-      total: res.total || ""
+      total: formatBND(grandTotal)
     }));
 
     localStorage.removeItem("cart");
     window.location.href = "success.html";
-  } catch (err) {
+  }catch(err){
     console.error(err);
     alert("Server error: " + (err?.message || "Check deployment / permissions."));
     resetSubmitUI();
