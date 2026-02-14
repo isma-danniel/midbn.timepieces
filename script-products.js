@@ -4,6 +4,7 @@
 // ✅ FIX 1: Render instantly, then sync live stock AFTER first paint (less lag)
 // ✅ FIX 2: Particles delayed + fewer on mobile + resize throttle (faster load)
 // ✅ FIX 3: Image fetchpriority=low (smoother decode)
+// ✅ + NEW: Stock syncing floating note w/ 3s timer + auto hide
 // ✅ Sold out separator + badge
 // ✅ Cart count bottom button
 // ✅ Filters + sort
@@ -47,11 +48,61 @@ const closeModal = document.getElementById("closeModal");
 const modalAddCart = document.getElementById("modalAddCart");
 const goCheckoutBottom = document.getElementById("goCheckoutBottom");
 
+// ✅ NEW: Stock Notice (from your HTML)
+const stockNotice = document.getElementById("stockNotice");
+const stockTimerEl = stockNotice?.querySelector(".stock-timer") || null;
+
 // ==========================================
 // State
 // ==========================================
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let currentQuickProduct = null;
+
+// ✅ NEW: Notice timer state
+let __noticeLeft = 3;
+let __noticeInterval = null;
+let __noticeTimeout = null;
+let __noticeDone = false;
+
+// ✅ NEW: Notice helpers
+function showStockNotice(){
+  if(!stockNotice) return;
+  stockNotice.style.display = "flex";
+  stockNotice.classList.remove("fade-out");
+  __noticeDone = false;
+
+  // reset timer
+  __noticeLeft = 3;
+  if(stockTimerEl) stockTimerEl.textContent = `${__noticeLeft}s`;
+
+  // clear old timers
+  clearInterval(__noticeInterval);
+  clearTimeout(__noticeTimeout);
+
+  __noticeInterval = setInterval(()=>{
+    __noticeLeft -= 1;
+    if(stockTimerEl) stockTimerEl.textContent = `${Math.max(0,__noticeLeft)}s`;
+    if(__noticeLeft <= 0){
+      clearInterval(__noticeInterval);
+    }
+  }, 1000);
+
+  // auto-hide after 3.2s if sync never finishes
+  __noticeTimeout = setTimeout(()=>hideStockNotice(), 3200);
+}
+
+function hideStockNotice(){
+  if(!stockNotice || __noticeDone) return;
+  __noticeDone = true;
+
+  clearInterval(__noticeInterval);
+  clearTimeout(__noticeTimeout);
+
+  stockNotice.classList.add("fade-out");
+  setTimeout(()=>{
+    if(stockNotice) stockNotice.style.display = "none";
+  }, 380);
+}
 
 // ==========================================
 // CART COUNT
@@ -171,7 +222,6 @@ function filterSortProducts(){
     return searchMatch && brandMatch && categoryMatch && gradeMatch && minMatch && maxMatch;
   });
 
-  // Default: in stock first
   filtered.sort(inStockFirstComparator);
 
   if(sortSelect?.value === "az"){
@@ -245,7 +295,6 @@ window.addEventListener("click", (e)=>{
 
 // ==========================================
 // ADD TO CART
-// ✅ Saves stock + brand + img into cart as fallback
 // ==========================================
 function addToCartInstant(product){
   if(!product) return false;
@@ -361,7 +410,6 @@ function spawnParticles(){
   }
 }
 
-// delay particle boot (prevents load stutter)
 setTimeout(() => spawnParticles(), 300);
 
 window.addEventListener("resize", () => {
@@ -370,16 +418,17 @@ window.addEventListener("resize", () => {
 });
 
 // ==========================================
-// FIX 1: FAST FIRST RENDER + LIVE STOCK SYNC (no lag)
-// - Render immediately from watchlist.js
-// - Then fetch live stock AFTER first paint
-// - Only re-render if live changes something
+// FIX 1: FAST FIRST RENDER + LIVE STOCK SYNC
 // ==========================================
 let hasRenderedOnce = false;
 
 function safeInitialRender(){
   if(hasRenderedOnce) return;
   hasRenderedOnce = true;
+
+  // ✅ NEW: show notice when page loads
+  showStockNotice();
+
   filterSortProducts(); // instant render
 }
 safeInitialRender();
@@ -407,11 +456,14 @@ function buildLiveMap(liveArr){
   return map;
 }
 
-// fetch AFTER first paint
 requestAnimationFrame(() => {
   requestAnimationFrame(async () => {
     const live = await getLiveProductsSafe();
-    if(!live || !Array.isArray(window.products)) return;
+    if(!live || !Array.isArray(window.products)) {
+      // ✅ NEW: hide notice even if live fails
+      hideStockNotice();
+      return;
+    }
 
     const map = buildLiveMap(live);
     let changed = false;
@@ -428,5 +480,8 @@ requestAnimationFrame(() => {
     });
 
     if(changed) filterSortProducts();
+
+    // ✅ NEW: hide notice when sync done
+    hideStockNotice();
   });
 });
