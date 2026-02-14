@@ -1,10 +1,12 @@
 // ==========================================
-// MIDBN CHECKOUT.JS - FINAL (UPDATED)
+// MIDBN CHECKOUT.JS - FULL (COMPLETE)
 // ✅ Anti duplicate submit (client token)
 // ✅ Live stock limit (GET ?action=products)
-// ✅ Server-side order creates PDF + deducts stock (no need POST type:'stock')
-// ✅ Saves pdfUrl from (pdfUrl OR receiptPdfUrl) into lastOrder
+// ✅ Server-side order creates PDF + deducts stock
 // ✅ FIXED: Stock mismatch (no Infinity fallback, trim IDs, strict sheet stock)
+// ✅ NEW: Delivery option support (pickup = 0, delivery fees)
+// ✅ NEW: Address optional (required only if deliveryFee > 0)
+// ✅ Sends subtotal + deliveryFee + grandTotal to Code.gs
 // ==========================================
 
 const API =
@@ -15,6 +17,10 @@ const cartTotalEl = document.getElementById("cartTotal");
 const clearCartBtn = document.getElementById("clearCartBtn");
 const checkoutForm = document.getElementById("checkoutForm");
 const placeOrderBtn = document.getElementById("placeOrderBtn");
+
+// ✅ Add this select in your checkout.html:
+// <select id="deliveryOption">...</select>
+const deliveryOption = document.getElementById("deliveryOption");
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
@@ -54,8 +60,17 @@ function saveCart() {
   localStorage.setItem("cart", JSON.stringify(cart));
 }
 
-function calcTotal() {
+function calcSubtotal() {
   return cart.reduce((sum, it) => sum + getQty(it) * toNumber(it.price), 0);
+}
+
+function getDeliveryFee(){
+  // if element missing, treat as pickup
+  return toNumber(deliveryOption?.value || 0);
+}
+
+function calcGrandTotal(){
+  return calcSubtotal() + getDeliveryFee();
 }
 
 function escapeHtml(str) {
@@ -188,7 +203,16 @@ function renderCart() {
     `;
   });
 
-  cartTotalEl.innerText = formatBND(calcTotal());
+  // ✅ Show grand total (subtotal + delivery)
+  const subtotal = calcSubtotal();
+  const deliveryFee = getDeliveryFee();
+  const grandTotal = subtotal + deliveryFee;
+
+  if (deliveryFee > 0) {
+    cartTotalEl.innerText = `${formatBND(grandTotal)} (Delivery ${formatBND(deliveryFee)})`;
+  } else {
+    cartTotalEl.innerText = formatBND(grandTotal);
+  }
 }
 
 // Initial render
@@ -199,6 +223,9 @@ renderCart();
   await ensureLiveStockMap();
   renderCart();
 })();
+
+// Re-render totals if delivery option changes
+deliveryOption?.addEventListener("change", renderCart);
 
 // ========================
 // Qty & Remove Controls
@@ -253,7 +280,7 @@ if (clearCartBtn) {
 
 // ========================
 // Submit Order
-// IMPORTANT: Order endpoint already deducts stock in Code.gs
+// IMPORTANT: Order endpoint deducts stock in Code.gs
 // ========================
 checkoutForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -269,12 +296,19 @@ checkoutForm.addEventListener("submit", async (e) => {
   }
 
   const name = document.getElementById("name").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const address = document.getElementById("address").value.trim();
+  const phone = document.getElementById("phone").value.trim(); // number only (no words)
+  const address = document.getElementById("address").value.trim(); // optional if pickup
   const payment = document.getElementById("payment").value;
 
-  if (!name || !phone || !address || !payment) {
-    alert("Please complete all fields.");
+  const deliveryFee = getDeliveryFee();
+
+  if (!name || !phone || !payment) {
+    alert("Please complete Name, Phone and Payment.");
+    resetSubmitUI();
+    return;
+  }
+  if (deliveryFee > 0 && !address) {
+    alert("Address is required for delivery.");
     resetSubmitUI();
     return;
   }
@@ -313,7 +347,8 @@ checkoutForm.addEventListener("submit", async (e) => {
     }
   }
 
-  const total = formatBND(calcTotal());
+  const subtotal = calcSubtotal();
+  const grandTotal = subtotal + deliveryFee;
 
   placeOrderBtn.disabled = true;
   placeOrderBtn.textContent = "Processing...";
@@ -324,15 +359,14 @@ checkoutForm.addEventListener("submit", async (e) => {
   try {
     const res = await postToAPI({
       type: "order",
-      token,                      // server anti-duplicate key
+      token,
       cart,
-      total,
-      customer: { name, phone, address, payment },
-      sellerSignature: "MIDBN Official",
-      status: "Pending Verification"
+      subtotal,
+      deliveryFee,
+      grandTotal,
+      customer: { name, phone, address, payment }
     });
 
-    // Server returns: status, orderId, pdfUrl + receiptPdfUrl
     const pdfUrl = res.pdfUrl || res.receiptPdfUrl || "";
 
     if (res.status === "duplicate") {
@@ -346,7 +380,9 @@ checkoutForm.addEventListener("submit", async (e) => {
       pdfUrl,
       customer: { name, phone, address, payment },
       cart,
-      total
+      subtotal: formatBND(subtotal),
+      deliveryFee: formatBND(deliveryFee),
+      total: formatBND(grandTotal)
     }));
 
     localStorage.removeItem("cart");
