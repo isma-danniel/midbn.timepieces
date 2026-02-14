@@ -1,7 +1,7 @@
 // watchlist.js
 // Holds ONLY product data (no logic)
 
-const products = [
+window.products = [
   // ===== MEN (Rolex) =====
   {id:1,  name:"Daytona (Black/Gold)", brand:"Rolex", category:"mens", grade:"A", price:25, stock:0, label:"NEW", img:"images/men/men-1.png", details:"Quartz, stainless steel case, men watch, Grade A"},
   {id:2,  name:"Daytona (Gold)",       brand:"Rolex", category:"mens", grade:"A", price:25, stock:0, label:"NEW", img:"images/men/men-2.png", details:"Quartz, stainless steel case, men watch, Grade A"},
