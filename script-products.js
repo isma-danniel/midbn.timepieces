@@ -11,7 +11,7 @@
 // ==========================================
 
 const API =
-  "https://script.google.com/macros/s/AKfycbyovzomINZnABB1-DatSQgIA_OHu7OjuRD-D2yGMWU7i-xD7irSsXR1p2frILSv02eNxg/exec";
+  "https://script.google.com/macros/s/AKfycbwQPk7AF8WrihfdEYuiK8wLcFdKlvgwCxpE3zBn5DgwGNKPK9RUiJyx7tg7H_jcrDNBFA/exec";
 
 // ---------- Helpers ----------
 function normId(v){ return String(v ?? "").trim(); }
