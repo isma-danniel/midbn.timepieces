@@ -282,3 +282,44 @@ body{
   white-space:nowrap;   /* ✅ SINGLE LINE */
   min-width:260px;
 }
+
+/* ===== SOLD OUT SEPARATOR (FULL WIDTH) ===== */
+.soldout-sep{
+  grid-column: 1 / -1;
+  margin: 6px 0 2px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: rgba(220,251,255,0.9);
+  border: 1px solid rgba(220,251,255,0.18);
+  background: linear-gradient(135deg, rgba(220,251,255,0.08), rgba(255,255,255,0.02));
+  box-shadow: 0 10px 26px rgba(0,0,0,.45);
+  position: relative;
+}
+
+.soldout-sep::before,
+.soldout-sep::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  width: 28%;
+  height:1px;
+  background: rgba(220,251,255,0.18);
+}
+.soldout-sep::before{ left:14px; }
+.soldout-sep::after{ right:14px; }
+
+/* ===== SOLD OUT CARD STYLE ===== */
+.product-card.soldout{
+  opacity: 0.62;
+  filter: grayscale(1);
+}
+.product-card.soldout:hover{ transform:none; }
+
+.label.soldout-badge{
+  border-color: rgba(255,90,90,0.55);
+  background: rgba(255,90,90,0.10);
+  color: rgba(255,170,170,0.95);
+}
