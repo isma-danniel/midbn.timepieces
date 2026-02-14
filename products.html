@@ -10,12 +10,18 @@
 
   <!-- ===== HEADER ===== -->
   <header class="header">
-    <a href="index.html" class="logo">← Home</a>
+  <a href="index.html" class="logo">← Home</a>
 
-    <div id="hamburger" class="hamburger" aria-label="Open filters" role="button" tabindex="0">
-      <span></span><span></span><span></span>
-    </div>
-  </header>
+  <!-- STOCK SYNC PILL (CENTER) -->
+  <div id="stockSyncNotice" class="stock-sync">
+    <span class="sync-text">Syncing latest stock</span>
+    <span id="syncTimer" class="sync-timer">3</span>
+  </div>
+
+  <div id="hamburger" class="hamburger" aria-label="Open filters" role="button" tabindex="0">
+    <span></span><span></span><span></span>
+  </div>
+</header>
 
   <!-- ✅ STOCK SYNC NOTICE (NEW) -->
   <div id="stockNotice" class="stock-notice" style="display:none;">
