@@ -1,11 +1,22 @@
 // ==========================================
-// CONFIG
+// MIDBN script-products.js (COMPLETE)
+// - Requires watchlist.js loaded FIRST (window.products)
+// - Live stock/price from Code.gs: ?action=products
+// - Sold out separator + badge
+// - Cart count bottom button
 // ==========================================
-const API = "https://script.google.com/macros/s/AKfycbyovzomINZnABB1-DatSQgIA_OHu7OjuRD-D2yGMWU7i-xD7irSsXR1p2frILSv02eNxg/exec";
 
-// Safety: watchlist.js must load first
+const API =
+  "https://script.google.com/macros/s/AKfycbyovzomINZnABB1-DatSQgIA_OHu7OjuRD-D2yGMWU7i-xD7irSsXR1p2frILSv02eNxg/exec";
+
+// ---------- Helpers ----------
+function normId(v){ return String(v ?? "").trim(); }
+function toNumber(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
+
+// ---------- Safety: watchlist.js must load first ----------
 if (!Array.isArray(window.products)) {
-  console.error("watchlist.js not loaded or products is not an array");
+  console.error("watchlist.js not loaded or window.products is not an array");
+  window.products = [];
 }
 
 // ==========================================
@@ -33,6 +44,9 @@ const closeModal = document.getElementById("closeModal");
 const modalAddCart = document.getElementById("modalAddCart");
 const goCheckoutBottom = document.getElementById("goCheckoutBottom");
 
+// ==========================================
+// State
+// ==========================================
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let currentQuickProduct = null;
 
@@ -42,6 +56,7 @@ let currentQuickProduct = null;
 function cartCount(){
   return cart.reduce((sum, it) => sum + Number(it.qty || 0), 0);
 }
+
 function updateCheckoutButton(){
   if(!goCheckoutBottom) return;
   const count = cartCount();
@@ -52,7 +67,8 @@ updateCheckoutButton();
 // ==========================================
 // HAMBURGER TOGGLE
 // ==========================================
-function toggleFilters(){ filters.classList.toggle("active"); }
+function toggleFilters(){ filters?.classList.toggle("active"); }
+
 if(hamburger && filters){
   hamburger.addEventListener("click", toggleFilters);
   hamburger.addEventListener("keydown", (e)=>{
@@ -64,7 +80,7 @@ if(hamburger && filters){
 }
 
 // ==========================================
-// RENDER (UPGRADED: SOLD OUT SEPARATOR + SOLD OUT BADGE)
+// RENDER (SOLD OUT SEPARATOR + BADGE)
 // ==========================================
 function renderProducts(list){
   if(!productGrid) return;
@@ -77,7 +93,7 @@ function renderProducts(list){
 
   const inStock = [];
   const soldOut = [];
-  list.forEach(p => (Number(p.stock) > 0 ? inStock : soldOut).push(p));
+  list.forEach(p => (toNumber(p.stock) > 0 ? inStock : soldOut).push(p));
 
   function makeCard(p, isSold){
     const card = document.createElement("div");
@@ -95,16 +111,16 @@ function renderProducts(list){
       </div>
 
       <div class="card-body">
-        <div class="brand">${p.brand}</div>
-        <div class="name product-name">${p.name}</div>
-        <div class="price">BND ${Number(p.price).toFixed(2)}</div>
-        <div class="stock">Stock: ${Number(p.stock)}</div>
+        <div class="brand">${p.brand || ""}</div>
+        <div class="name product-name">${p.name || ""}</div>
+        <div class="price">BND ${toNumber(p.price).toFixed(2)}</div>
+        <div class="stock">Stock: ${toNumber(p.stock)}</div>
         <a href="#" class="more-details-btn">${isSold ? "View Details →" : "More Details →"}</a>
       </div>
     `;
 
-    card.querySelector("img").addEventListener("click", ()=>openQuickView(p));
-    card.querySelector(".more-details-btn").addEventListener("click", (e)=>{
+    card.querySelector("img")?.addEventListener("click", ()=>openQuickView(p));
+    card.querySelector(".more-details-btn")?.addEventListener("click", (e)=>{
       e.preventDefault();
       openQuickView(p);
     });
@@ -128,17 +144,18 @@ function renderProducts(list){
 // FILTER + SORT
 // ==========================================
 function inStockFirstComparator(a, b){
-  const aIn = Number(a.stock) > 0 ? 1 : 0;
-  const bIn = Number(b.stock) > 0 ? 1 : 0;
+  const aIn = toNumber(a.stock) > 0 ? 1 : 0;
+  const bIn = toNumber(b.stock) > 0 ? 1 : 0;
   if (aIn !== bIn) return bIn - aIn;
   return 0;
 }
 
 function filterSortProducts(){
   const list = Array.isArray(window.products) ? window.products : [];
+
   let filtered = list.filter(p=>{
     const q = (searchInput?.value || "").toLowerCase().trim();
-    const searchMatch = !q || (p.name + " " + p.brand).toLowerCase().includes(q);
+    const searchMatch = !q || ((p.name + " " + p.brand).toLowerCase().includes(q));
 
     const brandMatch = !brandFilter?.value || p.brand === brandFilter.value;
     const categoryMatch = !categoryFilter?.value || p.category === categoryFilter.value;
@@ -147,27 +164,34 @@ function filterSortProducts(){
     const min = (minPrice?.value ?? "") === "" ? null : Number(minPrice.value);
     const max = (maxPrice?.value ?? "") === "" ? null : Number(maxPrice.value);
 
-    const minMatch = min === null || Number(p.price) >= min;
-    const maxMatch = max === null || Number(p.price) <= max;
+    const minMatch = min === null || toNumber(p.price) >= min;
+    const maxMatch = max === null || toNumber(p.price) <= max;
 
     return searchMatch && brandMatch && categoryMatch && gradeMatch && minMatch && maxMatch;
   });
 
+  // Default: in stock first
   filtered.sort(inStockFirstComparator);
 
   if(sortSelect?.value === "az"){
     filtered.sort((a,b)=>{
       const pri = inStockFirstComparator(a,b);
       if(pri !== 0) return pri;
-      return a.name.localeCompare(b.name);
+      return String(a.name || "").localeCompare(String(b.name || ""));
     });
   }
+
   if(sortSelect?.value === "priceLow"){
     filtered.sort((a,b)=>{
       const pri = inStockFirstComparator(a,b);
       if(pri !== 0) return pri;
-      return Number(a.price) - Number(b.price);
+      return toNumber(a.price) - toNumber(b.price);
     });
+  }
+
+  // If you keep the option in HTML, this makes it explicit:
+  if(sortSelect?.value === "inStock"){
+    filtered.sort(inStockFirstComparator);
   }
 
   renderProducts(filtered);
@@ -181,43 +205,40 @@ gradeFilter?.addEventListener("change", filterSortProducts);
 minPrice?.addEventListener("input", filterSortProducts);
 maxPrice?.addEventListener("input", filterSortProducts);
 
+// Initial render from watchlist immediately
 filterSortProducts();
 
 // ==========================================
-// QUICK VIEW MODAL (UPGRADED)
+// QUICK VIEW MODAL
 // ==========================================
 function openQuickView(product){
   currentQuickProduct = product;
 
-  modalImg.src = product.img;
-  modalName.textContent = product.name;
-  modalPrice.textContent = `BND ${Number(product.price).toFixed(2)}`;
-  modalStock.textContent = `Stock: ${product.stock}`;
-  modalDetails.textContent = product.details || "";
+  if(modalImg) modalImg.src = product.img || "";
+  if(modalName) modalName.textContent = product.name || "";
+  if(modalPrice) modalPrice.textContent = `BND ${toNumber(product.price).toFixed(2)}`;
+  if(modalStock) modalStock.textContent = `Stock: ${toNumber(product.stock)}`;
+  if(modalDetails) modalDetails.textContent = product.details || "";
 
   if(modalAddCart){
-    const out = Number(product.stock) <= 0;
+    const out = toNumber(product.stock) <= 0;
     modalAddCart.disabled = out;
-
-    if(out){
-      modalAddCart.textContent = "Out of Stock";
-      modalAddCart.classList.remove("added");
-      modalAddCart.setAttribute("aria-disabled","true");
-    }else{
-      modalAddCart.textContent = "+ Add to Cart";
-      modalAddCart.classList.remove("added");
-      modalAddCart.removeAttribute("aria-disabled");
-    }
+    modalAddCart.textContent = out ? "Out of Stock" : "+ Add to Cart";
+    modalAddCart.classList.remove("added");
   }
 
-  quickViewModal.style.display = "flex";
-  quickViewModal.setAttribute("aria-hidden","false");
+  if(quickViewModal){
+    quickViewModal.style.display = "flex";
+    quickViewModal.setAttribute("aria-hidden","false");
+  }
 }
 
 closeModal?.addEventListener("click", ()=>{
+  if(!quickViewModal) return;
   quickViewModal.style.display = "none";
   quickViewModal.setAttribute("aria-hidden","true");
 });
+
 window.addEventListener("click", (e)=>{
   if(e.target === quickViewModal){
     quickViewModal.style.display = "none";
@@ -226,19 +247,19 @@ window.addEventListener("click", (e)=>{
 });
 
 // ==========================================
-// ADD TO CART (UPGRADED: DO NOT RE-ENABLE WHEN STOCK 0)
+// ADD TO CART (UPGRADED: store stock+brand+img as fallback)
 // ==========================================
 function addToCartInstant(product){
-  if(!product) return;
+  if(!product) return false;
 
-  const stock = Number(product.stock || 0);
+  const stock = toNumber(product.stock);
   if(stock <= 0){
     alert("Out of stock");
     return false;
   }
 
-  const existing = cart.find(i => String(i.id) === String(product.id));
-  const currentQty = existing ? Number(existing.qty || 0) : 0;
+  const existing = cart.find(i => normId(i.id) === normId(product.id));
+  const currentQty = existing ? toNumber(existing.qty || 0) : 0;
 
   if(currentQty + 1 > stock){
     alert("Not enough stock");
@@ -247,8 +268,20 @@ function addToCartInstant(product){
 
   if(existing){
     existing.qty = currentQty + 1;
+    existing.price = toNumber(product.price);
+    existing.stock = stock; // fallback stability
+    existing.brand = product.brand || existing.brand || "";
+    existing.img = product.img || existing.img || "";
   }else{
-    cart.push({ id:Number(product.id), name:product.name, price:Number(product.price), qty:1 });
+    cart.push({
+      id: toNumber(product.id),
+      name: product.name,
+      price: toNumber(product.price),
+      qty: 1,
+      stock,
+      brand: product.brand || "",
+      img: product.img || ""
+    });
   }
 
   localStorage.setItem("cart", JSON.stringify(cart));
@@ -260,7 +293,7 @@ if(modalAddCart){
   modalAddCart.addEventListener("click", ()=>{
     if(!currentQuickProduct) return;
 
-    if(Number(currentQuickProduct.stock) <= 0){
+    if(toNumber(currentQuickProduct.stock) <= 0){
       modalAddCart.disabled = true;
       modalAddCart.textContent = "Out of Stock";
       return;
@@ -274,7 +307,8 @@ if(modalAddCart){
     modalAddCart.disabled = true;
 
     setTimeout(()=>{
-      if(Number(currentQuickProduct.stock) <= 0){
+      // Re-check current product stock
+      if(toNumber(currentQuickProduct.stock) <= 0){
         modalAddCart.disabled = true;
         modalAddCart.textContent = "Out of Stock";
         modalAddCart.classList.remove("added");
@@ -333,16 +367,20 @@ spawnParticles();
 window.addEventListener("resize", spawnParticles);
 
 // ==========================================
-// LIVE STOCK/PRICE OVERRIDE ON LOAD (cache-buster)
+// LIVE STOCK/PRICE OVERRIDE ON LOAD (FIXED)
 // ==========================================
 async function getLiveProductsSafe(){
   try{
-    const res = await fetch(`${API}?t=${Date.now()}`, { method:"GET" });
+    const res = await fetch(`${API}?action=products&t=${Date.now()}`, {
+      method:"GET",
+      cache:"no-store"
+    });
     if(!res.ok) throw new Error("API not ok");
     const data = await res.json();
     if(!Array.isArray(data)) throw new Error("API not array");
     return data;
   }catch(err){
+    console.warn("Live fetch failed:", err);
     return null;
   }
 }
@@ -351,11 +389,18 @@ async function getLiveProductsSafe(){
   const live = await getLiveProductsSafe();
   if(!live || !Array.isArray(window.products)) return;
 
-  live.forEach(lp=>{
-    const local = window.products.find(p=> String(p.id) === String(lp.id));
-    if(!local) return;
-    if(lp.price != null) local.price = Number(lp.price);
-    if(lp.stock != null) local.stock = Number(lp.stock);
+  // Build map for fast merge
+  const map = {};
+  live.forEach(lp => {
+    if (!lp || lp.id == null) return;
+    map[normId(lp.id)] = lp;
+  });
+
+  window.products.forEach(p=>{
+    const lp = map[normId(p.id)];
+    if(!lp) return;
+    if(lp.price != null) p.price = toNumber(lp.price);
+    if(lp.stock != null) p.stock = toNumber(lp.stock);
   });
 
   filterSortProducts();
