@@ -485,3 +485,31 @@ requestAnimationFrame(() => {
     hideStockNotice();
   });
 });
+
+// ==========================================
+// HEADER STOCK SYNC TIMER
+// ==========================================
+
+const syncNotice = document.getElementById("stockSyncNotice");
+const syncTimer = document.getElementById("syncTimer");
+
+if(syncNotice && syncTimer){
+  let count = 3;
+
+  const interval = setInterval(() => {
+    count--;
+    syncTimer.textContent = count;
+
+    if(count <= 0){
+      clearInterval(interval);
+
+      syncNotice.classList.add("done");
+      syncNotice.querySelector(".sync-text").textContent = "Stock synced";
+
+      setTimeout(()=>{
+        syncNotice.style.opacity = "0";
+        syncNotice.style.transform = "translateX(-50%) translateY(-5px)";
+      }, 1000);
+    }
+  }, 1000);
+}
