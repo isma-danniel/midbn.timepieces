@@ -1,12 +1,5 @@
 // ==========================================
-// MIDBN CHECKOUT.JS - FULL (COMPLETE)
-// ✅ Anti duplicate submit (client token)
-// ✅ Live stock limit (GET ?action=products)
-// ✅ Server-side order creates PDF + deducts stock
-// ✅ FIXED: Stock mismatch (no Infinity fallback, trim IDs, strict sheet stock)
-// ✅ NEW: Delivery option support (pickup = 0, delivery fees)
-// ✅ NEW: Address optional (required only if deliveryFee > 0)
-// ✅ Sends subtotal + deliveryFee + grandTotal to Code.gs
+// MIDBN CHECKOUT.JS - FINAL (UPDATED + EMAIL)
 // ==========================================
 
 const API =
@@ -18,68 +11,24 @@ const clearCartBtn = document.getElementById("clearCartBtn");
 const checkoutForm = document.getElementById("checkoutForm");
 const placeOrderBtn = document.getElementById("placeOrderBtn");
 
-// ✅ Add this select in your checkout.html:
-// <select id="deliveryOption">...</select>
-const deliveryOption = document.getElementById("deliveryOption");
-
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-// ---------- Anti duplicate (client) ----------
 let isSubmitting = false;
 
-// ---------- Live stock cache ----------
-let liveStockMap = null; // { "id": stockNumber }
+let liveStockMap = null;
 let lastStockFetchAt = 0;
 
-// ========================
-// Helpers
-// ========================
-function normId(v){
-  return String(v ?? "").trim();
-}
+function normId(v){ return String(v ?? "").trim(); }
+function toNumber(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
+function formatBND(n){ return "BND " + toNumber(n).toFixed(2); }
+function getQty(item){ return Math.max(1, toNumber(item.qty ?? item.quantity ?? 1)); }
+function setQty(item, qty){ item.qty = qty; if ("quantity" in item) item.quantity = qty; }
+function saveCart(){ localStorage.setItem("cart", JSON.stringify(cart)); }
+function calcTotal(){ return cart.reduce((sum, it) => sum + getQty(it) * toNumber(it.price), 0); }
 
-function toNumber(v) {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : 0;
-}
-
-function formatBND(n) {
-  return "BND " + toNumber(n).toFixed(2);
-}
-
-function getQty(item) {
-  return Math.max(1, toNumber(item.qty ?? item.quantity ?? 1));
-}
-
-function setQty(item, qty) {
-  item.qty = qty;
-  if ("quantity" in item) item.quantity = qty;
-}
-
-function saveCart() {
-  localStorage.setItem("cart", JSON.stringify(cart));
-}
-
-function calcSubtotal() {
-  return cart.reduce((sum, it) => sum + getQty(it) * toNumber(it.price), 0);
-}
-
-function getDeliveryFee(){
-  // if element missing, treat as pickup
-  return toNumber(deliveryOption?.value || 0);
-}
-
-function calcGrandTotal(){
-  return calcSubtotal() + getDeliveryFee();
-}
-
-function escapeHtml(str) {
+function escapeHtml(str){
   return String(str ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
 }
 
 function resetSubmitUI(){
@@ -90,9 +39,6 @@ function resetSubmitUI(){
   }
 }
 
-// ========================
-// Safari-safe POST
-// ========================
 function postToAPI(data) {
   return fetch(API, {
     method: "POST",
@@ -100,26 +46,20 @@ function postToAPI(data) {
     body: JSON.stringify(data)
   }).then(async (res) => {
     const json = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      const msg = json?.message || `HTTP ${res.status}`;
-      throw new Error(msg);
-    }
+    if (!res.ok) throw new Error(json?.message || `HTTP ${res.status}`);
     return json;
   });
 }
 
-// ========================
-// Live stock fetch (GET ?action=products)
-// ========================
 async function getLiveProductsSafe() {
-  try {
+  try{
     const url = API + "?action=products&t=" + Date.now();
-    const res = await fetch(url, { method: "GET", cache: "no-store" });
-    if (!res.ok) throw new Error("API not ok");
+    const res = await fetch(url, { method:"GET", cache:"no-store" });
+    if(!res.ok) throw new Error("API not ok");
     const data = await res.json();
-    if (!Array.isArray(data)) throw new Error("API not array");
+    if(!Array.isArray(data)) throw new Error("API not array");
     return data;
-  } catch {
+  }catch{
     return null;
   }
 }
@@ -132,8 +72,8 @@ async function ensureLiveStockMap() {
   if (!live) return null;
 
   const map = {};
-  live.forEach((p) => {
-    if (!p || p.id == null) return;
+  live.forEach(p=>{
+    if(!p || p.id == null) return;
     map[normId(p.id)] = toNumber(p.stock);
   });
 
@@ -142,7 +82,6 @@ async function ensureLiveStockMap() {
   return map;
 }
 
-// ✅ IMPORTANT: never Infinity. If not loaded, treat as 0 (safe).
 function getMaxStockForItem(item) {
   const id = normId(item.id);
   if (liveStockMap && Object.prototype.hasOwnProperty.call(liveStockMap, id)) {
@@ -151,9 +90,6 @@ function getMaxStockForItem(item) {
   return 0;
 }
 
-// ========================
-// Render Cart (with stock clamp)
-// ========================
 function renderCart() {
   cartItemsContainer.innerHTML = "";
 
@@ -177,10 +113,9 @@ function renderCart() {
     const lineTotal = qty * price;
 
     const minusDisabled = qty <= 1;
-    const plusDisabled = qty >= maxStock; // maxStock may be 0 while loading → plus disabled
+    const plusDisabled = qty >= maxStock;
 
-    const stockHint =
-      `<small>${formatBND(price)} each • Stock ${maxStock}</small>`;
+    const stockHint = `<small>${formatBND(price)} each • Stock ${maxStock}</small>`;
 
     cartItemsContainer.innerHTML += `
       <div class="cart-item">
@@ -203,33 +138,16 @@ function renderCart() {
     `;
   });
 
-  // ✅ Show grand total (subtotal + delivery)
-  const subtotal = calcSubtotal();
-  const deliveryFee = getDeliveryFee();
-  const grandTotal = subtotal + deliveryFee;
-
-  if (deliveryFee > 0) {
-    cartTotalEl.innerText = `${formatBND(grandTotal)} (Delivery ${formatBND(deliveryFee)})`;
-  } else {
-    cartTotalEl.innerText = formatBND(grandTotal);
-  }
+  cartTotalEl.innerText = formatBND(calcTotal());
 }
 
-// Initial render
 renderCart();
 
-// Boot stock once (so clamp works quickly)
 (async function bootStock() {
   await ensureLiveStockMap();
   renderCart();
 })();
 
-// Re-render totals if delivery option changes
-deliveryOption?.addEventListener("change", renderCart);
-
-// ========================
-// Qty & Remove Controls
-// ========================
 cartItemsContainer.addEventListener("click", async (e) => {
   const btn = e.target.closest("button");
   if (!btn) return;
@@ -265,9 +183,6 @@ cartItemsContainer.addEventListener("click", async (e) => {
   renderCart();
 });
 
-// ========================
-// Clear Cart
-// ========================
 if (clearCartBtn) {
   clearCartBtn.addEventListener("click", () => {
     if (!cart.length) return;
@@ -278,10 +193,6 @@ if (clearCartBtn) {
   });
 }
 
-// ========================
-// Submit Order
-// IMPORTANT: Order endpoint deducts stock in Code.gs
-// ========================
 checkoutForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -296,24 +207,17 @@ checkoutForm.addEventListener("submit", async (e) => {
   }
 
   const name = document.getElementById("name").value.trim();
-  const phone = document.getElementById("phone").value.trim(); // number only (no words)
-  const address = document.getElementById("address").value.trim(); // optional if pickup
+  const phone = document.getElementById("phone").value.trim();
+  const email = (document.getElementById("email")?.value || "").trim(); // NEW
+  const address = document.getElementById("address").value.trim();
   const payment = document.getElementById("payment").value;
 
-  const deliveryFee = getDeliveryFee();
-
-  if (!name || !phone || !payment) {
-    alert("Please complete Name, Phone and Payment.");
-    resetSubmitUI();
-    return;
-  }
-  if (deliveryFee > 0 && !address) {
-    alert("Address is required for delivery.");
+  if (!name || !phone || !address || !payment) {
+    alert("Please complete all fields.");
     resetSubmitUI();
     return;
   }
 
-  // Ensure we have live sheet stock before validating
   const map = await ensureLiveStockMap();
   if (!map) {
     alert("Unable to load live stock. Please try again.");
@@ -325,7 +229,7 @@ checkoutForm.addEventListener("submit", async (e) => {
     const id = normId(it.id);
 
     if (!Object.prototype.hasOwnProperty.call(map, id)) {
-      alert(`Stock not found in sheet for ID: ${id} (${it.name}).\nPlease fix the ID in Google Sheet.`);
+      alert(`Stock not found in sheet for ID: ${id} (${it.name}).`);
       resetSubmitUI();
       return;
     }
@@ -347,13 +251,9 @@ checkoutForm.addEventListener("submit", async (e) => {
     }
   }
 
-  const subtotal = calcSubtotal();
-  const grandTotal = subtotal + deliveryFee;
-
   placeOrderBtn.disabled = true;
   placeOrderBtn.textContent = "Processing...";
 
-  // Unique token (anti double submit + server dup key)
   const token = `${Date.now()}_${Math.random().toString(16).slice(2)}`;
 
   try {
@@ -361,10 +261,7 @@ checkoutForm.addEventListener("submit", async (e) => {
       type: "order",
       token,
       cart,
-      subtotal,
-      deliveryFee,
-      grandTotal,
-      customer: { name, phone, address, payment }
+      customer: { name, phone, email, address, payment } // NEW
     });
 
     const pdfUrl = res.pdfUrl || res.receiptPdfUrl || "";
@@ -378,11 +275,9 @@ checkoutForm.addEventListener("submit", async (e) => {
     localStorage.setItem("lastOrder", JSON.stringify({
       orderId: res.orderId || "-",
       pdfUrl,
-      customer: { name, phone, address, payment },
+      customer: { name, phone, email, address, payment },
       cart,
-      subtotal: formatBND(subtotal),
-      deliveryFee: formatBND(deliveryFee),
-      total: formatBND(grandTotal)
+      total: res.total || ""
     }));
 
     localStorage.removeItem("cart");
