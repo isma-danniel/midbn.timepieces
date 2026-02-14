@@ -5,7 +5,7 @@
 // ✅ Server deducts stock + creates PDF + emails seller
 // ==========================================
 
-const API = "PASTE_YOUR_WEBAPP_URL_HERE"; // <-- your /exec URL
+const API = "https://script.google.com/macros/s/AKfycbwQPk7AF8WrihfdEYuiK8wLcFdKlvgwCxpE3zBn5DgwGNKPK9RUiJyx7tg7H_jcrDNBFA/exec"; // <-- your /exec URL
 
 const cartItemsContainer = document.getElementById("cartItems");
 const cartTotalEl = document.getElementById("cartTotal");
