@@ -6,7 +6,7 @@
 // ✅ Secure server-side total calculation
 // ==========================================
 
-const API = "https://script.google.com/macros/s/AKfycbx5FX_Id6eW6DPPVrGK4IMAJGJ1sxBcVWsfqdv3wYs-cZXNuUfm8zCAd72b20b6tpZu/exec";
+const API = "https://script.google.com/macros/s/AKfycbzRr3ySWQ_RbEufl1zlG2thCio_qRnTG9f6Kkvmdb1Z8aJ7JnHaslspD4NaRHcTIgXZ/exec";
 
 const cartItemsContainer = document.getElementById("cartItems");
 const cartTotalEl = document.getElementById("cartTotal");
