@@ -157,10 +157,27 @@ function computeDiscountPreview(subtotal,codeRaw){
 
 function updateDiscountPreview(){
   const subtotal = calcSubtotal();
-  const code = discountCodeEl?.value||"";
+  const code = discountCodeEl?.value || "";
 
-  discountPreviewAmount = computeDiscountPreview(subtotal,code);
-  appliedDiscountCode = code.trim();
+  const res = computeDiscount(subtotal, code);
+  discountAmount = Math.max(0, toNumber(res.amount));
+  appliedDiscountCode = String(code || "").trim();
+
+  if(discountHintEl){
+    discountHintEl.classList.remove("success", "error");
+
+    if(!code.trim()){
+      discountHintEl.textContent = "";
+    }
+    else if(discountAmount > 0){
+      discountHintEl.textContent = "Code Applied ✅";
+      discountHintEl.classList.add("success");
+    }
+    else{
+      discountHintEl.textContent = "Invalid Code ❌";
+      discountHintEl.classList.add("error");
+    }
+  }
 
   renderCart();
 }
