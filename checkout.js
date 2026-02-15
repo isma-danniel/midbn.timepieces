@@ -1,7 +1,8 @@
 // ==========================================
-// MIDBN CHECKOUT.JS (FULL - Delivery + Email server)
+// MIDBN CHECKOUT.JS (FULL - Delivery + Email server + Discount Code)
 // ✅ Live stock limit (GET ?action=products)
 // ✅ Delivery type + district + auto delivery charges
+// ✅ Discount code (client preview) + sent to server for verification
 // ✅ Server deducts stock + creates PDF + emails seller
 // ==========================================
 
@@ -19,11 +20,19 @@ const districtEl = document.getElementById("district");
 const addressEl = document.getElementById("address");
 const deliveryFeeHint = document.getElementById("deliveryFeeHint");
 
+// ✅ Discount UI (requires these IDs in HTML)
+const discountCodeEl = document.getElementById("discountCode");
+const discountHintEl = document.getElementById("discountHint");
+
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let isSubmitting = false;
 
 let liveStockMap = null;
 let lastStockFetchAt = 0;
+
+// ✅ Discount state
+let discountAmount = 0;
+let appliedDiscountCode = "";
 
 function normId(v){ return String(v ?? "").trim(); }
 function toNumber(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
@@ -132,12 +141,40 @@ function updateDeliveryUI(){
   const fee = computeDeliveryFee(deliveryType, districtEl?.value || "");
   if(deliveryFeeHint) deliveryFeeHint.textContent = "Delivery charges: " + formatBND(fee);
 
-  // also refresh total display with fee
   renderCart();
 }
 
 deliveryTypeEl?.addEventListener("change", updateDeliveryUI);
 districtEl?.addEventListener("change", updateDeliveryUI);
+
+// --------------------
+// Discount (client preview)
+// IMPORTANT: Server MUST verify for real.
+// --------------------
+function computeDiscount(subtotal, codeRaw){
+  const code = String(codeRaw || "").trim().toUpperCase();
+  if(!code) return { amount: 0, label: "" };
+
+  // ✅ Example codes (replace with your real private codes)
+  if(code === "MIDBN10") return { amount: subtotal * 0.10, label: "10% discount applied" };
+  if(code === "VIP20")   return { amount: subtotal * 0.20, label: "20% VIP discount applied" };
+
+  return { amount: 0, label: "Code will be verified" };
+}
+
+function updateDiscountPreview(){
+  const subtotal = calcSubtotal();
+  const code = discountCodeEl?.value || "";
+
+  const res = computeDiscount(subtotal, code);
+  discountAmount = Math.max(0, toNumber(res.amount));
+  appliedDiscountCode = String(code || "").trim();
+
+  if(discountHintEl && res.label) discountHintEl.textContent = res.label;
+  renderCart();
+}
+
+discountCodeEl?.addEventListener("input", updateDiscountPreview);
 
 // --------------------
 // Render cart
@@ -149,7 +186,7 @@ function renderCart(){
 
   if(!cart.length){
     cartItemsContainer.innerHTML = `<div class="empty-cart">Your cart is empty</div>`;
-    cartTotalEl.innerText = formatBND(0);
+    if(cartTotalEl) cartTotalEl.innerText = formatBND(0);
     return;
   }
 
@@ -195,9 +232,20 @@ function renderCart(){
   const deliveryFee = computeDeliveryFee(deliveryType, district);
 
   const subtotal = calcSubtotal();
-  const grandTotal = subtotal + deliveryFee;
+  const grandTotal = Math.max(0, subtotal + deliveryFee - discountAmount);
 
   if(cartTotalEl) cartTotalEl.innerText = formatBND(grandTotal);
+
+  if(discountHintEl){
+    if(discountAmount > 0){
+      discountHintEl.textContent = `Discount: -${formatBND(discountAmount)}`;
+    } else if ((discountCodeEl?.value || "").trim()){
+      // keep it simple
+      if(discountHintEl.textContent.trim() === "") discountHintEl.textContent = "Code will be verified";
+    } else {
+      discountHintEl.textContent = "";
+    }
+  }
 }
 
 // initial render + load stock
@@ -206,6 +254,7 @@ renderCart();
   await ensureLiveStockMap();
   renderCart();
   updateDeliveryUI();
+  updateDiscountPreview();
 })();
 
 // qty controls
@@ -230,6 +279,7 @@ cartItemsContainer?.addEventListener("click", async (e)=>{
   if(action === "remove"){
     cart.splice(index, 1);
     saveCart();
+    updateDiscountPreview();
     renderCart();
     return;
   }
@@ -241,6 +291,7 @@ cartItemsContainer?.addEventListener("click", async (e)=>{
 
   setQty(item, qty);
   saveCart();
+  updateDiscountPreview();
   renderCart();
 });
 
@@ -250,6 +301,7 @@ clearCartBtn?.addEventListener("click", ()=>{
   if(!confirm("Clear all items in cart?")) return;
   cart = [];
   localStorage.removeItem("cart");
+  updateDiscountPreview();
   renderCart();
 });
 
@@ -273,6 +325,8 @@ checkoutForm?.addEventListener("submit", async (e)=>{
   const deliveryType = deliveryTypeEl?.value || "Delivery";
   const district = districtEl?.value || "";
   const address = (addressEl?.value || "").trim();
+
+  const discountCode = String(discountCodeEl?.value || "").trim();
 
   if(!name || !phone || !payment){
     alert("Please complete all fields.");
@@ -327,7 +381,13 @@ checkoutForm?.addEventListener("submit", async (e)=>{
 
   const subtotal = calcSubtotal();
   const deliveryFee = computeDeliveryFee(deliveryType, district);
-  const grandTotal = subtotal + deliveryFee;
+
+  // recompute discount based on current subtotal
+  const dRes = computeDiscount(subtotal, discountCode);
+  discountAmount = Math.max(0, toNumber(dRes.amount));
+  appliedDiscountCode = discountCode;
+
+  const grandTotal = Math.max(0, subtotal + deliveryFee - discountAmount);
 
   if(placeOrderBtn){
     placeOrderBtn.disabled = true;
@@ -343,6 +403,8 @@ checkoutForm?.addEventListener("submit", async (e)=>{
       cart,
       subtotal,
       deliveryFee,
+      discountCode: appliedDiscountCode,
+      discountAmount,
       grandTotal,
       customer: {
         name,
@@ -366,7 +428,9 @@ checkoutForm?.addEventListener("submit", async (e)=>{
       pdfUrl,
       customer: { name, phone, payment, deliveryType, district, address },
       cart,
-      total: formatBND(grandTotal)
+      total: formatBND(grandTotal),
+      discountCode: appliedDiscountCode,
+      discountAmount: formatBND(discountAmount)
     }));
 
     localStorage.removeItem("cart");
