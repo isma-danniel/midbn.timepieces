@@ -20,7 +20,9 @@
 
   <div class="checkout-container">
 
-    <!-- CART -->
+    <!-- ===================== -->
+    <!-- CART SECTION -->
+    <!-- ===================== -->
     <div class="cart-section">
       <div class="cart-head">
         <h3>Your Cart</h3>
@@ -28,32 +30,61 @@
       </div>
 
       <div id="cartItems"></div>
-      <div class="cart-total" id="cartTotal">BND 0</div>
+
+      <!-- TOTAL -->
+      <div class="cart-total" id="cartTotal">BND 0.00</div>
     </div>
 
-    <!-- FORM -->
+    <!-- ===================== -->
+    <!-- FORM SECTION -->
+    <!-- ===================== -->
     <div class="form-section">
       <h3>Customer Details</h3>
 
       <form id="checkoutForm" class="checkout-form">
-        <input type="text" id="discountCode" placeholder="Discount Code (optional)" />
-        <input type="text" id="name" placeholder="Full Name" required />
-        <input type="tel" id="phone" placeholder="Phone Number (e.g. 6731234567)" required />
 
+        <!-- DISCOUNT -->
+        <input 
+          type="text" 
+          id="discountCode" 
+          placeholder="Discount Code (optional)" 
+          autocomplete="off"
+        />
+        <div class="order-hint" id="discountHint"></div>
+
+        <!-- NAME -->
+        <input 
+          type="text" 
+          id="name" 
+          placeholder="Full Name" 
+          required 
+        />
+
+        <!-- PHONE (numbers only recommended) -->
+        <input 
+          type="tel" 
+          id="phone" 
+          placeholder="Phone Number (e.g. 6731234567)" 
+          required 
+        />
+
+        <!-- PAYMENT -->
         <select id="payment" required>
           <option value="">Select Payment Method</option>
           <option value="Cash">Cash</option>
           <option value="Bank Transfer">Bank Transfer</option>
         </select>
 
+        <!-- DELIVERY TYPE -->
         <select id="deliveryType" required>
           <option value="Delivery">Delivery</option>
           <option value="Pickup">Pickup</option>
         </select>
 
-        <!-- shown only if Delivery -->
+        <!-- DELIVERY FIELDS -->
         <div id="deliveryFields">
-          <select id="district" required>
+
+          <select id="district">
             <option value="">Select District</option>
             <option value="bsb">BSB / Bandar Seri Begawan (BND 5)</option>
             <option value="tutong">Tutong (BND 10)</option>
@@ -61,12 +92,25 @@
             <option value="temburong">Temburong (BND 15)</option>
           </select>
 
-          <textarea id="address" placeholder="Delivery Address"></textarea>
-          <div class="order-hint" id="deliveryFeeHint">Delivery charges: BND 0.00</div>
+          <textarea 
+            id="address" 
+            placeholder="Delivery Address"
+          ></textarea>
+
+          <div class="order-hint" id="deliveryFeeHint">
+            Delivery charges: BND 0.00
+          </div>
         </div>
 
-        <button id="placeOrderBtn" type="submit">Place Order</button>
-        <p class="order-hint">Stock will be deducted after order is saved.</p>
+        <!-- SUBMIT -->
+        <button id="placeOrderBtn" type="submit">
+          Place Order
+        </button>
+
+        <p class="order-hint">
+          Stock will be deducted after order is saved.
+        </p>
+
       </form>
     </div>
 
