@@ -536,3 +536,22 @@ body {
   content:"";
   flex: 0 0 20px; /* end spacer so last card shows fully */
 }
+
+.faq-image {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.faq-image img {
+  width: 100%;
+  max-width: 600px;
+  border-radius: 18px;
+  border: 1px solid rgba(220,251,255,0.2);
+  box-shadow: 0 0 30px rgba(220,251,255,0.08);
+  transition: 0.3s ease;
+}
+
+.faq-image img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 40px rgba(220,251,255,0.15);
+}
