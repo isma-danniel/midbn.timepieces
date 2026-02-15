@@ -61,18 +61,27 @@
   <!-- FORM -->
   <!-- ===================== -->
   <div class="form-section">
-    <h3>Customer Details</h3>
+
+    <!-- DISCOUNT BOX (separate bordered container) -->
+    <div class="discount-box">
+      <div class="discount-row">
+        <input 
+          type="text" 
+          id="discountCode" 
+          placeholder="Enter Discount Code"
+          autocomplete="off"
+        />
+        <button type="button" id="applyDiscountBtn">
+          Apply
+        </button>
+      </div>
+      <div class="order-hint" id="discountHint"></div>
+    </div>
+
+    <!-- CUSTOMER HEADER BELOW DISCOUNT -->
+    <h3 class="customer-title">Customer Details</h3>
 
     <form id="checkoutForm" class="checkout-form">
-
-      <!-- DISCOUNT -->
-      <input 
-        type="text" 
-        id="discountCode" 
-        placeholder="Discount Code (optional)"
-        autocomplete="off"
-      />
-      <div class="order-hint" id="discountHint"></div>
 
       <!-- NAME -->
       <input 
@@ -82,7 +91,7 @@
         required
       />
 
-      <!-- PHONE (NUMBERS ONLY) -->
+      <!-- PHONE -->
       <input 
         type="tel" 
         id="phone"
@@ -98,6 +107,9 @@
         <option value="Cash">Cash</option>
         <option value="Bank Transfer">Bank Transfer</option>
       </select>
+
+      <!-- SPACING GAP AFTER PAYMENT -->
+      <div style="height:18px;"></div>
 
       <!-- DELIVERY TYPE -->
       <select id="deliveryType" required>
