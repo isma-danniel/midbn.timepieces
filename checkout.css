@@ -357,3 +357,13 @@ body{
   margin-bottom:16px;
   color:var(--primary);
 }
+
+#discountHint.success{
+  color: #4CAF50;
+  font-weight: 600;
+}
+
+#discountHint.error{
+  color: #ff4d4f;
+  font-weight: 600;
+}
