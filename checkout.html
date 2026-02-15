@@ -10,112 +10,147 @@
 </head>
 <body>
 
-  <header class="header">
-    <a href="products.html" class="logo">← Products</a>
-  </header>
+<header class="header">
+  <a href="products.html" class="logo">← Products</a>
+</header>
 
-  <div id="particleContainer"></div>
+<div id="particleContainer"></div>
 
-  <h2 class="checkout-title">Checkout</h2>
+<h2 class="checkout-title">Checkout</h2>
 
-  <div class="checkout-container">
+<div class="checkout-container">
 
-    <!-- ===================== -->
-    <!-- CART SECTION -->
-    <!-- ===================== -->
-    <div class="cart-section">
-      <div class="cart-head">
-        <h3>Your Cart</h3>
-        <button id="clearCartBtn" class="ghost-btn" type="button">Clear</button>
+  <!-- ===================== -->
+  <!-- CART -->
+  <!-- ===================== -->
+  <div class="cart-section">
+    <div class="cart-head">
+      <h3>Your Cart</h3>
+      <button id="clearCartBtn" class="ghost-btn" type="button">Clear</button>
+    </div>
+
+    <div id="cartItems"></div>
+
+    <!-- PRICE BREAKDOWN -->
+    <div class="price-breakdown">
+
+      <div class="price-row">
+        <span>Subtotal</span>
+        <span id="subtotalAmount">BND 0.00</span>
       </div>
 
-      <div id="cartItems"></div>
+      <div class="price-row">
+        <span>Delivery</span>
+        <span id="deliveryAmount">BND 0.00</span>
+      </div>
 
-      <!-- TOTAL -->
-      <div class="cart-total" id="cartTotal">BND 0.00</div>
+      <div class="price-row discount-row">
+        <span>Discount</span>
+        <span id="discountAmount">- BND 0.00</span>
+      </div>
+
+      <div class="price-row grand">
+        <span>Total</span>
+        <span id="cartTotal">BND 0.00</span>
+      </div>
+
     </div>
-
-    <!-- ===================== -->
-    <!-- FORM SECTION -->
-    <!-- ===================== -->
-    <div class="form-section">
-      <h3>Customer Details</h3>
-
-      <form id="checkoutForm" class="checkout-form">
-
-        <!-- DISCOUNT -->
-        <input 
-          type="text" 
-          id="discountCode" 
-          placeholder="Discount Code (optional)" 
-          autocomplete="off"
-        />
-        <div class="order-hint" id="discountHint"></div>
-
-        <!-- NAME -->
-        <input 
-          type="text" 
-          id="name" 
-          placeholder="Full Name" 
-          required 
-        />
-
-        <!-- PHONE (numbers only recommended) -->
-        <input 
-          type="tel" 
-          id="phone" 
-          placeholder="Phone Number (e.g. 6731234567)" 
-          required 
-        />
-
-        <!-- PAYMENT -->
-        <select id="payment" required>
-          <option value="">Select Payment Method</option>
-          <option value="Cash">Cash</option>
-          <option value="Bank Transfer">Bank Transfer</option>
-        </select>
-
-        <!-- DELIVERY TYPE -->
-        <select id="deliveryType" required>
-          <option value="Delivery">Delivery</option>
-          <option value="Pickup">Pickup</option>
-        </select>
-
-        <!-- DELIVERY FIELDS -->
-        <div id="deliveryFields">
-
-          <select id="district">
-            <option value="">Select District</option>
-            <option value="bsb">BSB / Bandar Seri Begawan (BND 5)</option>
-            <option value="tutong">Tutong (BND 10)</option>
-            <option value="belait">Kuala Belait (BND 15)</option>
-            <option value="temburong">Temburong (BND 15)</option>
-          </select>
-
-          <textarea 
-            id="address" 
-            placeholder="Delivery Address"
-          ></textarea>
-
-          <div class="order-hint" id="deliveryFeeHint">
-            Delivery charges: BND 0.00
-          </div>
-        </div>
-
-        <!-- SUBMIT -->
-        <button id="placeOrderBtn" type="submit">
-          Place Order
-        </button>
-
-        <p class="order-hint">
-          Stock will be deducted after order is saved.
-        </p>
-
-      </form>
-    </div>
-
   </div>
 
-  <script src="checkout.js"></script>
+  <!-- ===================== -->
+  <!-- FORM -->
+  <!-- ===================== -->
+  <div class="form-section">
+    <h3>Customer Details</h3>
+
+    <form id="checkoutForm" class="checkout-form">
+
+      <!-- DISCOUNT -->
+      <input 
+        type="text" 
+        id="discountCode" 
+        placeholder="Discount Code (optional)"
+        autocomplete="off"
+      />
+      <div class="order-hint" id="discountHint"></div>
+
+      <!-- NAME -->
+      <input 
+        type="text" 
+        id="name" 
+        placeholder="Full Name"
+        required
+      />
+
+      <!-- PHONE (NUMBERS ONLY) -->
+      <input 
+        type="tel" 
+        id="phone"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        placeholder="Phone Number (e.g. 6731234567)"
+        required
+      />
+
+      <!-- PAYMENT -->
+      <select id="payment" required>
+        <option value="">Select Payment Method</option>
+        <option value="Cash">Cash</option>
+        <option value="Bank Transfer">Bank Transfer</option>
+      </select>
+
+      <!-- DELIVERY TYPE -->
+      <select id="deliveryType" required>
+        <option value="Delivery">Delivery</option>
+        <option value="Pickup">Pickup</option>
+      </select>
+
+      <!-- DELIVERY FIELDS -->
+      <div id="deliveryFields">
+
+        <select id="district">
+          <option value="">Select District</option>
+          <option value="bsb">BSB / Bandar Seri Begawan (BND 5)</option>
+          <option value="tutong">Tutong (BND 10)</option>
+          <option value="belait">Kuala Belait (BND 15)</option>
+          <option value="temburong">Temburong (BND 15)</option>
+        </select>
+
+        <textarea 
+          id="address"
+          placeholder="Delivery Address"
+        ></textarea>
+
+        <div class="order-hint" id="deliveryFeeHint">
+          Delivery charges: BND 0.00
+        </div>
+
+      </div>
+
+      <button id="placeOrderBtn" type="submit">
+        Place Order
+      </button>
+
+      <p class="order-hint">
+        Stock will be deducted after order is saved.
+      </p>
+
+    </form>
+  </div>
+
+</div>
+
+<script src="checkout.js"></script>
+
+<script>
+/* ==============================
+   PHONE NUMBER STRICT NUMBERS
+============================== */
+const phoneInput = document.getElementById("phone");
+phoneInput?.addEventListener("input", () => {
+  phoneInput.value = phoneInput.value.replace(/\D/g, "");
+});
+</script>
+
 </body>
 </html>
