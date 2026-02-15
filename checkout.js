@@ -165,7 +165,11 @@ function updateDiscountPreview(){
   renderCart();
 }
 
-discountCodeEl?.addEventListener("input",updateDiscountPreview);
+const applyDiscountBtn = document.getElementById("applyDiscountBtn");
+
+applyDiscountBtn?.addEventListener("click", () => {
+  updateDiscountPreview();
+});
 
 // =============================
 // Render Cart
