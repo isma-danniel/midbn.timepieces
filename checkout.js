@@ -3,13 +3,15 @@
 // ✅ Live stock limit (GET ?action=products)
 // ✅ Delivery type + district + auto delivery charges
 // ✅ Discount code (client preview) + sent to server for verification
+// ✅ Updates price breakdown IDs:
+//    #subtotalAmount, #deliveryAmount, #discountAmount, #cartTotal
 // ✅ Server deducts stock + creates PDF + emails seller
 // ==========================================
 
 const API = "https://script.google.com/macros/s/AKfycbxPsVPZF7sqTyb6e0ywQerFcI-WkDEX2Jbx9hpbT2yqBbhF3AbuxTz9DWOVvZtBZjLxaw/exec"; // <-- your /exec URL
 
 const cartItemsContainer = document.getElementById("cartItems");
-const cartTotalEl = document.getElementById("cartTotal");
+const cartTotalEl = document.getElementById("cartTotal"); // now used as GRAND TOTAL in breakdown
 const clearCartBtn = document.getElementById("clearCartBtn");
 const checkoutForm = document.getElementById("checkoutForm");
 const placeOrderBtn = document.getElementById("placeOrderBtn");
@@ -119,7 +121,8 @@ function computeDeliveryFee(deliveryType, district){
   const d = String(district || "").toLowerCase().trim();
   if(d === "bsb" || d === "bandar seri begawan") return 5;
   if(d === "tutong") return 10;
-  if(d === "belait" || d === "kuala belait" || d === "temburong") return 15;
+  if(d === "belait" || d === "kuala belait") return 15;
+  if(d === "temburong") return 15;
   return 0;
 }
 
@@ -177,15 +180,24 @@ function updateDiscountPreview(){
 discountCodeEl?.addEventListener("input", updateDiscountPreview);
 
 // --------------------
-// Render cart
+// Render cart + breakdown totals
+// Requires HTML IDs:
+//   #subtotalAmount, #deliveryAmount, #discountAmount, #cartTotal
 // --------------------
 function renderCart(){
   if(!cartItemsContainer) return;
+
+  const subtotalEl = document.getElementById("subtotalAmount");
+  const deliveryEl = document.getElementById("deliveryAmount");
+  const discountEl = document.getElementById("discountAmount");
 
   cartItemsContainer.innerHTML = "";
 
   if(!cart.length){
     cartItemsContainer.innerHTML = `<div class="empty-cart">Your cart is empty</div>`;
+    if(subtotalEl) subtotalEl.innerText = formatBND(0);
+    if(deliveryEl) deliveryEl.innerText = formatBND(0);
+    if(discountEl) discountEl.innerText = "- " + formatBND(0);
     if(cartTotalEl) cartTotalEl.innerText = formatBND(0);
     return;
   }
@@ -234,14 +246,16 @@ function renderCart(){
   const subtotal = calcSubtotal();
   const grandTotal = Math.max(0, subtotal + deliveryFee - discountAmount);
 
+  if(subtotalEl) subtotalEl.innerText = formatBND(subtotal);
+  if(deliveryEl) deliveryEl.innerText = formatBND(deliveryFee);
+  if(discountEl) discountEl.innerText = "- " + formatBND(Math.max(0, discountAmount));
   if(cartTotalEl) cartTotalEl.innerText = formatBND(grandTotal);
 
   if(discountHintEl){
     if(discountAmount > 0){
-      discountHintEl.textContent = `Discount: -${formatBND(discountAmount)}`;
+      discountHintEl.textContent = "Discount applied";
     } else if ((discountCodeEl?.value || "").trim()){
-      // keep it simple
-      if(discountHintEl.textContent.trim() === "") discountHintEl.textContent = "Code will be verified";
+      if(!discountHintEl.textContent.trim()) discountHintEl.textContent = "Code will be verified";
     } else {
       discountHintEl.textContent = "";
     }
@@ -318,9 +332,9 @@ checkoutForm?.addEventListener("submit", async (e)=>{
     return;
   }
 
-  const name = document.getElementById("name").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const payment = document.getElementById("payment").value;
+  const name = document.getElementById("name")?.value.trim();
+  const phone = document.getElementById("phone")?.value.trim();
+  const payment = document.getElementById("payment")?.value;
 
   const deliveryType = deliveryTypeEl?.value || "Delivery";
   const district = districtEl?.value || "";
