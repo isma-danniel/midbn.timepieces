@@ -8,7 +8,7 @@
 // ✅ Server deducts stock + creates PDF + emails seller
 // ==========================================
 
-const API = "https://script.google.com/macros/s/AKfycbxPsVPZF7sqTyb6e0ywQerFcI-WkDEX2Jbx9hpbT2yqBbhF3AbuxTz9DWOVvZtBZjLxaw/exec"; // <-- your /exec URL
+const API = "https://script.google.com/macros/s/AKfycbwJBm-cXgQO8pN_alkxFHdlbk3j9NKrhmNlBpiTIYb4JUoQWBdbL0pHZ5edEt8J8m8K/exec"; // <-- your /exec URL
 
 const cartItemsContainer = document.getElementById("cartItems");
 const cartTotalEl = document.getElementById("cartTotal"); // now used as GRAND TOTAL in breakdown
