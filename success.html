@@ -1,8 +1,135 @@
-<script>
-  // ✅ Replace with your Apps Script Web App URL (/exec)
-  const API = "https://script.google.com/macros/s/AKfycbzRr3ySWQ_RbEufl1zlG2thCio_qRnTG9f6Kkvmdb1Z8aJ7JnHaslspD4NaRHcTIgXZ/exec";
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Order Received</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  // ✅ Your seller WhatsApp number
+  <style>
+    body{
+      background:#0d0f10;
+      color:#e6e6e6;
+      font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial;
+      padding:20px;
+    }
+    .box{
+      max-width:520px;
+      margin:40px auto;
+      background:rgba(255,255,255,.05);
+      padding:28px;
+      border-radius:20px;
+      border:1px solid rgba(220,251,255,.2);
+      backdrop-filter:blur(12px);
+    }
+    .brand{
+      text-align:center;
+      color:#DCFBFF;
+      font-weight:800;
+      letter-spacing:.8px;
+      margin-bottom:6px;
+      font-size:16px;
+    }
+    h2{
+      text-align:center;
+      color:#DCFBFF;
+      margin-bottom:12px;
+      letter-spacing:.4px;
+      font-size:20px;
+    }
+    .order-id{
+      text-align:center;
+      font-weight:700;
+      margin:8px 0 10px;
+      letter-spacing:.3px;
+    }
+    .statusRow{ text-align:center; margin-bottom:14px; }
+    .status{
+      font-size:13px;
+      padding:8px 12px;
+      border-radius:999px;
+      display:inline-block;
+      border:1px solid rgba(220,251,255,.22);
+      background:rgba(255,255,255,.03);
+      color:#DCFBFF;
+    }
+    .item{
+      display:flex;
+      justify-content:space-between;
+      padding:8px 0;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      font-size:14px;
+    }
+    .total{
+      text-align:right;
+      font-weight:800;
+      margin-top:14px;
+      color:#DCFBFF;
+    }
+    .note{
+      margin-top:16px;
+      padding-top:14px;
+      border-top:1px solid rgba(255,255,255,.10);
+      font-size:12.5px;
+      opacity:.72;
+      text-align:center;
+    }
+    .btn{
+      display:block;
+      margin-top:16px;
+      text-align:center;
+      padding:12px;
+      border-radius:30px;
+      border:1px solid #DCFBFF;
+      color:#DCFBFF;
+      text-decoration:none;
+      transition:.25s;
+    }
+    .btn:hover{ background:#DCFBFF; color:#000; }
+    .btn.secondary{
+      border:1px solid rgba(220,251,255,.35);
+      background:rgba(255,255,255,.03);
+    }
+    .btn.secondary:hover{
+      background:rgba(220,251,255,.12);
+    }
+    .mini{
+      margin-top:10px;
+      font-size:12px;
+      opacity:.6;
+      text-align:center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <div class="brand">MIDBN.Timepieces</div>
+  <h2>Order Received</h2>
+
+  <div class="order-id" id="orderId"></div>
+
+  <div class="statusRow">
+    <span class="status" id="orderStatus">Status: Pending Verification</span>
+  </div>
+
+  <div id="orderItems"></div>
+  <div class="total" id="orderTotal"></div>
+
+  <div class="note">
+    *Your order will be verified by the seller before confirmation.<br>
+    For faster processing, please send your <strong>Order ID</strong> to our official WhatsApp.
+  </div>
+
+  <a id="waBtn" href="#" target="_blank" class="btn secondary">
+    Send Order ID to WhatsApp
+  </a>
+
+  <a href="products.html" class="btn">Continue Shopping</a>
+
+  <div class="mini">Status updates automatically after seller approval.</div>
+</div>
+
+<script>
+  const API = "https://script.google.com/macros/s/AKfycbzRr3ySWQ_RbEufl1zlG2thCio_qRnTG9f6Kkvmdb1Z8aJ7JnHaslspD4NaRHcTIgXZ/exec";
   const SELLER_WA = "6738908960";
 
   const order = JSON.parse(localStorage.getItem("lastOrder"));
@@ -15,50 +142,39 @@
       .replaceAll(">","&gt;");
   }
 
-  function toNumber(v){
-    const n = Number(v);
-    return Number.isFinite(n) ? n : 0;
-  }
-
   function formatBND(n){
-    return "BND " + toNumber(n).toFixed(2);
+    const v = Number(n);
+    return "BND " + (Number.isFinite(v) ? v : 0).toFixed(2);
   }
 
-  function getQty(item){
-    return Math.max(1, toNumber(item.qty ?? item.quantity ?? 1));
+  function calcSubtotal(cart){
+    return (cart || []).reduce((sum, item)=>{
+      const qty = Number(item.qty ?? item.quantity ?? 1) || 1;
+      const price = Number(item.price ?? 0) || 0;
+      return sum + qty * price;
+    },0);
   }
 
-  function computeDeliveryFee(type, district){
-    if(type !== "Delivery") return 0;
-    const d = String(district || "").toLowerCase().trim();
-    if(d === "bsb" || d.includes("bandar")) return 5;
-    if(d.includes("tutong")) return 10;
-    if(d.includes("belait") || d.includes("kuala belait")) return 15;
-    if(d.includes("temburong")) return 15;
-    return 0;
-  }
-
-  function setWhatsAppLink(orderIdDisplay){
+  function setWhatsApp(orderId){
     const msg =
       "Hi MIDBN.Timepieces, I just placed an order.\n" +
-      "Order ID: " + orderIdDisplay + "\n" +
+      "Order ID: " + orderId + "\n" +
       "Please verify and confirm. Thank you.";
-    const url = "https://wa.me/" + SELLER_WA + "?text=" + encodeURIComponent(msg);
-    const waBtn = document.getElementById("waBtn");
-    waBtn.href = url;
+    document.getElementById("waBtn").href =
+      "https://wa.me/" + SELLER_WA + "?text=" + encodeURIComponent(msg);
   }
 
   if(!order || !order.orderId){
-    box.innerHTML = "<h2>No order found</h2><div class='mini'>Go back to Products and place order again.</div>";
+    box.innerHTML = "<h2>No order found</h2>";
   } else {
-    // Render items immediately from localStorage
+
     const container = document.getElementById("orderItems");
     container.innerHTML = "";
 
-    const cart = Array.isArray(order.cart) ? order.cart : [];
-    cart.forEach(item=>{
-      const qty = getQty(item);
-      const price = toNumber(item.price);
+    (order.cart || []).forEach(item=>{
+      const qty = Number(item.qty ?? item.quantity ?? 1) || 1;
+      const price = Number(item.price ?? 0) || 0;
+
       const div = document.createElement("div");
       div.className = "item";
       div.innerHTML = `
@@ -68,59 +184,55 @@
       container.appendChild(div);
     });
 
-    // ✅ Calculate totals (works even if order.total missing)
-    const customer = order.customer || {};
-    const deliveryType = customer.deliveryType || "Delivery"; // from your checkout.js older save
-    const district = customer.district || "";
-    const deliveryFee = computeDeliveryFee(deliveryType, district);
-
-    const subtotal = cart.reduce((sum, it) => sum + (getQty(it) * toNumber(it.price)), 0);
-    const grandTotal = Math.max(0, subtotal + deliveryFee);
-
+    // show quick subtotal first
+    const localTotal = calcSubtotal(order.cart);
     document.getElementById("orderTotal").innerText =
-      "Total: " + formatBND(grandTotal);
+      "Total: " + formatBND(localTotal);
 
-    // Default display = existing orderId (fallback)
-    let displayId = order.orderId;
-    document.getElementById("orderId").innerText = "Order ID: " + displayId;
-    setWhatsAppLink(displayId);
+    document.getElementById("orderId").innerText =
+      "Order ID: " + order.orderId;
 
-    // Auto-refresh status from sheet
+    setWhatsApp(order.orderId);
+
     async function refreshStatus(){
       try{
-        if(!API || API.includes("PASTE_YOUR_WEBAPP_URL_HERE")) return;
-
         const res = await fetch(
-          API + "?action=order&orderId=" + encodeURIComponent(order.orderId),
-          { cache: "no-store" }
+          API + "?action=order&orderId=" +
+          encodeURIComponent(order.orderId),
+          { cache:"no-store" }
         );
+
         const data = await res.json();
-        if(!data || data.status !== "success" || !data.order) return;
+        if(!data || data.status !== "success") return;
 
         const o = data.order;
 
-        // If server provides a simple order number, use it:
-        if (o.simpleOrderId) {
-          displayId = String(o.simpleOrderId);
-          document.getElementById("orderId").innerText = "Order ID: " + displayId;
-          setWhatsAppLink(displayId);
+        if(o.total){
+          document.getElementById("orderTotal").innerText =
+            "Total: " + o.total;
         }
 
-        const statusText = o.status ? String(o.status) : "Pending Verification";
-        document.getElementById("orderStatus").innerText = "Status: " + statusText;
+        const statusText = o.status || "Pending Verification";
+        document.getElementById("orderStatus").innerText =
+          "Status: " + statusText;
 
-        if (String(statusText).toLowerCase() === "approved") {
-          clearInterval(window.__midbnTimer);
+        if(statusText.toLowerCase() === "approved"){
+          clearInterval(window.__timer);
         }
-      } catch(err){
-        // ignore refresh errors
+
+      }catch(err){
+        // ignore
       }
     }
 
     refreshStatus();
-    window.__midbnTimer = setInterval(refreshStatus, 3000);
+    window.__timer = setInterval(refreshStatus, 3000);
 
-    // optional clear after 2 minutes
-    setTimeout(()=> localStorage.removeItem("lastOrder"), 120000);
+    setTimeout(()=>{
+      localStorage.removeItem("lastOrder");
+    },120000);
   }
 </script>
+
+</body>
+</html>
