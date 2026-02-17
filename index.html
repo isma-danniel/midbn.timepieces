@@ -31,6 +31,26 @@
   </nav>
 </header>
 
+<!-- ✅ DISCOUNT BANNER (ADD) -->
+<div class="promo-wrap" id="promoWrap" style="display:none;">
+  <div class="promo-banner">
+    <div class="promo-left">
+      <div class="promo-badge">PROMO</div>
+      <div class="promo-text">
+        <div class="promo-title" id="promoTitle">Ramadhan Sale</div>
+        <div class="promo-sub" id="promoSub">
+          Use code <b id="promoCode">RAMADHAN10</b> • 10% OFF
+        </div>
+      </div>
+    </div>
+
+    <div class="promo-actions">
+      <button class="promo-btn" id="copyPromoBtn" type="button">Copy Code</button>
+      <button class="promo-close" id="closePromoBtn" type="button" aria-label="Close">✕</button>
+    </div>
+  </div>
+</div>
+
 <!-- ================= HERO ================= -->
 <section class="hero">
   <video
@@ -130,10 +150,11 @@
     <div class="faq-item">
       <button class="faq-question">How To Place An Order With Us</button>
       <div class="faq-item">
-  <div class="faq-image">
-    <img src="images/how-to-purchase.PNG" alt="How to Purchase Guide">
-  </div>
-</div>
+        <div class="faq-image">
+          <img src="images/how-to-purchase.PNG" alt="How to Purchase Guide">
+        </div>
+      </div>
+    </div>
 
     <div class="faq-item">
       <button class="faq-question">Warranty</button>
@@ -208,11 +229,11 @@
   </div>
 
   <form class="contact-form" id="waForm">
-  <input id="waName" type="text" placeholder="Your Name" required>
-  <input id="waEmail" type="email" placeholder="Your Email (optional)">
-  <textarea id="waMsg" placeholder="Your Message" required></textarea>
-  <button type="submit">Send via WhatsApp</button>
-</form>
+    <input id="waName" type="text" placeholder="Your Name" required>
+    <input id="waEmail" type="email" placeholder="Your Email (optional)">
+    <textarea id="waMsg" placeholder="Your Message" required></textarea>
+    <button type="submit">Send via WhatsApp</button>
+  </form>
 </section>
 
 <footer class="footer">
@@ -220,6 +241,60 @@
 </footer>
 
 <script src="script.js" defer></script>
+
+<!-- ✅ Promo Banner JS (ADD) -->
+<script>
+  const PROMO = {
+    enabled: true,
+    title: "Ramadhan Sale",
+    code: "RAMADHAN10",
+    subtitle: "Use code {CODE} • 10% OFF",
+    storageKey: "midbn_promo_closed_v1"
+  };
+
+  const promoWrap = document.getElementById("promoWrap");
+  const promoTitle = document.getElementById("promoTitle");
+  const promoSub = document.getElementById("promoSub");
+  const promoCode = document.getElementById("promoCode");
+  const copyPromoBtn = document.getElementById("copyPromoBtn");
+  const closePromoBtn = document.getElementById("closePromoBtn");
+
+  function showPromo(){
+    if(!PROMO.enabled) return;
+    if(localStorage.getItem(PROMO.storageKey) === "1") return;
+
+    promoTitle.textContent = PROMO.title;
+    promoCode.textContent = PROMO.code;
+    promoSub.innerHTML = PROMO.subtitle.replace("{CODE}", `<b>${PROMO.code}</b>`);
+
+    promoWrap.style.display = "block";
+  }
+
+  async function copyCode(){
+    try{
+      await navigator.clipboard.writeText(PROMO.code);
+      copyPromoBtn.textContent = "Copied ✅";
+      setTimeout(()=> copyPromoBtn.textContent = "Copy Code", 1200);
+    }catch(e){
+      const t = document.createElement("textarea");
+      t.value = PROMO.code;
+      document.body.appendChild(t);
+      t.select();
+      document.execCommand("copy");
+      document.body.removeChild(t);
+      copyPromoBtn.textContent = "Copied ✅";
+      setTimeout(()=> copyPromoBtn.textContent = "Copy Code", 1200);
+    }
+  }
+
+  copyPromoBtn?.addEventListener("click", copyCode);
+  closePromoBtn?.addEventListener("click", ()=>{
+    localStorage.setItem(PROMO.storageKey, "1");
+    promoWrap.style.display = "none";
+  });
+
+  showPromo();
+</script>
 
 <!-- Smooth video autoplay after first paint -->
 <script>
