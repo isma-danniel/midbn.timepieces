@@ -221,22 +221,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* =========================
-     PROMO STRIP (1 LINE)
-     - Works with the 1-line HTML
-     - id="promoWrap", "promoTitle", "promoSub", "promoCode",
-       "copyPromoBtn", "closePromoBtn"
+    /* =========================
+     PROMO STRIP (1 LINE + MOVING ON PHONE)
+     Requires HTML:
+       id="promoWrap"
+       id="promoTitle" id="promoSub" id="promoCode"
+       id="copyPromoBtn" id="closePromoBtn"
+       + promo ticker wrapper:
+         id="promoTicker" and id="promoTrack"
   ========================= */
   const PROMO = {
     enabled: true,
     title: "Ramadhan Sale",
     code: "RAMADHAN10",
     subtitle: "Use code {CODE} • 10% OFF",
-    storageKey: "midbn_promo_closed_v1"
+    storageKey: "midbn_promo_closed_v2"
   };
 
   const wrap = document.getElementById("promoWrap");
-  if (wrap) {
+  const ticker = document.getElementById("promoTicker");
+  const track = document.getElementById("promoTrack");
+
+  if (wrap && ticker && track) {
     const titleEl = document.getElementById("promoTitle");
     const subEl = document.getElementById("promoSub");
     const codeEl = document.getElementById("promoCode");
@@ -247,10 +253,44 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!PROMO.enabled) return;
       if (localStorage.getItem(PROMO.storageKey) === "1") return;
 
-      if (titleEl) titleEl.textContent = PROMO.title;
-      if (codeEl) codeEl.textContent = PROMO.code;
-      if (subEl) subEl.innerHTML = PROMO.subtitle.replace("{CODE}", `<b>${PROMO.code}</b>`);
+      titleEl && (titleEl.textContent = PROMO.title);
+      codeEl && (codeEl.textContent = PROMO.code);
+      subEl && (subEl.innerHTML = PROMO.subtitle.replace("{CODE}", `<b>${PROMO.code}</b>`));
+
       wrap.style.display = "block";
+      requestAnimationFrame(setupTicker);
+    }
+
+    function setupTicker() {
+      const isPhone = window.matchMedia("(max-width: 520px)").matches;
+
+      // remove old clone if any
+      const next = track.nextElementSibling;
+      if (next && next.dataset && next.dataset.clone === "1") next.remove();
+
+      // stop moving on desktop
+      if (!isPhone) {
+        ticker.classList.remove("is-moving");
+        return;
+      }
+
+      // if it fits, don't move
+      if (track.scrollWidth <= ticker.clientWidth) {
+        ticker.classList.remove("is-moving");
+        return;
+      }
+
+      // clone for seamless loop
+      const clone = track.cloneNode(true);
+      clone.dataset.clone = "1";
+      track.parentNode.appendChild(clone);
+
+      // speed by length (premium slower)
+      const px = track.scrollWidth;
+      const dur = Math.min(22, Math.max(12, px / 45)); // tweak here
+      ticker.style.setProperty("--promoDur", dur + "s");
+
+      ticker.classList.add("is-moving");
     }
 
     async function copyCode() {
@@ -266,17 +306,19 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (copyBtn) {
         copyBtn.textContent = "Copied ✅";
-        setTimeout(() => (copyBtn.textContent = "Copy Code"), 1200);
+        setTimeout(() => (copyBtn.textContent = "Copy"), 1200);
       }
     }
 
-    copyBtn?.addEventListener("click", copyCode);
-
-    closeBtn?.addEventListener("click", () => {
+    copyBtn && copyBtn.addEventListener("click", copyCode);
+    closeBtn && closeBtn.addEventListener("click", () => {
       localStorage.setItem(PROMO.storageKey, "1");
       wrap.style.display = "none";
     });
 
+    window.addEventListener("resize", () => {
+      if (wrap.style.display !== "none") setupTicker();
+    });
+
     showPromo();
   }
-});
