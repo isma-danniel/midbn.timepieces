@@ -557,7 +557,7 @@ body {
 }
 
 /* =========================
-   PROMO STRIP (1 LINE)
+   PROMO STRIP (1 LINE + MOVING ON PHONE)
 ========================= */
 .promo-strip{
   width:100%;
@@ -580,14 +580,21 @@ body {
   letter-spacing:.2px;
 }
 
-.promo-line{
-  display:flex;
+/* ticker wrapper */
+.promo-ticker{
+  position:relative;
+  overflow:hidden;
+  flex:1 1 auto;
+  min-width:0;
+}
+
+/* the moving line */
+.promo-track{
+  display:inline-flex;
   align-items:center;
   gap:10px;
   white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  min-width:0;
+  will-change: transform;
 }
 
 .promo-pill{
@@ -606,7 +613,7 @@ body {
   display:flex;
   align-items:center;
   gap:10px;
-  flex-shrink:0;
+  flex:0 0 auto;
 }
 
 .promo-btn,.promo-close{
@@ -624,7 +631,24 @@ body {
   color:#000;
 }
 
-@media(max-width:520px){
+/* Desktop: keep still */
+@media (min-width:521px){
+  .promo-track{
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+}
+
+/* Phone: auto move only if JS sets .is-moving */
+@media (max-width:520px){
   .promo-strip-inner{ font-size:12px; }
   .promo-btn{ padding:6px 8px; }
+
+  .promo-ticker.is-moving .promo-track{
+    animation: promoMarquee var(--promoDur, 12s) linear infinite;
+  }
+  @keyframes promoMarquee{
+    from{ transform: translateX(0); }
+    to{ transform: translateX(-50%); }
+  }
 }
