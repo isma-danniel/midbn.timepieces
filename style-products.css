@@ -425,3 +425,44 @@ body{
   border-color: rgba(220,251,255,0.18);
   box-shadow: none;
 }
+
+/* ==============================
+   MODAL GALLERY (2+ images)
+============================== */
+
+.modal-gallery{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.modal-thumbs{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-bottom:8px;
+}
+
+.modal-thumbs button{
+  border:1px solid rgba(220,251,255,0.22);
+  background: rgba(255,255,255,0.03);
+  padding:0;
+  border-radius:12px;
+  overflow:hidden;
+  cursor:pointer;
+  width:64px;
+  height:64px;
+}
+
+.modal-thumbs img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.modal-thumbs button.active{
+  border-color: rgba(220,251,255,0.55);
+  box-shadow: 0 0 0 2px rgba(220,251,255,0.12);
+}
