@@ -89,7 +89,12 @@
     <div class="modal-content" role="dialog" aria-modal="true">
       <span id="closeModal" class="close-btn" aria-label="Close">&times;</span>
 
-      <img id="modalImg" alt="Product image" />
+      <!-- ✅ UPDATED: gallery wrapper + thumbnails container -->
+      <div class="modal-gallery">
+        <img id="modalImg" alt="Product image" />
+        <div id="modalThumbs" class="modal-thumbs" aria-label="More images"></div>
+      </div>
+
       <div id="modalName" class="modal-name"></div>
       <div id="modalPrice" class="modal-price"></div>
       <div id="modalStock" class="modal-stock"></div>
