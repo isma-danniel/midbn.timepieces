@@ -232,9 +232,9 @@ document.addEventListener("DOMContentLoaded", () => {
   ========================= */
   const PROMO = {
     enabled: true,
-    title: "Ramadhan Sale",
-    code: "RAMADHAN10",
-    subtitle: "Use code {CODE} • 10% OFF",
+    title: "Delivery Discount (min. purchase of $50)",
+    code: "deli3",
+    subtitle: "Use code {CODE} • $3 OFF",
     storageKey: "midbn_promo_closed_v2"
   };
 
