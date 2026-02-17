@@ -32,27 +32,29 @@
 </header>
 
 <!-- ✅ DISCOUNT BANNER (1 LINE) -->
+<!-- ✅ DISCOUNT BANNER (1 LINE + MOVING ON PHONE) -->
 <div class="promo-strip" id="promoWrap" style="display:none;">
   <div class="promo-strip-inner">
-    <span class="promo-line">
-      <span class="promo-pill">PROMO</span>
-      <span id="promoTitle">Ramadhan Sale</span>
-      <span class="dot">•</span>
-      <span id="promoSub">Use code <b id="promoCode">RAMADHAN10</b> • 10% OFF</span>
-    </span>
+    
+    <!-- ticker area -->
+    <div class="promo-ticker" id="promoTicker">
+      <div class="promo-track" id="promoTrack">
+        <span class="promo-pill">PROMO</span>
+        <span id="promoTitle">Ramadhan Sale</span>
+        <span class="dot">•</span>
+        <span id="promoSub">Use code <b id="promoCode">RAMADHAN10</b> • 10% OFF</span>
+      </div>
+      <!-- clone inserted by JS for seamless scroll -->
+    </div>
 
+    <!-- actions (ONLY ONCE) -->
     <div class="promo-actions">
       <button class="promo-btn" id="copyPromoBtn" type="button">Copy</button>
       <button class="promo-close" id="closePromoBtn" type="button" aria-label="Close">✕</button>
     </div>
-  </div>
-</div>
 
-    <div class="promo-actions">
-      <button class="promo-btn" id="copyPromoBtn" type="button">Copy Code</button>
-      <button class="promo-close" id="closePromoBtn" type="button" aria-label="Close">✕</button>
-    </div>
   </div>
+ </div>
 </div>
 
 <!-- ================= HERO ================= -->
