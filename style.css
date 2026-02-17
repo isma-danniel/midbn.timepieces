@@ -555,3 +555,106 @@ body {
   transform: scale(1.02);
   box-shadow: 0 0 40px rgba(220,251,255,0.15);
 }
+
+/* =========================
+   PROMO BANNER (MIDBN)
+========================= */
+.promo-wrap{
+  max-width: 1100px;
+  margin: 16px auto 0;
+  padding: 0 16px;
+}
+
+.promo-banner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:14px 14px;
+  border-radius:18px;
+  border:1px solid rgba(220,251,255,.18);
+  background: rgba(255,255,255,.04);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 0 30px rgba(0,0,0,.35);
+}
+
+.promo-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width: 0;
+}
+
+.promo-badge{
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.8px;
+  color:#0d0f10;
+  background:#DCFBFF;
+  padding:6px 10px;
+  border-radius:999px;
+  flex:0 0 auto;
+}
+
+.promo-text{ min-width:0; }
+
+.promo-title{
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:.3px;
+  color:#DCFBFF;
+  line-height:1.2;
+  margin-bottom:2px;
+}
+
+.promo-sub{
+  font-size:12.5px;
+  color: rgba(230,230,230,.85);
+  line-height:1.25;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.promo-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex:0 0 auto;
+}
+
+.promo-btn{
+  border:1px solid rgba(220,251,255,.35);
+  background: rgba(255,255,255,.03);
+  color:#DCFBFF;
+  padding:10px 12px;
+  border-radius:999px;
+  font-size:12.5px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s;
+}
+.promo-btn:hover{
+  background: rgba(220,251,255,.10);
+}
+
+.promo-close{
+  width:36px;
+  height:36px;
+  border-radius:999px;
+  border:1px solid rgba(220,251,255,.22);
+  background: rgba(255,255,255,.02);
+  color: rgba(230,230,230,.9);
+  cursor:pointer;
+  transition:.2s;
+}
+.promo-close:hover{
+  background: rgba(255,255,255,.06);
+}
+
+@media (max-width:520px){
+  .promo-banner{ padding:12px; }
+  .promo-btn{ padding:9px 10px; }
+  .promo-sub{ white-space:normal; }
+}
