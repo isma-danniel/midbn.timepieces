@@ -1,6 +1,14 @@
 // ==========================================
 // MIDBN script-products.js (FULL + FIX 1-3 + HEADER SYNC PILL)
-// + ✅ MULTI-IMAGE QUICK VIEW (uses product.images[])
+// ✅ Requires watchlist.js loaded FIRST (window.products)
+// ✅ FIX 1: Render instantly, then sync live stock AFTER first paint (less lag)
+// ✅ FIX 2: Particles delayed + fewer on mobile + resize throttle (faster load)
+// ✅ FIX 3: Image fetchpriority=low (smoother decode)
+// ✅ NEW: Header stock syncing pill w/ 3s timer + synced/fail message + auto hide
+// ✅ Sold out separator + badge
+// ✅ Cart count bottom button
+// ✅ Filters + sort
+// ✅ EDIT: Supports 2 images via product.images[] (hover swap + modal tap toggle)
 // ==========================================
 
 const API =
@@ -9,6 +17,16 @@ const API =
 // ---------- Helpers ----------
 function normId(v){ return String(v ?? "").trim(); }
 function toNumber(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
+
+// ✅ image helpers (supports old img + new images[])
+function getPrimaryImg(p){
+  if(Array.isArray(p?.images) && p.images[0]) return String(p.images[0]);
+  return String(p?.img || "");
+}
+function getAltImg(p){
+  if(Array.isArray(p?.images) && p.images[1]) return String(p.images[1]);
+  return "";
+}
 
 // ---------- Safety: watchlist.js must load first ----------
 if (!Array.isArray(window.products)) {
@@ -41,9 +59,6 @@ const closeModal = document.getElementById("closeModal");
 const modalAddCart = document.getElementById("modalAddCart");
 const goCheckoutBottom = document.getElementById("goCheckoutBottom");
 
-// ✅ NEW: thumbnails container (add in HTML: <div id="modalThumbs"></div>)
-const modalThumbs = document.getElementById("modalThumbs");
-
 // ✅ Header sync pill from your HTML
 const syncNotice = document.getElementById("stockSyncNotice");
 const syncTimer = document.getElementById("syncTimer");
@@ -53,6 +68,9 @@ const syncTimer = document.getElementById("syncTimer");
 // ==========================================
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let currentQuickProduct = null;
+
+// ✅ modal image toggle state
+let __modalImgIndex = 0;
 
 // ==========================================
 // HEADER SYNC PILL (SAFE)
@@ -160,9 +178,20 @@ function renderProducts(list){
       ? `<div class="label soldout-badge">SOLD OUT</div>`
       : (p.label ? `<div class="label">${p.label}</div>` : "");
 
+    const primarySrc = getPrimaryImg(p);
+    const altSrc = getAltImg(p);
+
     card.innerHTML = `
       <div class="img-wrap">
-        <img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" fetchpriority="low">
+        <img 
+          src="${primarySrc}" 
+          alt="${p.name || ""}" 
+          loading="lazy" 
+          decoding="async" 
+          fetchpriority="low"
+          data-primary="${primarySrc}"
+          data-alt="${altSrc}"
+        >
         ${labelHtml}
       </div>
 
@@ -175,7 +204,35 @@ function renderProducts(list){
       </div>
     `;
 
-    card.querySelector("img")?.addEventListener("click", ()=>openQuickView(p));
+    const imgEl = card.querySelector("img");
+
+    // ✅ hover swap if second image exists
+    if(imgEl && altSrc){
+      card.addEventListener("mouseenter", ()=>{
+        imgEl.src = altSrc;
+      });
+      card.addEventListener("mouseleave", ()=>{
+        imgEl.src = primarySrc;
+      });
+
+      // mobile: tap once to swap, tap again opens modal
+      let tappedOnce = false;
+      imgEl.addEventListener("click", (e)=>{
+        if(window.matchMedia && window.matchMedia("(hover: none)").matches){
+          if(!tappedOnce){
+            e.preventDefault();
+            imgEl.src = altSrc;
+            tappedOnce = true;
+            setTimeout(()=>{ tappedOnce = false; imgEl.src = primarySrc; }, 900);
+            return;
+          }
+        }
+        openQuickView(p);
+      });
+    }else{
+      imgEl?.addEventListener("click", ()=>openQuickView(p));
+    }
+
     card.querySelector(".more-details-btn")?.addEventListener("click", (e)=>{
       e.preventDefault();
       openQuickView(p);
@@ -211,7 +268,7 @@ function filterSortProducts(){
 
   let filtered = list.filter(p=>{
     const q = (searchInput?.value || "").toLowerCase().trim();
-    const searchMatch = !q || ((p.name + " " + p.brand).toLowerCase().includes(q));
+    const searchMatch = !q || ((String(p.name || "") + " " + String(p.brand || "")).toLowerCase().includes(q));
 
     const brandMatch = !brandFilter?.value || p.brand === brandFilter.value;
     const categoryMatch = !categoryFilter?.value || p.category === categoryFilter.value;
@@ -260,58 +317,26 @@ minPrice?.addEventListener("input", filterSortProducts);
 maxPrice?.addEventListener("input", filterSortProducts);
 
 // ==========================================
-// QUICK VIEW MODAL (✅ MULTI-IMAGE)
-// Requires in HTML:
-//   <div id="modalThumbs" class="modal-thumbs"></div>
-// and keep: <img id="modalImg" ...>
+// QUICK VIEW MODAL
 // ==========================================
 function openQuickView(product){
   currentQuickProduct = product;
+  __modalImgIndex = 0;
 
-  // ✅ build image list: prefer product.images[], fallback to product.img
-  const imgs = Array.isArray(product.images) && product.images.length
-    ? product.images.filter(Boolean)
-    : (product.img ? [product.img] : []);
+  const primarySrc = getPrimaryImg(product);
+  const altSrc = getAltImg(product);
 
-  // main image
-  if(modalImg) modalImg.src = imgs[0] || "";
-
-  // thumbnails (if exists)
-  if(modalThumbs){
-    modalThumbs.innerHTML = "";
-
-    if(imgs.length > 1){
-      imgs.forEach((src, i) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = i === 0 ? "active" : "";
-
-        const im = document.createElement("img");
-        im.src = src;
-        im.alt = `${product.name || "Product"} photo ${i + 1}`;
-        im.loading = "lazy";
-        im.decoding = "async";
-
-        btn.appendChild(im);
-
-        btn.addEventListener("click", () => {
-          if(modalImg) modalImg.src = src;
-          modalThumbs.querySelectorAll("button").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-        });
-
-        modalThumbs.appendChild(btn);
-      });
-    }
+  if(modalImg){
+    modalImg.src = primarySrc;
+    modalImg.dataset.primary = primarySrc;
+    modalImg.dataset.alt = altSrc;
   }
 
-  // text
   if(modalName) modalName.textContent = product.name || "";
   if(modalPrice) modalPrice.textContent = `BND ${toNumber(product.price).toFixed(2)}`;
   if(modalStock) modalStock.textContent = `Stock: ${toNumber(product.stock)}`;
   if(modalDetails) modalDetails.textContent = product.details || "";
 
-  // button state
   if(modalAddCart){
     const out = toNumber(product.stock) <= 0;
     modalAddCart.disabled = out;
@@ -319,12 +344,21 @@ function openQuickView(product){
     modalAddCart.classList.remove("added");
   }
 
-  // show modal
   if(quickViewModal){
     quickViewModal.style.display = "flex";
     quickViewModal.setAttribute("aria-hidden","false");
   }
 }
+
+// ✅ Tap/click modal image to toggle between 2 images (if exists)
+modalImg?.addEventListener("click", ()=>{
+  const primary = modalImg.dataset.primary || "";
+  const alt = modalImg.dataset.alt || "";
+  if(!alt) return;
+
+  __modalImgIndex = (__modalImgIndex + 1) % 2;
+  modalImg.src = (__modalImgIndex === 0) ? primary : alt;
+});
 
 closeModal?.addEventListener("click", ()=>{
   if(!quickViewModal) return;
@@ -359,12 +393,14 @@ function addToCartInstant(product){
     return false;
   }
 
+  const primaryImg = getPrimaryImg(product);
+
   if(existing){
     existing.qty = currentQty + 1;
     existing.price = toNumber(product.price);
     existing.stock = stock;
     existing.brand = product.brand || existing.brand || "";
-    existing.img = product.img || existing.img || "";
+    existing.img = primaryImg || existing.img || "";
   }else{
     cart.push({
       id: toNumber(product.id),
@@ -373,7 +409,7 @@ function addToCartInstant(product){
       qty: 1,
       stock,
       brand: product.brand || "",
-      img: product.img || ""
+      img: primaryImg || ""
     });
   }
 
@@ -500,6 +536,7 @@ function buildLiveMap(liveArr){
   return map;
 }
 
+// fetch AFTER first paint
 requestAnimationFrame(() => {
   requestAnimationFrame(async () => {
     const live = await getLiveProductsSafe();
