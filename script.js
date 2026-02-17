@@ -227,3 +227,63 @@ document.addEventListener("DOMContentLoaded", () => {
     window.open(url, "_blank");
   });
 });
+
+/* =========================
+   PROMO BANNER
+========================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const PROMO = {
+    enabled: true,
+    title: "Ramadhan Sale",
+    code: "RAMADHAN10",
+    subtitle: "Use code {CODE} • 10% OFF",
+    storageKey: "midbn_promo_closed_v1"
+  };
+
+  const wrap = document.getElementById("promoWrap");
+  const titleEl = document.getElementById("promoTitle");
+  const subEl = document.getElementById("promoSub");
+  const codeEl = document.getElementById("promoCode");
+  const copyBtn = document.getElementById("copyPromoBtn");
+  const closeBtn = document.getElementById("closePromoBtn");
+
+  if (!wrap) return; // safety
+
+  function showPromo(){
+    if(!PROMO.enabled) return;
+    if(localStorage.getItem(PROMO.storageKey) === "1") return;
+
+    titleEl.textContent = PROMO.title;
+    codeEl.textContent = PROMO.code;
+    subEl.innerHTML = PROMO.subtitle.replace("{CODE}", `<b>${PROMO.code}</b>`);
+    wrap.style.display = "block";
+  }
+
+  async function copyCode(){
+    try{
+      await navigator.clipboard.writeText(PROMO.code);
+      copyBtn.textContent = "Copied ✅";
+      setTimeout(()=> copyBtn.textContent = "Copy Code", 1200);
+    }catch(e){
+      const t = document.createElement("textarea");
+      t.value = PROMO.code;
+      document.body.appendChild(t);
+      t.select();
+      document.execCommand("copy");
+      document.body.removeChild(t);
+      copyBtn.textContent = "Copied ✅";
+      setTimeout(()=> copyBtn.textContent = "Copy Code", 1200);
+    }
+  }
+
+  copyBtn?.addEventListener("click", copyCode);
+
+  closeBtn?.addEventListener("click", ()=>{
+    localStorage.setItem(PROMO.storageKey, "1");
+    wrap.style.display = "none";
+  });
+
+  showPromo();
+});
