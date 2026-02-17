@@ -55,7 +55,7 @@ window.products = [
   {id:38, name:"Couple (Yellow)",       brand:"Rolex", category:"couple", grade:"A", price:40, stock:1, label:"NEW", img:"images/couple/couple-5.png", details:"Quartz, stainless steel case, couple watch, Grade A"},
 
   // ===== COMING SOON =====
-  {id:39, name:"GA2100 (Manga L.Gray W)",     brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/gs39.jpeg", "images/men/gspackaging.jpeg", details:"Rubber, complete with box & paper bag, Grade Premium"},
+  {id:39, name:"GA2100 (Manga L.Gray W)",     brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/gs39.jpeg", images: ["images/men/gspackaging.jpeg","images/men/gs39.jpeg"], details:"Rubber, complete with box & paper bag, Grade Premium"},
   {id:40, name:"GA2100 (Manga Green B)",   brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/gs40.jpeg", details:"Rubber, complete with box & paper bag, Grade Premium"},
   {id:41, name:"GA2100 (Manga Green W)",      brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/gs41.jpeg", details:"Rubber, complete with box & paper bag, Grade Premium"},
   {id:42, name:"GA2100 (Manga Gray W)",    brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/gs42.jpeg", details:"Rubber, complete with box & paper bag, Grade Premium"},
