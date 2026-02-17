@@ -15,7 +15,7 @@ window.products = [
   // ===== MEN (Patek Philippe) =====
   {id:9,  name:"Nautilus (Blue)",  brand:"Patek Philippe", category:"mens", grade:"A", price:25, stock:0, label:"NEW", img:"images/men/men-9.png",  details:"Quartz, stainless steel case, men watch, Grade A"},
   {id:10, name:"Nautilus (Black)", brand:"Patek Philippe", category:"mens", grade:"A", price:25, stock:0, label:"NEW", img:"images/men/men-10.png", details:"Quartz, stainless steel case, men watch, Grade A"},
-  {id:11, name:"Nautilus (White)", brand:"Patek Philippe", category:"mens", grade:"A", price:25, stock:1, label:"NEW", img:"images/men/men-11.png", details:"Quartz, stainless steel case, men watch, Grade A"},
+  {id:11, name:"Nautilus (White)", brand:"Patek Philippe", category:"mens", grade:"A", price:25, stock:1, label:"", img:"images/men/men-11.png", details:"Quartz, stainless steel case, men watch, Grade A"},
 
   // ===== WOMEN (Franck Muller) =====
   {id:12, name:"Vanguard (White)", brand:"Franck Muller", category:"womens", grade:"A", price:25, stock:1, label:"NEW", img:"images/women/women-1.png", details:"Quartz, leather strap, women watch, Grade A"},
