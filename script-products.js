@@ -1,13 +1,6 @@
 // ==========================================
 // MIDBN script-products.js (FULL + FIX 1-3 + HEADER SYNC PILL)
-// ✅ Requires watchlist.js loaded FIRST (window.products)
-// ✅ FIX 1: Render instantly, then sync live stock AFTER first paint (less lag)
-// ✅ FIX 2: Particles delayed + fewer on mobile + resize throttle (faster load)
-// ✅ FIX 3: Image fetchpriority=low (smoother decode)
-// ✅ NEW: Header stock syncing pill w/ 3s timer + synced/fail message + auto hide
-// ✅ Sold out separator + badge
-// ✅ Cart count bottom button
-// ✅ Filters + sort
+// + ✅ MULTI-IMAGE QUICK VIEW (uses product.images[])
 // ==========================================
 
 const API =
@@ -48,6 +41,9 @@ const closeModal = document.getElementById("closeModal");
 const modalAddCart = document.getElementById("modalAddCart");
 const goCheckoutBottom = document.getElementById("goCheckoutBottom");
 
+// ✅ NEW: thumbnails container (add in HTML: <div id="modalThumbs"></div>)
+const modalThumbs = document.getElementById("modalThumbs");
+
 // ✅ Header sync pill from your HTML
 const syncNotice = document.getElementById("stockSyncNotice");
 const syncTimer = document.getElementById("syncTimer");
@@ -66,7 +62,6 @@ let __syncFadeTimeout = null;
 
 function setSyncText(text){
   if(!syncNotice) return;
-  // Your HTML: <div><span>Syncing latest stock</span><span id="syncTimer">3</span></div>
   const firstSpan = syncNotice.querySelector("span");
   if(firstSpan) firstSpan.textContent = text;
 }
@@ -74,7 +69,6 @@ function setSyncText(text){
 function startHeaderSyncPill(){
   if(!syncNotice || !syncTimer) return;
 
-  // reset
   syncNotice.style.opacity = "1";
   syncNotice.style.transform = "none";
   syncNotice.classList.remove("done");
@@ -91,7 +85,6 @@ function startHeaderSyncPill(){
     syncTimer.textContent = String(Math.max(0, count));
     if(count <= 0){
       clearInterval(__syncInterval);
-      // keep showing until we actually finish sync (success/fail)
     }
   }, 1000);
 }
@@ -106,11 +99,9 @@ function finishHeaderSyncPill(success){
     syncNotice.classList.add("done");
     setSyncText("Stock synced");
   }else{
-    // no extra css needed, just text
     setSyncText("Sync failed");
   }
 
-  // hide after a moment
   __syncFadeTimeout = setTimeout(() => {
     syncNotice.style.opacity = "0";
     syncNotice.style.transform = "translateY(-6px)";
@@ -269,17 +260,58 @@ minPrice?.addEventListener("input", filterSortProducts);
 maxPrice?.addEventListener("input", filterSortProducts);
 
 // ==========================================
-// QUICK VIEW MODAL
+// QUICK VIEW MODAL (✅ MULTI-IMAGE)
+// Requires in HTML:
+//   <div id="modalThumbs" class="modal-thumbs"></div>
+// and keep: <img id="modalImg" ...>
 // ==========================================
 function openQuickView(product){
   currentQuickProduct = product;
 
-  if(modalImg) modalImg.src = product.img || "";
+  // ✅ build image list: prefer product.images[], fallback to product.img
+  const imgs = Array.isArray(product.images) && product.images.length
+    ? product.images.filter(Boolean)
+    : (product.img ? [product.img] : []);
+
+  // main image
+  if(modalImg) modalImg.src = imgs[0] || "";
+
+  // thumbnails (if exists)
+  if(modalThumbs){
+    modalThumbs.innerHTML = "";
+
+    if(imgs.length > 1){
+      imgs.forEach((src, i) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = i === 0 ? "active" : "";
+
+        const im = document.createElement("img");
+        im.src = src;
+        im.alt = `${product.name || "Product"} photo ${i + 1}`;
+        im.loading = "lazy";
+        im.decoding = "async";
+
+        btn.appendChild(im);
+
+        btn.addEventListener("click", () => {
+          if(modalImg) modalImg.src = src;
+          modalThumbs.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+        });
+
+        modalThumbs.appendChild(btn);
+      });
+    }
+  }
+
+  // text
   if(modalName) modalName.textContent = product.name || "";
   if(modalPrice) modalPrice.textContent = `BND ${toNumber(product.price).toFixed(2)}`;
   if(modalStock) modalStock.textContent = `Stock: ${toNumber(product.stock)}`;
   if(modalDetails) modalDetails.textContent = product.details || "";
 
+  // button state
   if(modalAddCart){
     const out = toNumber(product.stock) <= 0;
     modalAddCart.disabled = out;
@@ -287,6 +319,7 @@ function openQuickView(product){
     modalAddCart.classList.remove("added");
   }
 
+  // show modal
   if(quickViewModal){
     quickViewModal.style.display = "flex";
     quickViewModal.setAttribute("aria-hidden","false");
@@ -439,10 +472,7 @@ function safeInitialRender(){
   if(hasRenderedOnce) return;
   hasRenderedOnce = true;
 
-  // ✅ Start header pill immediately
   startHeaderSyncPill();
-
-  // Instant render from watchlist.js
   filterSortProducts();
 }
 safeInitialRender();
@@ -470,7 +500,6 @@ function buildLiveMap(liveArr){
   return map;
 }
 
-// fetch AFTER first paint
 requestAnimationFrame(() => {
   requestAnimationFrame(async () => {
     const live = await getLiveProductsSafe();
