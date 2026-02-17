@@ -35,7 +35,7 @@ body {
 .header {
   position: sticky;
   top:0;
-  z-index:10;
+  z-index: 999; /* ✅ ADDED: keep header above promo so hamburger is clickable */
   background: rgba(13,15,16,0.5);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
@@ -462,7 +462,7 @@ body {
   position: absolute;
   right: 20px;
   top: 60px;
-  z-index: 15;
+  z-index: 1000; /* ✅ ADDED: ensure button is on top */
 }
 .hamburger span {
   display: block;
@@ -561,6 +561,8 @@ body {
 ========================= */
 .promo-strip{
   width:100%;
+  position: relative; /* ✅ ADDED */
+  z-index: 50;        /* ✅ ADDED: below header */
   background: rgba(255,255,255,.03);
   border-bottom: 1px solid rgba(220,251,255,.18);
   backdrop-filter: blur(10px);
@@ -586,6 +588,8 @@ body {
   overflow:hidden;
   flex:1 1 auto;
   min-width:0;
+
+  display:flex; /* ✅ ADDED: needed when JS clones track */
 }
 
 /* the moving line */
@@ -595,6 +599,7 @@ body {
   gap:10px;
   white-space:nowrap;
   will-change: transform;
+  flex: 0 0 auto; /* ✅ ADDED */
 }
 
 #promoTitle{
