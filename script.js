@@ -65,9 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* =========================
      NEW ARRIVALS drag + momentum + auto-slide (UPGRADED)
-     - Fixes: can't reach last card
-     - Auto-scroll "bounces" instead of resetting to 0
-     - Pauses auto-scroll briefly after drag so it doesn't fight user
   ========================= */
   const slider = document.querySelector(".arrival-scroll");
   if (slider) {
@@ -78,9 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let lastX = 0;
     let momentumID = null;
     let pauseAutoScroll = false;
-
-    // NEW: direction for auto-scroll bounce
-    let autoDir = 1; // 1 forward, -1 backward
+    let autoDir = 1;
 
     function updateSlider(x) {
       const walk = (x - startX) * 2;
@@ -104,15 +99,11 @@ document.addEventListener("DOMContentLoaded", () => {
     function endDrag() {
       if (!isDown) return;
       isDown = false;
-
-      // NEW: pause auto-scroll a bit after user interaction
       pauseAutoScroll = true;
       setTimeout(() => (pauseAutoScroll = false), 1200);
-
       startMomentum(velocity);
     }
 
-    // Desktop drag
     slider.addEventListener("mousedown", (e) => {
       isDown = true;
       pauseAutoScroll = true;
@@ -120,6 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
       scrollLeft = slider.scrollLeft;
       lastX = e.pageX;
       cancelMomentum();
+      slider.classList.add("is-dragging");
     });
 
     slider.addEventListener("mousemove", (e) => {
@@ -129,10 +121,16 @@ document.addEventListener("DOMContentLoaded", () => {
       lastX = e.pageX;
     });
 
-    slider.addEventListener("mouseup", endDrag);
-    slider.addEventListener("mouseleave", endDrag);
+    slider.addEventListener("mouseup", () => {
+      slider.classList.remove("is-dragging");
+      endDrag();
+    });
 
-    // Mobile drag
+    slider.addEventListener("mouseleave", () => {
+      slider.classList.remove("is-dragging");
+      endDrag();
+    });
+
     slider.addEventListener(
       "touchstart",
       (e) => {
@@ -159,14 +157,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     slider.addEventListener("touchend", endDrag);
 
-    // Auto-slide (UPGRADED): bounce at ends instead of resetting
     function animateSlide() {
       if (!pauseAutoScroll && !isDown) {
         const maxScroll = slider.scrollWidth - slider.clientWidth;
-
         slider.scrollLeft += 0.35 * autoDir;
-
-        // bounce at ends (this allows reaching last card)
         if (slider.scrollLeft >= maxScroll - 1) autoDir = -1;
         if (slider.scrollLeft <= 0) autoDir = 1;
       }
@@ -202,38 +196,37 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-});
 
-// CONTACT FORM -> WHATSAPP
-document.addEventListener("DOMContentLoaded", () => {
+  /* =========================
+     CONTACT FORM -> WHATSAPP
+  ========================= */
   const form = document.getElementById("waForm");
-  if (!form) return;
+  if (form) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
 
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
+      const name = document.getElementById("waName")?.value.trim() || "";
+      const email = document.getElementById("waEmail")?.value.trim() || "";
+      const msg = document.getElementById("waMsg")?.value.trim() || "";
 
-    const name = document.getElementById("waName")?.value.trim() || "";
-    const email = document.getElementById("waEmail")?.value.trim() || "";
-    const msg = document.getElementById("waMsg")?.value.trim() || "";
+      const phone = "6738908960";
+      const text =
+        `Hi MIDBN.Timepieces, I want to enquire.\n\n` +
+        `Name: ${name}\n` +
+        (email ? `Email: ${email}\n` : "") +
+        `Message: ${msg}`;
 
-    const phone = "6738908960"; // your WhatsApp number (no +)
-    const text =
-      `Hi MIDBN.Timepieces, I want to enquire.\n\n` +
-      `Name: ${name}\n` +
-      (email ? `Email: ${email}\n` : "") +
-      `Message: ${msg}`;
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+      window.open(url, "_blank");
+    });
+  }
 
-    const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
-    window.open(url, "_blank");
-  });
-});
-
-/* =========================
-   PROMO BANNER
-========================= */
-
-document.addEventListener("DOMContentLoaded", () => {
-
+  /* =========================
+     PROMO STRIP (1 LINE)
+     - Works with the 1-line HTML
+     - id="promoWrap", "promoTitle", "promoSub", "promoCode",
+       "copyPromoBtn", "closePromoBtn"
+  ========================= */
   const PROMO = {
     enabled: true,
     title: "Ramadhan Sale",
@@ -243,47 +236,47 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const wrap = document.getElementById("promoWrap");
-  const titleEl = document.getElementById("promoTitle");
-  const subEl = document.getElementById("promoSub");
-  const codeEl = document.getElementById("promoCode");
-  const copyBtn = document.getElementById("copyPromoBtn");
-  const closeBtn = document.getElementById("closePromoBtn");
+  if (wrap) {
+    const titleEl = document.getElementById("promoTitle");
+    const subEl = document.getElementById("promoSub");
+    const codeEl = document.getElementById("promoCode");
+    const copyBtn = document.getElementById("copyPromoBtn");
+    const closeBtn = document.getElementById("closePromoBtn");
 
-  if (!wrap) return; // safety
+    function showPromo() {
+      if (!PROMO.enabled) return;
+      if (localStorage.getItem(PROMO.storageKey) === "1") return;
 
-  function showPromo(){
-    if(!PROMO.enabled) return;
-    if(localStorage.getItem(PROMO.storageKey) === "1") return;
-
-    titleEl.textContent = PROMO.title;
-    codeEl.textContent = PROMO.code;
-    subEl.innerHTML = PROMO.subtitle.replace("{CODE}", `<b>${PROMO.code}</b>`);
-    wrap.style.display = "block";
-  }
-
-  async function copyCode(){
-    try{
-      await navigator.clipboard.writeText(PROMO.code);
-      copyBtn.textContent = "Copied ✅";
-      setTimeout(()=> copyBtn.textContent = "Copy Code", 1200);
-    }catch(e){
-      const t = document.createElement("textarea");
-      t.value = PROMO.code;
-      document.body.appendChild(t);
-      t.select();
-      document.execCommand("copy");
-      document.body.removeChild(t);
-      copyBtn.textContent = "Copied ✅";
-      setTimeout(()=> copyBtn.textContent = "Copy Code", 1200);
+      if (titleEl) titleEl.textContent = PROMO.title;
+      if (codeEl) codeEl.textContent = PROMO.code;
+      if (subEl) subEl.innerHTML = PROMO.subtitle.replace("{CODE}", `<b>${PROMO.code}</b>`);
+      wrap.style.display = "block";
     }
+
+    async function copyCode() {
+      try {
+        await navigator.clipboard.writeText(PROMO.code);
+      } catch {
+        const t = document.createElement("textarea");
+        t.value = PROMO.code;
+        document.body.appendChild(t);
+        t.select();
+        document.execCommand("copy");
+        document.body.removeChild(t);
+      }
+      if (copyBtn) {
+        copyBtn.textContent = "Copied ✅";
+        setTimeout(() => (copyBtn.textContent = "Copy Code"), 1200);
+      }
+    }
+
+    copyBtn?.addEventListener("click", copyCode);
+
+    closeBtn?.addEventListener("click", () => {
+      localStorage.setItem(PROMO.storageKey, "1");
+      wrap.style.display = "none";
+    });
+
+    showPromo();
   }
-
-  copyBtn?.addEventListener("click", copyCode);
-
-  closeBtn?.addEventListener("click", ()=>{
-    localStorage.setItem(PROMO.storageKey, "1");
-    wrap.style.display = "none";
-  });
-
-  showPromo();
 });
