@@ -221,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-    /* =========================
+  /* =========================
      PROMO STRIP (1 LINE + MOVING ON PHONE)
      Requires HTML:
        id="promoWrap"
@@ -255,7 +255,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       titleEl && (titleEl.textContent = PROMO.title);
       codeEl && (codeEl.textContent = PROMO.code);
-      subEl && (subEl.innerHTML = PROMO.subtitle.replace("{CODE}", `<b>${PROMO.code}</b>`));
+      subEl &&
+        (subEl.innerHTML = PROMO.subtitle.replace(
+          "{CODE}",
+          `<b>${PROMO.code}</b>`
+        ));
 
       wrap.style.display = "block";
       requestAnimationFrame(setupTicker);
@@ -311,10 +315,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     copyBtn && copyBtn.addEventListener("click", copyCode);
-    closeBtn && closeBtn.addEventListener("click", () => {
-      localStorage.setItem(PROMO.storageKey, "1");
-      wrap.style.display = "none";
-    });
+    closeBtn &&
+      closeBtn.addEventListener("click", () => {
+        localStorage.setItem(PROMO.storageKey, "1");
+        wrap.style.display = "none";
+      });
 
     window.addEventListener("resize", () => {
       if (wrap.style.display !== "none") setupTicker();
@@ -322,3 +327,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
     showPromo();
   }
+}); // ✅ ADDED: closes the main DOMContentLoaded
