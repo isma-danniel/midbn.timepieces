@@ -55,7 +55,7 @@ window.products = [
   {id:38, name:"Couple (Yellow)",       brand:"Rolex", category:"couple", grade:"A", price:40, stock:1, label:"NEW", img:"images/couple/couple-5.png", details:"Quartz, stainless steel case, couple watch, Grade A"},
 
   // ===== COMING SOON =====
-  {id:39, name:"GA2100 (Manga Green)", brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
+  {id:39, name:"GA2100 (Manga Green)",     brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
   {id:40, name:"GA2100 (Manga D.Green)",   brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
   {id:41, name:"GA2100 (Manga Gray)",      brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
   {id:42, name:"GA2100 (Manga D.gray)",    brand:"G-Shock", category:"coming", grade:"Premium", price:35, stock:0, label:"COMING SOON", img:"images/men/unknown.png", details:"Rubber, complete with box & paper bag, Grade Premium"},
@@ -90,6 +90,26 @@ window.products = [
   {id:69, name:"Oalet (Black) — Defect", brand:"Franck Muller", category:"promo", grade:"A", price:15, stock:1, label:"DEFECT", img:"images/defect/defect-5.PNG", details:"Complete with box, Grade A (Scratch on the glass)"},
   {id:70, name:"Nautilus (Blue) — Defect", brand:"Patek Philippe", category:"promo", grade:"A", price:15, stock:1, label:"DEFECT", img:"images/defect/defect-2.PNG", details:"Complete with box, Grade A (Faded colour & scratches)"},
   {id:71, name:"Royal Oak (White) — Defect", brand:"Audemars Piguet", category:"promo", grade:"A", price:15, stock:1, label:"DEFECT", img:"images/defect/defect-3.PNG", details:"Complete with box, Grade A (Faded colour & scratches)"},
+
+  // ===== Casio =====
+  {id:72, name:"MTP 9203 (Black)",          brand:"Casio", category:"mens", grade:"Premium", price:50, stock:1, label:"NEW", img:"images/women/women-17.png", details:"Quartz, stainless steel case, men watch, Premium Grade complete with box, date & date display"},
+  {id:73, name:"MTP 9203 (Black/sapphire)", brand:"Casio", category:"mens", grade:"Premium", price:50, stock:1, label:"NEW", img:"images/women/women-17.png", details:"Quartz, stainless steel case, men watch, Premium Grade complete with box, date & date display"},
+  {id:74, name:"MTP 9203 (White)",          brand:"Casio", category:"mens", grade:"Premium", price:50, stock:1, label:"NEW", img:"images/women/women-17.png", details:"Quartz, stainless steel case, men watch, Premium Grade complete with box, date & date display"},
+  {id:75, name:"MTP 9203 (White/Sapphire)", brand:"Casio", category:"mens", grade:"Premium", price:50, stock:1, label:"NEW", img:"images/women/women-17.png", details:"Quartz, stainless steel case, men watch, Premium Grade complete with box, date & date display"},
+  {id:76, name:"MTP 9203 (Navy Blue)",      brand:"Casio", category:"mens", grade:"Premium", price:50, stock:1, label:"NEW", img:"images/women/women-17.png", details:"Quartz, stainless steel case, men watch, Premium Grade complete with box, date & date display"},
+  {id:77, name:"MTP 9203 (Cyan)",           brand:"Casio", category:"mens", grade:"Premium", price:50, stock:1, label:"NEW", img:"images/women/women-17.png", details:"Quartz, stainless steel case, men watch, Premium Grade, complete with premium box, date & date display"},
+  {id:78, name:"CL115 (black/gold)",   brand:"Casio", category:"couple", grade:"Premium", price:55, stock:1, label:"NEW", img:"images/women/women-18.png", details:"Quartz, leather strap, couple watch, Premium Grade , complete with Casio white box"},
+  {id:79, name:"CL115 (black/black)",  brand:"Casio", category:"couple", grade:"Premium", price:55, stock:1, label:"NEW", img:"images/women/women-18.png", details:"Quartz, leather strap, couple watch, Premium Grade , complete with Casio white box"},
+  {id:80, name:"CL115 (black/silver)", brand:"Casio", category:"couple", grade:"Premium", price:55, stock:1, label:"NEW", img:"images/women/women-18.png", details:"Quartz, leather strap, couple watch, Premium Grade , complete with Casio white box"},
+  {id:81, name:"CL115 (brown/black)",  brand:"Casio", category:"couple", grade:"Premium", price:55, stock:1, label:"NEW", img:"images/women/women-18.png", details:"Quartz, leather strap, couple watch, Premium Grade , complete with Casio white box"},
+  {id:82, name:"CL115 (brown/white)",  brand:"Casio", category:"couple", grade:"Premium", price:55, stock:1, label:"NEW", img:"images/women/women-18.png", details:"Quartz, leather strap, couple watch, Premium Grade , complete with Casio white box"},
+  {id:83, name:"CT5013 Arabic Couple (black/silver)", brand:"Casio", category:"couple", grade:"Premium", price:65, stock:1, label:"NEW", img:"images/women/women-18.png", details:"Quartz, stainless steel case, couple watch, premium grade, arabic font, complete with Casio white box"},
+  {id:84, name:"CT5013 Arabic Couple (black/gold)",   brand:"Casio", category:"couple", grade:"Premium", price:65, stock:1, label:"NEW", img:"images/women/women-18.png", details:"Quartz, stainless steel case, couple watch, premium grade, arabic font, complete with Casio white box"},
+  {id:85, name:"CT5013 Arabic Couple (white/silver)", brand:"Casio", category:"couple", grade:"Premium", price:65, stock:1, label:"NEW", img:"images/women/women-18.png", details:"Quartz, stainless steel case, couple watch, premium grade, arabic font, complete with Casio white box"},
+  {id:86, name:"CT5013 Arabic Couple (white/gold)",   brand:"Casio", category:"couple", grade:"Premium", price:65, stock:1, label:"NEW", img:"images/women/women-18.png", details:"Quartz, stainless steel case, couple watch, premium grade, arabic font, complete with Casio white box"},
+  {id:79, name:"CL5533 (Pixel)",   brand:"Casio", category:"womens", grade:"Premium", price:20, stock:2, label:"NEW", img:"images/women/women-19.png", details:"Quartz, leather strap, women watch, Premium grade"},
+  {id:80, name:"CL5533 (Classic)", brand:"Casio", category:"womens", grade:"Premium", price:25, stock:1, label:"NEW", img:"images/women/women-20.png", details:"Quartz, leather strap, women watch, premium grade"},
+  {id:81, name:"CL5533 (Mini)",    brand:"Casio", category:"womens", grade:"Premium", price:25, stock:1, label:"NEW", img:"images/women/women-21.png", details:"Quartz, leather strap, women watch, premium grade"},
 ];
 
 window.products = products;
