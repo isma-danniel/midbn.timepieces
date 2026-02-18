@@ -218,7 +218,7 @@ function applyDiscount(){
     setDiscountHint("success", "Code Applied ✅");
   } else {
     // not necessarily invalid; could be server-only code
-    setDiscountHint("error", "Code will be verified");
+    setDiscountHint("error", "Please select your districy first ❌");
   }
 
   renderCart();
