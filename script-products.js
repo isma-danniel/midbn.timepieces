@@ -1,7 +1,15 @@
 // ==========================================
-// MIDBN script-products.js (FULL + FIX 1-3 + HEADER SYNC PILL)
-// + ✅ MULTI-IMAGE QUICK VIEW (uses product.images[])
-// + ✅ PAGINATION (12 per page + prev/next arrows)
+// MIDBN script-products.js
+// ✅ Requires watchlist.js loaded FIRST (window.products)
+// ✅ Fast first render, live stock sync after first paint
+// ✅ Particles delayed + fewer on mobile + resize throttle
+// ✅ Image fetchpriority=low
+// ✅ Header stock syncing pill (3s timer + success/fail + auto hide)
+// ✅ Sold out separator + badge (always shown)
+// ✅ Cart count bottom button
+// ✅ Filters + sort
+// ✅ MULTI-IMAGE QUICK VIEW (uses product.images[])
+// ✅ PAGINATION (12 per page + prev/next)
 // ==========================================
 
 const API =
@@ -56,7 +64,7 @@ let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let currentQuickProduct = null;
 
 // ==========================================
-// ✅ PAGINATION STATE (12 per page)
+// PAGINATION STATE (12 per page)
 // ==========================================
 const PAGE_SIZE = 12;
 let currentPage = 1;
@@ -65,12 +73,14 @@ let __totalPages = 1;
 
 // Create pager under grid (auto) if not in HTML
 let pager = document.getElementById("pager");
+
 function ensurePager(){
   if(pager) return pager;
   if(!productGrid) return null;
 
   pager = document.createElement("div");
   pager.id = "pager";
+
   // lightweight inline style so you don't need CSS changes
   pager.style.position = "relative";
   pager.style.zIndex = "2";
@@ -82,6 +92,16 @@ function ensurePager(){
   pager.style.userSelect = "none";
 
   productGrid.insertAdjacentElement("afterend", pager);
+
+  // bind pager clicks ONCE (event delegation)
+  pager.addEventListener("click", (e) => {
+    const t = e.target;
+    if(!(t instanceof Element)) return;
+
+    if(t.id === "pgPrev") setPage(currentPage - 1);
+    if(t.id === "pgNext") setPage(currentPage + 1);
+  });
+
   return pager;
 }
 
@@ -144,9 +164,6 @@ function updatePager(){
       Next →
     </button>
   `;
-
-  p.querySelector("#pgPrev")?.addEventListener("click", ()=> setPage(currentPage - 1));
-  p.querySelector("#pgNext")?.addEventListener("click", ()=> setPage(currentPage + 1));
 }
 
 // ==========================================
@@ -232,6 +249,7 @@ if(hamburger && filters){
 
 // ==========================================
 // RENDER (SOLD OUT SEPARATOR + BADGE)
+// (sold out is ALWAYS shown, no button)
 // ==========================================
 function renderProducts(list){
   if(!productGrid) return;
@@ -295,7 +313,7 @@ function renderProducts(list){
 }
 
 // ==========================================
-// FILTER + SORT + ✅ PAGINATION SLICE
+// FILTER + SORT + PAGINATION SLICE
 // ==========================================
 function inStockFirstComparator(a, b){
   const aIn = toNumber(a.stock) > 0 ? 1 : 0;
@@ -350,7 +368,7 @@ function filterSortProducts(keepPage = false){
     filtered.sort(inStockFirstComparator);
   }
 
-  // ✅ Pagination: cache + compute pages + slice
+  // Pagination: cache + compute pages + slice
   __filteredCache = filtered;
   __totalPages = Math.max(1, Math.ceil(__filteredCache.length / PAGE_SIZE));
   currentPage = Math.max(1, Math.min(currentPage, __totalPages));
@@ -371,10 +389,7 @@ minPrice?.addEventListener("input", ()=>filterSortProducts(false));
 maxPrice?.addEventListener("input", ()=>filterSortProducts(false));
 
 // ==========================================
-// QUICK VIEW MODAL (✅ MULTI-IMAGE)
-// Requires in HTML:
-//   <div id="modalThumbs" class="modal-thumbs"></div>
-// and keep: <img id="modalImg" ...>
+// QUICK VIEW MODAL (MULTI-IMAGE)
 // ==========================================
 function openQuickView(product){
   currentQuickProduct = product;
@@ -531,18 +546,22 @@ goCheckoutBottom?.addEventListener("click", ()=>{
 });
 
 // ==========================================
-// FIX 2: WATERFALL PARTICLES (delay + fewer on mobile + throttle)
+// WATERFALL PARTICLES (delay + fewer on mobile + throttle)
 // ==========================================
 const particleContainer = document.getElementById("particleContainer");
-const __particleCount = window.innerWidth < 768 ? 28 : 55;
+
+function particleCount(){
+  return window.innerWidth < 768 ? 28 : 55;
+}
 
 function spawnParticles(){
   if(!particleContainer) return;
   particleContainer.innerHTML = "";
 
   const w = window.innerWidth;
+  const count = particleCount();
 
-  for(let i=0;i<__particleCount;i++){
+  for(let i=0;i<count;i++){
     const p = document.createElement("div");
     p.className = "particle";
 
@@ -561,7 +580,7 @@ function spawnParticles(){
   }
 }
 
-setTimeout(() => spawnParticles(), 300);
+setTimeout(spawnParticles, 300);
 
 window.addEventListener("resize", () => {
   clearTimeout(window.__pt);
@@ -569,7 +588,7 @@ window.addEventListener("resize", () => {
 });
 
 // ==========================================
-// FIX 1: FAST FIRST RENDER + LIVE STOCK SYNC
+// FAST FIRST RENDER + LIVE STOCK SYNC
 // ==========================================
 let hasRenderedOnce = false;
 
@@ -605,6 +624,7 @@ function buildLiveMap(liveArr){
   return map;
 }
 
+// fetch AFTER first paint
 requestAnimationFrame(() => {
   requestAnimationFrame(async () => {
     const live = await getLiveProductsSafe();
