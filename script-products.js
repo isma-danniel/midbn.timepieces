@@ -1,6 +1,8 @@
 // ==========================================
-// MIDBN script-products.js (FULL + FIX 1-3 + HEADER SYNC PILL)
-// + ✅ MULTI-IMAGE QUICK VIEW (uses product.images[])
+// MIDBN script-products.js (FULL + Infinite Scroll 12)
+// ✅ Requires watchlist.js loaded FIRST (window.products)
+// ✅ Infinite scroll: loads 12 products per batch
+// ✅ Keeps: header sync pill, sold out separator, cart count, filters/sort, quick view modal
 // ==========================================
 
 const API =
@@ -40,9 +42,6 @@ const modalDetails = document.getElementById("modalDetails");
 const closeModal = document.getElementById("closeModal");
 const modalAddCart = document.getElementById("modalAddCart");
 const goCheckoutBottom = document.getElementById("goCheckoutBottom");
-
-// ✅ NEW: thumbnails container (add in HTML: <div id="modalThumbs"></div>)
-const modalThumbs = document.getElementById("modalThumbs");
 
 // ✅ Header sync pill from your HTML
 const syncNotice = document.getElementById("stockSyncNotice");
@@ -136,64 +135,131 @@ if(hamburger && filters){
 }
 
 // ==========================================
-// RENDER (SOLD OUT SEPARATOR + BADGE)
+// ✅ INFINITE SCROLL SETTINGS
 // ==========================================
-function renderProducts(list){
-  if(!productGrid) return;
-  productGrid.innerHTML = "";
+const BATCH_SIZE = 12;
+let displayList = [];     // includes separator marker objects
+let renderedCount = 0;
+let isLoadingMore = false;
 
-  if(!list.length){
-    productGrid.innerHTML = `<p style="opacity:.6;text-align:center;padding:20px;">No products found.</p>`;
-    return;
+let sentinel = null;
+let observer = null;
+
+function ensureSentinel(){
+  if(!productGrid) return;
+
+  if(!sentinel){
+    sentinel = document.createElement("div");
+    sentinel.id = "scrollSentinel";
+    sentinel.style.height = "1px";
+    sentinel.style.width = "100%";
+    sentinel.style.gridColumn = "1 / -1";
+    productGrid.parentNode?.appendChild(sentinel);
   }
 
+  if(!observer){
+    observer = new IntersectionObserver((entries)=>{
+      const entry = entries[0];
+      if(entry && entry.isIntersecting){
+        renderNextBatch();
+      }
+    }, { root: null, rootMargin: "900px 0px", threshold: 0.01 });
+
+    observer.observe(sentinel);
+  }
+}
+
+function resetInfinite(){
+  renderedCount = 0;
+  isLoadingMore = false;
+
+  if(productGrid) productGrid.innerHTML = "";
+  ensureSentinel();
+  renderNextBatch(); // first 12
+}
+
+function buildDisplayList(list){
   const inStock = [];
   const soldOut = [];
   list.forEach(p => (toNumber(p.stock) > 0 ? inStock : soldOut).push(p));
 
-  function makeCard(p, isSold){
-    const card = document.createElement("div");
-    card.className = "product-card" + (isSold ? " soldout" : "");
-    card.dataset.id = p.id;
-
-    const labelHtml = isSold
-      ? `<div class="label soldout-badge">SOLD OUT</div>`
-      : (p.label ? `<div class="label">${p.label}</div>` : "");
-
-    card.innerHTML = `
-      <div class="img-wrap">
-        <img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" fetchpriority="low">
-        ${labelHtml}
-      </div>
-
-      <div class="card-body">
-        <div class="brand">${p.brand || ""}</div>
-        <div class="name product-name">${p.name || ""}</div>
-        <div class="price">BND ${toNumber(p.price).toFixed(2)}</div>
-        <div class="stock">Stock: ${toNumber(p.stock)}</div>
-        <a href="#" class="more-details-btn">${isSold ? "View Details →" : "More Details →"}</a>
-      </div>
-    `;
-
-    card.querySelector("img")?.addEventListener("click", ()=>openQuickView(p));
-    card.querySelector(".more-details-btn")?.addEventListener("click", (e)=>{
-      e.preventDefault();
-      openQuickView(p);
-    });
-
-    return card;
-  }
-
-  inStock.forEach(p => productGrid.appendChild(makeCard(p, false)));
-
+  const out = [...inStock];
   if(soldOut.length){
-    const sep = document.createElement("div");
-    sep.className = "soldout-sep";
-    sep.textContent = "SOLD OUT";
-    productGrid.appendChild(sep);
-
-    soldOut.forEach(p => productGrid.appendChild(makeCard(p, true)));
+    out.push({ __sep: true });
+    out.push(...soldOut);
   }
+  return out;
+}
+
+// ==========================================
+// RENDER HELPERS
+// ==========================================
+function makeCard(p, isSold){
+  const card = document.createElement("div");
+  card.className = "product-card" + (isSold ? " soldout" : "");
+  card.dataset.id = p.id;
+
+  const labelHtml = isSold
+    ? `<div class="label soldout-badge">SOLD OUT</div>`
+    : (p.label ? `<div class="label">${p.label}</div>` : "");
+
+  card.innerHTML = `
+    <div class="img-wrap">
+      <img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" fetchpriority="low">
+      ${labelHtml}
+    </div>
+
+    <div class="card-body">
+      <div class="brand">${p.brand || ""}</div>
+      <div class="name product-name">${p.name || ""}</div>
+      <div class="price">BND ${toNumber(p.price).toFixed(2)}</div>
+      <div class="stock">Stock: ${toNumber(p.stock)}</div>
+      <a href="#" class="more-details-btn">${isSold ? "View Details →" : "More Details →"}</a>
+    </div>
+  `;
+
+  card.querySelector("img")?.addEventListener("click", ()=>openQuickView(p));
+  card.querySelector(".more-details-btn")?.addEventListener("click", (e)=>{
+    e.preventDefault();
+    openQuickView(p);
+  });
+
+  return card;
+}
+
+function makeSeparator(){
+  const sep = document.createElement("div");
+  sep.className = "soldout-sep";
+  sep.textContent = "SOLD OUT";
+  return sep;
+}
+
+function renderNextBatch(){
+  if(!productGrid) return;
+  if(isLoadingMore) return;
+
+  if(renderedCount >= displayList.length) return;
+
+  isLoadingMore = true;
+
+  const end = Math.min(renderedCount + BATCH_SIZE, displayList.length);
+  const slice = displayList.slice(renderedCount, end);
+
+  slice.forEach(item=>{
+    if(item && item.__sep){
+      // only add separator if not already present
+      if(!productGrid.querySelector(".soldout-sep")){
+        productGrid.appendChild(makeSeparator());
+      }
+      return;
+    }
+
+    const isSold = toNumber(item.stock) <= 0;
+    productGrid.appendChild(makeCard(item, isSold));
+  });
+
+  renderedCount = end;
+  isLoadingMore = false;
 }
 
 // ==========================================
@@ -226,6 +292,7 @@ function filterSortProducts(){
     return searchMatch && brandMatch && categoryMatch && gradeMatch && minMatch && maxMatch;
   });
 
+  // default: in stock first
   filtered.sort(inStockFirstComparator);
 
   if(sortSelect?.value === "az"){
@@ -248,7 +315,18 @@ function filterSortProducts(){
     filtered.sort(inStockFirstComparator);
   }
 
-  renderProducts(filtered);
+  // ✅ build list with SOLD OUT separator marker, then reset infinite scroll
+  displayList = buildDisplayList(filtered);
+
+  if(productGrid){
+    productGrid.innerHTML = "";
+  }
+  resetInfinite();
+
+  // empty state
+  if(displayList.length === 0 && productGrid){
+    productGrid.innerHTML = `<p style="opacity:.6;text-align:center;padding:20px;">No products found.</p>`;
+  }
 }
 
 searchInput?.addEventListener("input", filterSortProducts);
@@ -260,58 +338,17 @@ minPrice?.addEventListener("input", filterSortProducts);
 maxPrice?.addEventListener("input", filterSortProducts);
 
 // ==========================================
-// QUICK VIEW MODAL (✅ MULTI-IMAGE)
-// Requires in HTML:
-//   <div id="modalThumbs" class="modal-thumbs"></div>
-// and keep: <img id="modalImg" ...>
+// QUICK VIEW MODAL
 // ==========================================
 function openQuickView(product){
   currentQuickProduct = product;
 
-  // ✅ build image list: prefer product.images[], fallback to product.img
-  const imgs = Array.isArray(product.images) && product.images.length
-    ? product.images.filter(Boolean)
-    : (product.img ? [product.img] : []);
-
-  // main image
-  if(modalImg) modalImg.src = imgs[0] || "";
-
-  // thumbnails (if exists)
-  if(modalThumbs){
-    modalThumbs.innerHTML = "";
-
-    if(imgs.length > 1){
-      imgs.forEach((src, i) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = i === 0 ? "active" : "";
-
-        const im = document.createElement("img");
-        im.src = src;
-        im.alt = `${product.name || "Product"} photo ${i + 1}`;
-        im.loading = "lazy";
-        im.decoding = "async";
-
-        btn.appendChild(im);
-
-        btn.addEventListener("click", () => {
-          if(modalImg) modalImg.src = src;
-          modalThumbs.querySelectorAll("button").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-        });
-
-        modalThumbs.appendChild(btn);
-      });
-    }
-  }
-
-  // text
+  if(modalImg) modalImg.src = product.img || "";
   if(modalName) modalName.textContent = product.name || "";
   if(modalPrice) modalPrice.textContent = `BND ${toNumber(product.price).toFixed(2)}`;
   if(modalStock) modalStock.textContent = `Stock: ${toNumber(product.stock)}`;
   if(modalDetails) modalDetails.textContent = product.details || "";
 
-  // button state
   if(modalAddCart){
     const out = toNumber(product.stock) <= 0;
     modalAddCart.disabled = out;
@@ -319,7 +356,6 @@ function openQuickView(product){
     modalAddCart.classList.remove("added");
   }
 
-  // show modal
   if(quickViewModal){
     quickViewModal.style.display = "flex";
     quickViewModal.setAttribute("aria-hidden","false");
@@ -426,7 +462,7 @@ goCheckoutBottom?.addEventListener("click", ()=>{
 });
 
 // ==========================================
-// FIX 2: WATERFALL PARTICLES (delay + fewer on mobile + throttle)
+// WATERFALL PARTICLES (delay + fewer on mobile + throttle)
 // ==========================================
 const particleContainer = document.getElementById("particleContainer");
 const __particleCount = window.innerWidth < 768 ? 28 : 55;
@@ -455,16 +491,14 @@ function spawnParticles(){
     particleContainer.appendChild(p);
   }
 }
-
 setTimeout(() => spawnParticles(), 300);
-
 window.addEventListener("resize", () => {
   clearTimeout(window.__pt);
   window.__pt = setTimeout(spawnParticles, 200);
 });
 
 // ==========================================
-// FIX 1: FAST FIRST RENDER + LIVE STOCK SYNC
+// FAST FIRST RENDER + LIVE STOCK SYNC
 // ==========================================
 let hasRenderedOnce = false;
 
@@ -473,6 +507,8 @@ function safeInitialRender(){
   hasRenderedOnce = true;
 
   startHeaderSyncPill();
+
+  // ✅ run filter once -> sets displayList -> infinite load first 12
   filterSortProducts();
 }
 safeInitialRender();
@@ -500,6 +536,7 @@ function buildLiveMap(liveArr){
   return map;
 }
 
+// fetch AFTER first paint
 requestAnimationFrame(() => {
   requestAnimationFrame(async () => {
     const live = await getLiveProductsSafe();
@@ -522,6 +559,7 @@ requestAnimationFrame(() => {
       if(toNumber(p.price) !== newPrice){ p.price = newPrice; changed = true; }
     });
 
+    // ✅ re-filter & reset infinite only if changed
     if(changed) filterSortProducts();
 
     finishHeaderSyncPill(true);
