@@ -1,15 +1,6 @@
 // ==========================================
-// MIDBN script-products.js
-// ✅ Requires watchlist.js loaded FIRST (window.products)
-// ✅ Fast first render, live stock sync after first paint
-// ✅ Particles delayed + fewer on mobile + resize throttle
-// ✅ Image fetchpriority=low
-// ✅ Header stock syncing pill (3s timer + success/fail + auto hide)
-// ✅ Sold out separator + badge (always shown)
-// ✅ Cart count bottom button
-// ✅ Filters + sort
-// ✅ MULTI-IMAGE QUICK VIEW (uses product.images[])
-// ✅ PAGINATION (12 per page + prev/next)
+// MIDBN script-products.js (FULL + FIX 1-3 + HEADER SYNC PILL)
+// + ✅ MULTI-IMAGE QUICK VIEW (uses product.images[])
 // ==========================================
 
 const API =
@@ -50,7 +41,7 @@ const closeModal = document.getElementById("closeModal");
 const modalAddCart = document.getElementById("modalAddCart");
 const goCheckoutBottom = document.getElementById("goCheckoutBottom");
 
-// ✅ thumbnails container (add in HTML: <div id="modalThumbs"></div>)
+// ✅ NEW: thumbnails container (add in HTML: <div id="modalThumbs"></div>)
 const modalThumbs = document.getElementById("modalThumbs");
 
 // ✅ Header sync pill from your HTML
@@ -62,109 +53,6 @@ const syncTimer = document.getElementById("syncTimer");
 // ==========================================
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let currentQuickProduct = null;
-
-// ==========================================
-// PAGINATION STATE (12 per page)
-// ==========================================
-const PAGE_SIZE = 12;
-let currentPage = 1;
-let __filteredCache = [];
-let __totalPages = 1;
-
-// Create pager under grid (auto) if not in HTML
-let pager = document.getElementById("pager");
-
-function ensurePager(){
-  if(pager) return pager;
-  if(!productGrid) return null;
-
-  pager = document.createElement("div");
-  pager.id = "pager";
-
-  // lightweight inline style so you don't need CSS changes
-  pager.style.position = "relative";
-  pager.style.zIndex = "2";
-  pager.style.display = "flex";
-  pager.style.justifyContent = "center";
-  pager.style.alignItems = "center";
-  pager.style.gap = "10px";
-  pager.style.padding = "12px 14px 90px"; // extra bottom so it won't clash with checkout button
-  pager.style.userSelect = "none";
-
-  productGrid.insertAdjacentElement("afterend", pager);
-
-  // bind pager clicks ONCE (event delegation)
-  pager.addEventListener("click", (e) => {
-    const t = e.target;
-    if(!(t instanceof Element)) return;
-
-    if(t.id === "pgPrev") setPage(currentPage - 1);
-    if(t.id === "pgNext") setPage(currentPage + 1);
-  });
-
-  return pager;
-}
-
-function setPage(next){
-  const n = Math.max(1, Math.min(__totalPages, next));
-  if(n === currentPage) return;
-  currentPage = n;
-  filterSortProducts(true); // keep page
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-function updatePager(){
-  const p = ensurePager();
-  if(!p) return;
-
-  const total = __totalPages || 1;
-
-  // hide pager when no products / only 1 page
-  if(!__filteredCache.length || total <= 1){
-    p.innerHTML = "";
-    p.style.display = "none";
-    return;
-  }
-  p.style.display = "flex";
-
-  const prevDisabled = currentPage <= 1;
-  const nextDisabled = currentPage >= total;
-
-  p.innerHTML = `
-    <button type="button" id="pgPrev" ${prevDisabled ? "disabled" : ""} style="
-      padding:10px 14px;border-radius:14px;
-      border:1px solid rgba(220,251,255,.25);
-      background:rgba(255,255,255,.03);
-      color:rgba(220,251,255,.95);
-      opacity:${prevDisabled ? ".45" : "1"};
-      cursor:${prevDisabled ? "not-allowed" : "pointer"};
-      ">
-      ← Prev
-    </button>
-
-    <div style="
-      padding:10px 14px;border-radius:14px;
-      border:1px solid rgba(220,251,255,.18);
-      background:rgba(13,15,16,0.55);
-      color:rgba(220,251,255,.9);
-      font-size:12px;
-      letter-spacing:.3px;
-    ">
-      Page ${currentPage} / ${total}
-    </div>
-
-    <button type="button" id="pgNext" ${nextDisabled ? "disabled" : ""} style="
-      padding:10px 14px;border-radius:14px;
-      border:1px solid rgba(220,251,255,.25);
-      background:rgba(255,255,255,.03);
-      color:rgba(220,251,255,.95);
-      opacity:${nextDisabled ? ".45" : "1"};
-      cursor:${nextDisabled ? "not-allowed" : "pointer"};
-      ">
-      Next →
-    </button>
-  `;
-}
 
 // ==========================================
 // HEADER SYNC PILL (SAFE)
@@ -249,7 +137,6 @@ if(hamburger && filters){
 
 // ==========================================
 // RENDER (SOLD OUT SEPARATOR + BADGE)
-// (sold out is ALWAYS shown, no button)
 // ==========================================
 function renderProducts(list){
   if(!productGrid) return;
@@ -257,7 +144,6 @@ function renderProducts(list){
 
   if(!list.length){
     productGrid.innerHTML = `<p style="opacity:.6;text-align:center;padding:20px;">No products found.</p>`;
-    updatePager();
     return;
   }
 
@@ -308,12 +194,10 @@ function renderProducts(list){
 
     soldOut.forEach(p => productGrid.appendChild(makeCard(p, true)));
   }
-
-  updatePager();
 }
 
 // ==========================================
-// FILTER + SORT + PAGINATION SLICE
+// FILTER + SORT
 // ==========================================
 function inStockFirstComparator(a, b){
   const aIn = toNumber(a.stock) > 0 ? 1 : 0;
@@ -322,11 +206,8 @@ function inStockFirstComparator(a, b){
   return 0;
 }
 
-function filterSortProducts(keepPage = false){
+function filterSortProducts(){
   const list = Array.isArray(window.products) ? window.products : [];
-
-  // when filters change, reset to page 1
-  if(!keepPage) currentPage = 1;
 
   let filtered = list.filter(p=>{
     const q = (searchInput?.value || "").toLowerCase().trim();
@@ -345,7 +226,6 @@ function filterSortProducts(keepPage = false){
     return searchMatch && brandMatch && categoryMatch && gradeMatch && minMatch && maxMatch;
   });
 
-  // default: in stock first
   filtered.sort(inStockFirstComparator);
 
   if(sortSelect?.value === "az"){
@@ -368,38 +248,35 @@ function filterSortProducts(keepPage = false){
     filtered.sort(inStockFirstComparator);
   }
 
-  // Pagination: cache + compute pages + slice
-  __filteredCache = filtered;
-  __totalPages = Math.max(1, Math.ceil(__filteredCache.length / PAGE_SIZE));
-  currentPage = Math.max(1, Math.min(currentPage, __totalPages));
-
-  const start = (currentPage - 1) * PAGE_SIZE;
-  const end = start + PAGE_SIZE;
-  const pageList = __filteredCache.slice(start, end);
-
-  renderProducts(pageList);
+  renderProducts(filtered);
 }
 
-searchInput?.addEventListener("input", ()=>filterSortProducts(false));
-sortSelect?.addEventListener("change", ()=>filterSortProducts(false));
-brandFilter?.addEventListener("change", ()=>filterSortProducts(false));
-categoryFilter?.addEventListener("change", ()=>filterSortProducts(false));
-gradeFilter?.addEventListener("change", ()=>filterSortProducts(false));
-minPrice?.addEventListener("input", ()=>filterSortProducts(false));
-maxPrice?.addEventListener("input", ()=>filterSortProducts(false));
+searchInput?.addEventListener("input", filterSortProducts);
+sortSelect?.addEventListener("change", filterSortProducts);
+brandFilter?.addEventListener("change", filterSortProducts);
+categoryFilter?.addEventListener("change", filterSortProducts);
+gradeFilter?.addEventListener("change", filterSortProducts);
+minPrice?.addEventListener("input", filterSortProducts);
+maxPrice?.addEventListener("input", filterSortProducts);
 
 // ==========================================
-// QUICK VIEW MODAL (MULTI-IMAGE)
+// QUICK VIEW MODAL (✅ MULTI-IMAGE)
+// Requires in HTML:
+//   <div id="modalThumbs" class="modal-thumbs"></div>
+// and keep: <img id="modalImg" ...>
 // ==========================================
 function openQuickView(product){
   currentQuickProduct = product;
 
+  // ✅ build image list: prefer product.images[], fallback to product.img
   const imgs = Array.isArray(product.images) && product.images.length
     ? product.images.filter(Boolean)
     : (product.img ? [product.img] : []);
 
+  // main image
   if(modalImg) modalImg.src = imgs[0] || "";
 
+  // thumbnails (if exists)
   if(modalThumbs){
     modalThumbs.innerHTML = "";
 
@@ -428,11 +305,13 @@ function openQuickView(product){
     }
   }
 
+  // text
   if(modalName) modalName.textContent = product.name || "";
   if(modalPrice) modalPrice.textContent = `BND ${toNumber(product.price).toFixed(2)}`;
   if(modalStock) modalStock.textContent = `Stock: ${toNumber(product.stock)}`;
   if(modalDetails) modalDetails.textContent = product.details || "";
 
+  // button state
   if(modalAddCart){
     const out = toNumber(product.stock) <= 0;
     modalAddCart.disabled = out;
@@ -440,6 +319,7 @@ function openQuickView(product){
     modalAddCart.classList.remove("added");
   }
 
+  // show modal
   if(quickViewModal){
     quickViewModal.style.display = "flex";
     quickViewModal.setAttribute("aria-hidden","false");
@@ -546,22 +426,18 @@ goCheckoutBottom?.addEventListener("click", ()=>{
 });
 
 // ==========================================
-// WATERFALL PARTICLES (delay + fewer on mobile + throttle)
+// FIX 2: WATERFALL PARTICLES (delay + fewer on mobile + throttle)
 // ==========================================
 const particleContainer = document.getElementById("particleContainer");
-
-function particleCount(){
-  return window.innerWidth < 768 ? 28 : 55;
-}
+const __particleCount = window.innerWidth < 768 ? 28 : 55;
 
 function spawnParticles(){
   if(!particleContainer) return;
   particleContainer.innerHTML = "";
 
   const w = window.innerWidth;
-  const count = particleCount();
 
-  for(let i=0;i<count;i++){
+  for(let i=0;i<__particleCount;i++){
     const p = document.createElement("div");
     p.className = "particle";
 
@@ -580,7 +456,7 @@ function spawnParticles(){
   }
 }
 
-setTimeout(spawnParticles, 300);
+setTimeout(() => spawnParticles(), 300);
 
 window.addEventListener("resize", () => {
   clearTimeout(window.__pt);
@@ -588,7 +464,7 @@ window.addEventListener("resize", () => {
 });
 
 // ==========================================
-// FAST FIRST RENDER + LIVE STOCK SYNC
+// FIX 1: FAST FIRST RENDER + LIVE STOCK SYNC
 // ==========================================
 let hasRenderedOnce = false;
 
@@ -597,7 +473,7 @@ function safeInitialRender(){
   hasRenderedOnce = true;
 
   startHeaderSyncPill();
-  filterSortProducts(false); // first render page 1
+  filterSortProducts();
 }
 safeInitialRender();
 
@@ -624,7 +500,6 @@ function buildLiveMap(liveArr){
   return map;
 }
 
-// fetch AFTER first paint
 requestAnimationFrame(() => {
   requestAnimationFrame(async () => {
     const live = await getLiveProductsSafe();
@@ -647,8 +522,7 @@ requestAnimationFrame(() => {
       if(toNumber(p.price) !== newPrice){ p.price = newPrice; changed = true; }
     });
 
-    // keep current page after live sync
-    if(changed) filterSortProducts(true);
+    if(changed) filterSortProducts();
 
     finishHeaderSyncPill(true);
   });
