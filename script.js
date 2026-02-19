@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+
   /* =========================
      HERO animation
   ========================= */
@@ -29,8 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 400 * (lines.length + 1));
   }
 
+
   /* =========================
-     FAQ toggle (smooth + safe)
+     FAQ toggle
   ========================= */
   document.querySelectorAll(".faq-question").forEach((btn) => {
     const answer = btn.nextElementSibling;
@@ -48,47 +50,53 @@ document.addEventListener("DOMContentLoaded", () => {
       if (isOpen) {
         btn.setAttribute("aria-expanded", "false");
         answer.style.maxHeight = "0px";
-        setTimeout(() => {
-          answer.style.display = "none";
-        }, 350);
+        setTimeout(() => answer.style.display = "none", 350);
         return;
       }
 
       btn.setAttribute("aria-expanded", "true");
       answer.style.display = "block";
       answer.style.maxHeight = "0px";
+
       requestAnimationFrame(() => {
         answer.style.maxHeight = answer.scrollHeight + "px";
       });
     });
   });
 
+
   /* =========================
-     NEW ARRIVALS drag + momentum + auto-slide (UPGRADED)
+     NEW ARRIVALS (Luxury Smooth)
   ========================= */
   const slider = document.querySelector(".arrival-scroll");
+
   if (slider) {
+
     let isDown = false;
     let startX = 0;
-    let scrollLeft = 0;
+    let startScrollLeft = 0;
+
     let velocity = 0;
     let lastX = 0;
     let momentumID = null;
-    let pauseAutoScroll = false;
+
+    let pauseUntil = 0;
     let autoDir = 1;
 
-    function updateSlider(x) {
-      const walk = (x - startX) * 2;
-      slider.scrollLeft = scrollLeft - walk;
+    const AUTO_SPEED = 0.28;
+    const DRAG_SPEED = 1.8;
+    const FRICTION = 0.92;
+    const STOP_V = 0.35;
+    const PAUSE_MS = 1600;
+
+    function maxScroll() {
+      return Math.max(0, slider.scrollWidth - slider.clientWidth);
     }
 
-    function startMomentum(v) {
-      function momentum() {
-        slider.scrollLeft -= v;
-        v *= 0.92;
-        if (Math.abs(v) > 0.5) momentumID = requestAnimationFrame(momentum);
-      }
-      momentumID = requestAnimationFrame(momentum);
+    function clampScroll() {
+      const m = maxScroll();
+      if (slider.scrollLeft < 0) slider.scrollLeft = 0;
+      if (slider.scrollLeft > m) slider.scrollLeft = m;
     }
 
     function cancelMomentum() {
@@ -96,81 +104,94 @@ document.addEventListener("DOMContentLoaded", () => {
       momentumID = null;
     }
 
-    function endDrag() {
+    function startMomentum(v) {
+      cancelMomentum();
+
+      function momentum() {
+        slider.scrollLeft -= v;
+        clampScroll();
+
+        const atStart = slider.scrollLeft <= 0;
+        const atEnd = slider.scrollLeft >= maxScroll() - 1;
+        if (atStart || atEnd) v = 0;
+
+        v *= FRICTION;
+
+        if (Math.abs(v) > STOP_V) {
+          momentumID = requestAnimationFrame(momentum);
+        } else {
+          momentumID = null;
+        }
+      }
+
+      momentumID = requestAnimationFrame(momentum);
+    }
+
+    function pauseAuto(ms = PAUSE_MS) {
+      pauseUntil = Date.now() + ms;
+    }
+
+    function onDown(pageX) {
+      isDown = true;
+      pauseAuto();
+      startX = pageX - slider.offsetLeft;
+      startScrollLeft = slider.scrollLeft;
+      lastX = pageX;
+      velocity = 0;
+      cancelMomentum();
+      slider.classList.add("is-dragging");
+    }
+
+    function onMove(pageX) {
+      if (!isDown) return;
+      const x = pageX - slider.offsetLeft;
+      const walk = (x - startX) * DRAG_SPEED;
+      slider.scrollLeft = startScrollLeft - walk;
+
+      velocity = pageX - lastX;
+      lastX = pageX;
+    }
+
+    function onUp() {
       if (!isDown) return;
       isDown = false;
-      pauseAutoScroll = true;
-      setTimeout(() => (pauseAutoScroll = false), 1200);
+      slider.classList.remove("is-dragging");
+      pauseAuto();
       startMomentum(velocity);
     }
 
-    slider.addEventListener("mousedown", (e) => {
-      isDown = true;
-      pauseAutoScroll = true;
-      startX = e.pageX - slider.offsetLeft;
-      scrollLeft = slider.scrollLeft;
-      lastX = e.pageX;
-      cancelMomentum();
-      slider.classList.add("is-dragging");
-    });
+    slider.addEventListener("mousedown", (e) => onDown(e.pageX));
+    slider.addEventListener("mousemove", (e) => onMove(e.pageX));
+    slider.addEventListener("mouseup", onUp);
+    slider.addEventListener("mouseleave", onUp);
 
-    slider.addEventListener("mousemove", (e) => {
-      if (!isDown) return;
-      updateSlider(e.pageX);
-      velocity = e.pageX - lastX;
-      lastX = e.pageX;
-    });
+    slider.addEventListener("touchstart", (e) => onDown(e.touches[0].pageX), { passive: true });
+    slider.addEventListener("touchmove", (e) => onMove(e.touches[0].pageX), { passive: true });
+    slider.addEventListener("touchend", onUp);
 
-    slider.addEventListener("mouseup", () => {
-      slider.classList.remove("is-dragging");
-      endDrag();
-    });
+    slider.addEventListener("mouseenter", () => pauseAuto(999999));
+    slider.addEventListener("mouseleave", () => pauseAuto(PAUSE_MS));
 
-    slider.addEventListener("mouseleave", () => {
-      slider.classList.remove("is-dragging");
-      endDrag();
-    });
+    function animate() {
+      const now = Date.now();
+      const m = maxScroll();
 
-    slider.addEventListener(
-      "touchstart",
-      (e) => {
-        isDown = true;
-        pauseAutoScroll = true;
-        startX = e.touches[0].pageX - slider.offsetLeft;
-        scrollLeft = slider.scrollLeft;
-        lastX = e.touches[0].pageX;
-        cancelMomentum();
-      },
-      { passive: true }
-    );
+      if (!isDown && !momentumID && now > pauseUntil && m > 0) {
+        slider.scrollLeft += AUTO_SPEED * autoDir;
 
-    slider.addEventListener(
-      "touchmove",
-      (e) => {
-        if (!isDown) return;
-        updateSlider(e.touches[0].pageX);
-        velocity = e.touches[0].pageX - lastX;
-        lastX = e.touches[0].pageX;
-      },
-      { passive: true }
-    );
-
-    slider.addEventListener("touchend", endDrag);
-
-    function animateSlide() {
-      if (!pauseAutoScroll && !isDown) {
-        const maxScroll = slider.scrollWidth - slider.clientWidth;
-        slider.scrollLeft += 0.35 * autoDir;
-        if (slider.scrollLeft >= maxScroll - 1) autoDir = -1;
+        if (slider.scrollLeft >= m - 1) autoDir = -1;
         if (slider.scrollLeft <= 0) autoDir = 1;
       }
-      requestAnimationFrame(animateSlide);
+
+      requestAnimationFrame(animate);
     }
-    requestAnimationFrame(animateSlide);
+
+    requestAnimationFrame(animate);
   }
 
+
   /* =========================
-     HAMBURGER MENU (safe)
+     HAMBURGER MENU
   ========================= */
   const hamburger = document.querySelector(".hamburger");
   const navMenu = document.querySelector(".header nav ul");
@@ -197,10 +218,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+
   /* =========================
-     CONTACT FORM -> WHATSAPP
+     CONTACT FORM → WHATSAPP
   ========================= */
   const form = document.getElementById("waForm");
+
   if (form) {
     form.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -221,14 +244,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+
   /* =========================
-     PROMO STRIP (1 LINE + MOVING ON PHONE)
-     Requires HTML:
-       id="promoWrap"
-       id="promoTitle" id="promoSub" id="promoCode"
-       id="copyPromoBtn" id="closePromoBtn"
-       + promo ticker wrapper:
-         id="promoTicker" and id="promoTrack"
+     PROMO STRIP
   ========================= */
   const PROMO = {
     enabled: true,
@@ -243,6 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const track = document.getElementById("promoTrack");
 
   if (wrap && ticker && track) {
+
     const titleEl = document.getElementById("promoTitle");
     const subEl = document.getElementById("promoSub");
     const codeEl = document.getElementById("promoCode");
@@ -253,13 +272,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!PROMO.enabled) return;
       if (localStorage.getItem(PROMO.storageKey) === "1") return;
 
-      titleEl && (titleEl.textContent = PROMO.title);
-      codeEl && (codeEl.textContent = PROMO.code);
-      subEl &&
-        (subEl.innerHTML = PROMO.subtitle.replace(
-          "{CODE}",
-          `<b>${PROMO.code}</b>`
-        ));
+      titleEl.textContent = PROMO.title;
+      codeEl.textContent = PROMO.code;
+      subEl.innerHTML = PROMO.subtitle.replace("{CODE}", `<b>${PROMO.code}</b>`);
 
       wrap.style.display = "block";
       requestAnimationFrame(setupTicker);
@@ -268,30 +283,25 @@ document.addEventListener("DOMContentLoaded", () => {
     function setupTicker() {
       const isPhone = window.matchMedia("(max-width: 520px)").matches;
 
-      // remove old clone if any
       const next = track.nextElementSibling;
-      if (next && next.dataset && next.dataset.clone === "1") next.remove();
+      if (next && next.dataset.clone === "1") next.remove();
 
-      // stop moving on desktop
       if (!isPhone) {
         ticker.classList.remove("is-moving");
         return;
       }
 
-      // if it fits, don't move
       if (track.scrollWidth <= ticker.clientWidth) {
         ticker.classList.remove("is-moving");
         return;
       }
 
-      // clone for seamless loop
       const clone = track.cloneNode(true);
       clone.dataset.clone = "1";
       track.parentNode.appendChild(clone);
 
-      // speed by length (premium slower)
       const px = track.scrollWidth;
-      const dur = Math.min(22, Math.max(12, px / 45)); // tweak here
+      const dur = Math.min(22, Math.max(12, px / 45));
       ticker.style.setProperty("--promoDur", dur + "s");
 
       ticker.classList.add("is-moving");
@@ -308,18 +318,16 @@ document.addEventListener("DOMContentLoaded", () => {
         document.execCommand("copy");
         document.body.removeChild(t);
       }
-      if (copyBtn) {
-        copyBtn.textContent = "Copied ✅";
-        setTimeout(() => (copyBtn.textContent = "Copy"), 1200);
-      }
+
+      copyBtn.textContent = "Copied ✅";
+      setTimeout(() => copyBtn.textContent = "Copy", 1200);
     }
 
-    copyBtn && copyBtn.addEventListener("click", copyCode);
-    closeBtn &&
-      closeBtn.addEventListener("click", () => {
-        localStorage.setItem(PROMO.storageKey, "1");
-        wrap.style.display = "none";
-      });
+    copyBtn?.addEventListener("click", copyCode);
+    closeBtn?.addEventListener("click", () => {
+      localStorage.setItem(PROMO.storageKey, "1");
+      wrap.style.display = "none";
+    });
 
     window.addEventListener("resize", () => {
       if (wrap.style.display !== "none") setupTicker();
@@ -327,4 +335,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     showPromo();
   }
-}); // ✅ ADDED: closes the main DOMContentLoaded
+
+});
