@@ -734,3 +734,21 @@ body {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); } /* because you duplicated the set */
 }
+
+/* ✅ FIX: your new HTML uses .arrival-scroll-track */
+.arrival-scroll{
+  overflow: hidden;              /* because you want auto loop */
+}
+
+/* make the items horizontal */
+.arrival-scroll-track{
+  display: flex;
+  gap: 20px;
+  width: max-content;
+}
+
+/* each item block */
+.arrival-scroll-track > div{
+  flex: 0 0 auto;
+  width: 150px;
+}
