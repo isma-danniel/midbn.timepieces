@@ -752,3 +752,37 @@ body {
   flex: 0 0 auto;
   width: 150px;
 }
+
+/* ✅ FIX for your NEW HTML structure */
+.arrival-scroll{
+  overflow: hidden; /* premium look for auto-loop */
+}
+
+/* make the inner track horizontal */
+.arrival-scroll-track{
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  align-items: flex-start;
+}
+
+/* each item block (the wrapper that contains card + name) */
+.arrival-scroll-track > div{
+  flex: 0 0 auto;
+}
+
+.arrival-scroll-track{
+  animation: arrivalsMarquee 18s linear infinite;
+}
+
+@keyframes arrivalsMarquee{
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* pause on hover (desktop) */
+@media (hover:hover){
+  .arrival-scroll:hover .arrival-scroll-track{
+    animation-play-state: paused;
+  }
+}
