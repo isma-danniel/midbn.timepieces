@@ -656,3 +656,45 @@ body {
     to{ transform: translateX(-50%); }
   }
 }
+
+/* =========================
+   NEW ARRIVALS - HORIZONTAL + SMOOTH + AUTO READY
+========================= */
+.arrival-scroll{
+  display:flex;
+  gap:20px;
+  overflow-x:auto;
+
+  padding: 10px 20px;
+  scroll-padding: 0 20px;
+
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+
+  scroll-snap-type: x proximity;
+  scroll-behavior: smooth;
+
+  cursor: grab;
+  user-select: none;
+}
+
+/* hide scrollbar */
+.arrival-scroll::-webkit-scrollbar{ display:none; }
+.arrival-scroll{ scrollbar-width:none; }
+
+/* items */
+.arrival-item{
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+/* end spacer so last card fully visible */
+.arrival-scroll::after{
+  content:"";
+  flex: 0 0 30px;
+}
+
+/* dragging state */
+.arrival-scroll.is-dragging{
+  cursor: grabbing;
+}
