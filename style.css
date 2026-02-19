@@ -698,3 +698,39 @@ body {
 .arrival-scroll.is-dragging{
   cursor: grabbing;
 }
+
+/* =========================
+   NEW ARRIVALS (HORIZONTAL + INFINITE LOOP)
+========================= */
+
+.arrival-scroll{
+  overflow: hidden;             /* hide the looping overflow */
+  padding: 10px 20px;
+}
+
+/* this is the moving row */
+.arrival-scroll-track{
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  animation: arrivalsMarquee 18s linear infinite;
+}
+
+/* each item (your plain <div> wrappers) */
+.arrival-scroll-track > div{
+  flex: 0 0 auto;
+  width: 150px;                 /* match your card width */
+}
+
+/* optional: pause on hover (desktop) */
+@media (hover:hover){
+  .arrival-scroll:hover .arrival-scroll-track{
+    animation-play-state: paused;
+  }
+}
+
+/* the loop animation */
+@keyframes arrivalsMarquee{
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); } /* because you duplicated the set */
+}
