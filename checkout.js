@@ -1,12 +1,12 @@
 // ==========================================
-// MIDBN CHECKOUT.JS (SECURE + RESTORED FEATURES) + DELI3 PREVIEW
+// MIDBN CHECKOUT.JS (SECURE + RESTORED FEATURES) + HK42 PREVIEW
 // ✅ Live stock limit (GET ?action=products)
 // ✅ Qty +/- controls + Remove + Clear cart
 // ✅ Delivery type + district + auto delivery charges
 // ✅ Discount code with APPLY button
 // ✅ UI Preview supports:
-//    - RAMADHAN10 (10% off subtotal, if you want)
-//    - DELI3 (delivery fee -$3 when subtotal >= $50, delivery only)
+//    - RAMADHAN10 (10% off subtotal, optional example)
+//    - HK42 (delivery fee -$3 when subtotal >= $50, delivery only)
 // ✅ Secure: server recalculates totals; client sends only cart + deliveryArea + discountCode
 // ==========================================
 
@@ -37,7 +37,7 @@ let lastStockFetchAt = 0;
 
 // discount state (preview only)
 let discountPreviewAmount = 0; // item discount preview (percent/fixed)
-let deliveryDiscountPreviewAmount = 0; // delivery discount preview (DELI3)
+let deliveryDiscountPreviewAmount = 0; // delivery discount preview (HK42)
 let appliedDiscountCode = "";
 
 // =============================
@@ -146,11 +146,10 @@ function updateDeliveryUI(){
   if(districtEl){ districtEl.required = show; if(!show) districtEl.value = ""; }
   if(addressEl){ addressEl.required = show; if(!show) addressEl.value = ""; }
 
-  // show base fee hint (renderCart will show final fee after discount)
   const fee = computeDeliveryFee(type, districtEl?.value || "");
   if(deliveryFeeHint) deliveryFeeHint.textContent = "Delivery charges: " + formatBND(fee);
 
-  renderCart(); // update totals
+  renderCart();
 }
 
 deliveryTypeEl?.addEventListener("change", updateDeliveryUI);
@@ -161,7 +160,7 @@ districtEl?.addEventListener("change", updateDeliveryUI);
 // Server must verify for real
 // Supports:
 //   - RAMADHAN10: 10% off subtotal (optional)
-//   - DELI3: delivery fee -3 when subtotal>=50 (delivery only)
+//   - HK42: delivery fee -3 when subtotal>=50 (delivery only)
 // =============================
 function computeDiscountPreview(subtotal, codeRaw){
   const code = String(codeRaw || "").trim().toUpperCase();
@@ -170,7 +169,7 @@ function computeDiscountPreview(subtotal, codeRaw){
   // ✅ percent-off example
   if(code === "RAMADHAN10") return subtotal * 0.10;
 
-  // DELI3 is delivery discount (handled separately)
+  // HK42 is delivery discount only
   if(code === "HK42") return 0;
 
   return 0;
@@ -196,29 +195,40 @@ function setDiscountHint(status, msg){
 // Apply button = “confirm”
 function applyDiscount(){
   const subtotal = calcSubtotal();
-  const code = String(discountCodeEl?.value || "").trim();
+  const codeTyped = String(discountCodeEl?.value || "").trim();
+  appliedDiscountCode = codeTyped; // always send what user typed; server verifies
 
-  appliedDiscountCode = code; // always send what user typed; server verifies
-
-  // preview amounts
-  discountPreviewAmount = Math.max(0, computeDiscountPreview(subtotal, code));
+  discountPreviewAmount = Math.max(0, computeDiscountPreview(subtotal, codeTyped));
   deliveryDiscountPreviewAmount = Math.max(
     0,
     computeDeliveryDiscountPreview(
       subtotal,
       deliveryTypeEl?.value || "Delivery",
       districtEl?.value || "",
-      code
+      codeTyped
     )
   );
 
-  if(!code){
+  const upper = codeTyped.toUpperCase();
+  const isDelivery = (deliveryTypeEl?.value || "Delivery") === "Delivery";
+  const hasDistrict = !!String(districtEl?.value || "").trim();
+
+  if(!codeTyped){
     setDiscountHint("", "");
+  } else if(upper === "HK42"){
+    if(!isDelivery){
+      setDiscountHint("error", "HK42 is for Delivery only ❌");
+    } else if(!hasDistrict){
+      setDiscountHint("error", "Select your district first ❌");
+    } else if(subtotal < 50){
+      setDiscountHint("error", "Minimum purchase BND 50 to use HK42 ❌");
+    } else {
+      setDiscountHint("success", "HK42 Applied ✅ (-BND 3 delivery)");
+    }
   } else if(discountPreviewAmount > 0 || deliveryDiscountPreviewAmount > 0){
     setDiscountHint("success", "Code Applied ✅");
   } else {
-    // not necessarily invalid; could be server-only code
-    setDiscountHint("error", "Please select your districy first ❌");
+    setDiscountHint("error", "Invalid code ❌");
   }
 
   renderCart();
@@ -264,7 +274,6 @@ function renderCart(){
     return;
   }
 
-  // enforce max stock if we have it
   cart.forEach((item, index)=>{
     let qty = getQty(item);
     const maxStock = getMaxStockForItem(item);
@@ -307,10 +316,8 @@ function renderCart(){
 
   const type = deliveryTypeEl?.value || "Delivery";
   const district = districtEl?.value || "";
-
   const subtotal = calcSubtotal();
 
-  // base delivery fee then apply delivery discount preview
   const baseDeliveryFee = computeDeliveryFee(type, district);
   const deliveryDiscount = Math.max(
     0,
@@ -318,23 +325,18 @@ function renderCart(){
   );
   const finalDeliveryFee = Math.max(0, baseDeliveryFee - deliveryDiscount);
 
-  // item discount preview (eg RAMADHAN10)
   const itemDiscount = Math.max(0, computeDiscountPreview(subtotal, appliedDiscountCode));
-
-  // totals
   const grandTotal = Math.max(0, subtotal + finalDeliveryFee - itemDiscount);
 
   if(subtotalEl) subtotalEl.innerText = formatBND(subtotal);
   if(deliveryEl) deliveryEl.innerText = formatBND(finalDeliveryFee);
 
-  // show combined discount line (delivery discount + item discount)
   const totalDiscountShown = Math.max(0, deliveryDiscount + itemDiscount);
   if(discountEl) discountEl.innerText = "- " + formatBND(totalDiscountShown);
 
   if(cartTotalEl) cartTotalEl.innerText = formatBND(grandTotal);
 
   if(deliveryFeeHint){
-    // show final fee with discount applied
     deliveryFeeHint.textContent = "Delivery charges: " + formatBND(finalDeliveryFee);
   }
 }
@@ -363,20 +365,6 @@ cartItemsContainer?.addEventListener("click", async (e)=>{
   if(action === "remove"){
     cart.splice(index, 1);
     saveCart();
-
-    // recompute preview because subtotal changed
-    const subtotal = calcSubtotal();
-    discountPreviewAmount = Math.max(0, computeDiscountPreview(subtotal, appliedDiscountCode));
-    deliveryDiscountPreviewAmount = Math.max(
-      0,
-      computeDeliveryDiscountPreview(
-        subtotal,
-        deliveryTypeEl?.value || "Delivery",
-        districtEl?.value || "",
-        appliedDiscountCode
-      )
-    );
-
     renderCart();
     return;
   }
@@ -388,19 +376,6 @@ cartItemsContainer?.addEventListener("click", async (e)=>{
 
   setQty(item, qty);
   saveCart();
-
-  const subtotal = calcSubtotal();
-  discountPreviewAmount = Math.max(0, computeDiscountPreview(subtotal, appliedDiscountCode));
-  deliveryDiscountPreviewAmount = Math.max(
-    0,
-    computeDeliveryDiscountPreview(
-      subtotal,
-      deliveryTypeEl?.value || "Delivery",
-      districtEl?.value || "",
-      appliedDiscountCode
-    )
-  );
-
   renderCart();
 });
 
@@ -462,7 +437,6 @@ checkoutForm?.addEventListener("submit", async (e)=>{
     }
   }
 
-  // strict stock validation before submit
   const map = await ensureLiveStockMap();
   if(!map){
     alert("Unable to load live stock. Please try again.");
@@ -505,10 +479,9 @@ checkoutForm?.addEventListener("submit", async (e)=>{
       token,
       cart,
 
-      // ✅ server uses this for fee lookup
       deliveryArea: (deliveryType === "Delivery") ? district : "Pickup",
 
-      // ✅ send code (server verifies + applies)
+      // ✅ Send code (server verifies + applies)
       discountCode: String(appliedDiscountCode || "").trim(),
 
       customer: {
@@ -549,5 +522,5 @@ renderCart();
   await ensureLiveStockMap();
   renderCart();
   updateDeliveryUI();
-  // do not auto-apply coupon; user must click Apply
+  // user must click Apply
 })();
