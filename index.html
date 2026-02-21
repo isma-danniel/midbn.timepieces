@@ -6,8 +6,6 @@
   <title>MIDBN.Timepieces</title>
 
   <link rel="stylesheet" href="style.css">
-
-  <!-- Preload hero poster for instant paint -->
   <link rel="preload" as="image" href="./images/hero-poster.jpg">
 </head>
 <body>
@@ -15,10 +13,8 @@
 <!-- ================= HEADER ================= -->
 <header class="header">
   <nav>
-    <div class="hamburger">
-      <span></span>
-      <span></span>
-      <span></span>
+    <div class="hamburger" aria-label="Open menu" role="button" tabindex="0">
+      <span></span><span></span><span></span>
     </div>
 
     <ul>
@@ -34,23 +30,18 @@
 <!-- ✅ DISCOUNT BANNER (1 LINE + MOVING ON PHONE) -->
 <div class="promo-strip" id="promoWrap" style="display:none;">
   <div class="promo-strip-inner">
-
-    <!-- ticker area -->
     <div class="promo-ticker" id="promoTicker">
       <div class="promo-track" id="promoTrack">
-        <span id="promoTitle">Delivery Discount for purchase $50 & above</span>
+        <span id="promoTitle">Delivery Discount (min. purchase of $50)</span>
         <span class="dot">•</span>
-        <span id="promoSub">Use code <b id="promoCode">HK42</b> • $3 off</span>
+        <span id="promoSub">Use code <b id="promoCode">HK42</b> • $3 OFF</span>
       </div>
-      <!-- clone inserted by JS for seamless scroll -->
     </div>
 
-    <!-- actions (ONLY ONCE) -->
     <div class="promo-actions">
       <button class="promo-btn" id="copyPromoBtn" type="button">Copy</button>
       <button class="promo-close" id="closePromoBtn" type="button" aria-label="Close">✕</button>
     </div>
-
   </div>
 </div>
 
@@ -85,14 +76,14 @@
     <h2>About MIDBN.Timepieces</h2>
     <hr class="intro-divider">
     <p>
-      At <strong>MIDBN Timepieces</strong>, we bring 
+      At <strong>MIDBN Timepieces</strong>, we bring
       <span class="highlight">timeless elegance</span> to your wrist.
-      Offering a curated selection of 
-      <span class="highlight">quality watches</span> for all ages, 
+      Offering a curated selection of
+      <span class="highlight">quality watches</span> for all ages,
       we combine style, functionality, and affordability.
-      Whether you’re looking for a 
-      <span class="highlight">classic design</span>, 
-      a <span class="highlight">modern statement piece</span>, 
+      Whether you’re looking for a
+      <span class="highlight">classic design</span>,
+      a <span class="highlight">modern statement piece</span>,
       or a gift for someone special,
       MIDBN Timepieces has the perfect watch for every occasion.
       Your time, your style—elevated.
@@ -101,87 +92,48 @@
   </div>
 </section>
 
-<!-- ================= NEW ARRIVALS ================= -->
-<!-- ================= NEW ARRIVALS ================= -->
+<!-- ================= NEW ARRIVALS (FIXED: HORIZONTAL + NO DUPLICATES) ================= -->
 <section id="arrivals" class="arrivals">
   <h2>New Arrivals</h2>
 
+  <!-- ✅ Put items directly inside arrival-scroll (no arrival-scroll-track) -->
   <div class="arrival-scroll">
-    <div class="arrival-scroll-track">
 
-      <!-- ORIGINAL 5 -->
-      <div>
-        <div class="arrival-card">
-          <img src="./images/men/gs68.jpeg" loading="lazy" decoding="async" alt="Stealth Black">
-        </div>
-        <p class="arrival-name">Gshock GA2100 (Stealth Black)</p>
+    <div class="arrival-item">
+      <div class="arrival-card">
+        <img src="./images/men/gs68.jpeg" loading="lazy" decoding="async" alt="Stealth Black">
       </div>
-
-      <div>
-        <div class="arrival-card">
-          <img src="./images/men/gs45.jpeg" loading="lazy" decoding="async" alt="Manga Red">
-        </div>
-        <p class="arrival-name">Gshock Manga Red</p>
-      </div>
-
-      <div>
-        <div class="arrival-card">
-          <img src="./images/casio/casio13.jpeg" loading="lazy" decoding="async" alt="Casio Couple Blackgold">
-        </div>
-        <p class="arrival-name">Casio couple Black Gold</p>
-      </div>
-
-      <div>
-        <div class="arrival-card">
-          <img src="./images/casio/casio1.jpeg" loading="lazy" decoding="async" alt="Casio men">
-        </div>
-        <p class="arrival-name">Casio men</p>
-      </div>
-
-      <div>
-        <div class="arrival-card">
-          <img src="./images/casio/casio16.jpeg" loading="lazy" decoding="async" alt="Casio women">
-        </div>
-        <p class="arrival-name">Casio women</p>
-      </div>
-
-      <!-- DUPLICATE SAME 5 AGAIN (for infinite smooth loop) -->
-      <div>
-        <div class="arrival-card">
-          <img src="./images/men/gs68.jpeg" loading="lazy" decoding="async" alt="Stealth Black">
-        </div>
-        <p class="arrival-name">Gshock GA2100 (Stealth Black)</p>
-      </div>
-
-      <div>
-        <div class="arrival-card">
-          <img src="./images/men/gs45.jpeg" loading="lazy" decoding="async" alt="Manga Red">
-        </div>
-        <p class="arrival-name">Gshock Manga Red</p>
-      </div>
-
-      <div>
-        <div class="arrival-card">
-          <img src="./images/casio/casio13.jpeg" loading="lazy" decoding="async" alt="Casio Couple Blackgold">
-        </div>
-        <p class="arrival-name">Casio couple Black Gold</p>
-      </div>
-
-      <div>
-        <div class="arrival-card">
-          <img src="./images/casio/casio1.jpeg" loading="lazy" decoding="async" alt="Casio men">
-        </div>
-        <p class="arrival-name">Casio men</p>
-      </div>
-
-      <div>
-        <div class="arrival-card">
-          <img src="./images/casio/casio16.jpeg" loading="lazy" decoding="async" alt="Casio women">
-        </div>
-        <p class="arrival-name">Casio women</p>
-      </div>
-
+      <p class="arrival-name">Gshock GA2100 (Stealth Black)</p>
     </div>
+
+    <div class="arrival-item">
+      <div class="arrival-card">
+        <img src="./images/men/gs45.jpeg" loading="lazy" decoding="async" alt="Manga Red">
+      </div>
+      <p class="arrival-name">Gshock Manga Red</p>
+    </div>
+
+    <div class="arrival-item">
+      <div class="arrival-card">
+        <img src="./images/casio/casio13.jpeg" loading="lazy" decoding="async" alt="Casio Couple Blackgold">
+      </div>
+      <p class="arrival-name">Casio couple Black Gold</p>
+    </div>
+
+    <div class="arrival-item">
+      <div class="arrival-card">
+        <img src="./images/casio/casio1.jpeg" loading="lazy" decoding="async" alt="Casio men">
+      </div>
+      <p class="arrival-name">Casio men</p>
+    </div>
+
+    <div class="arrival-item">
+      <div class="arrival-card">
+        <img src="./images/casio/casio16.jpeg" loading="lazy" decoding="async" alt="Casio women">
+      </div>
+      <p class="arrival-name">Casio women</p>
+    </div>
+
   </div>
 </section>
 
@@ -192,7 +144,9 @@
 
     <div class="faq-item">
       <button class="faq-question">How To Place An Order With Us</button>
-      <div class="faq-item">
+
+      <!-- ✅ Make this the "answer" block (better structure) -->
+      <div class="faq-answer">
         <div class="faq-image">
           <img src="images/how-to-purchase.PNG" alt="How to Purchase Guide">
         </div>
@@ -231,17 +185,17 @@
   <h2>BRANDS</h2>
 
   <div class="brand-scroll">
-    <div class="brand-card"><img src="./images/men/men-1.png" loading="lazy" decoding="async"><div class="brand-name">Rolex</div></div>
-    <div class="brand-card"><img src="./images/men/unknown.png" loading="lazy" decoding="async"><div class="brand-name">Omega</div></div>
-    <div class="brand-card"><img src="./images/men/unknown.png" loading="lazy" decoding="async"><div class="brand-name">Casio</div></div>
-    <div class="brand-card"><img src="./images/women/women-8.png" loading="lazy" decoding="async"><div class="brand-name">Cartier</div></div>
-    <div class="brand-card"><img src="./images/men/men-9.png" loading="lazy" decoding="async"><div class="brand-name">Patek Philippe</div></div>
-    <div class="brand-card"><img src="./images/men/gs62.jpeg" loading="lazy" decoding="async"><div class="brand-name">G-Shock</div></div>
-    <div class="brand-card"><img src="./images/men/unknown.png" loading="lazy" decoding="async"><div class="brand-name">Swarovski</div></div>
-    <div class="brand-card"><img src="./images/women/women-15.png" loading="lazy" decoding="async"><div class="brand-name">Franck Muller</div></div>
-    <div class="brand-card"><img src="./images/men/men-12.png" loading="lazy" decoding="async"><div class="brand-name">Audemars Piguet</div></div>
-    <div class="brand-card"><img src="./images/men/men-1.png" loading="lazy" decoding="async"><div class="brand-name">Seiko</div></div>
-    <div class="brand-card"><img src="./images/women/women-13.png" loading="lazy" decoding="async"><div class="brand-name">Michael Kors</div></div>
+    <div class="brand-card"><img src="./images/men/men-1.png" loading="lazy" decoding="async" alt=""><div class="brand-name">Rolex</div></div>
+    <div class="brand-card"><img src="./images/men/unknown.png" loading="lazy" decoding="async" alt=""><div class="brand-name">Omega</div></div>
+    <div class="brand-card"><img src="./images/men/unknown.png" loading="lazy" decoding="async" alt=""><div class="brand-name">Casio</div></div>
+    <div class="brand-card"><img src="./images/women/women-8.png" loading="lazy" decoding="async" alt=""><div class="brand-name">Cartier</div></div>
+    <div class="brand-card"><img src="./images/men/men-9.png" loading="lazy" decoding="async" alt=""><div class="brand-name">Patek Philippe</div></div>
+    <div class="brand-card"><img src="./images/men/gs62.jpeg" loading="lazy" decoding="async" alt=""><div class="brand-name">G-Shock</div></div>
+    <div class="brand-card"><img src="./images/men/unknown.png" loading="lazy" decoding="async" alt=""><div class="brand-name">Swarovski</div></div>
+    <div class="brand-card"><img src="./images/women/women-15.png" loading="lazy" decoding="async" alt=""><div class="brand-name">Franck Muller</div></div>
+    <div class="brand-card"><img src="./images/men/men-12.png" loading="lazy" decoding="async" alt=""><div class="brand-name">Audemars Piguet</div></div>
+    <div class="brand-card"><img src="./images/men/men-1.png" loading="lazy" decoding="async" alt=""><div class="brand-name">Seiko</div></div>
+    <div class="brand-card"><img src="./images/women/women-13.png" loading="lazy" decoding="async" alt=""><div class="brand-name">Michael Kors</div></div>
   </div>
 </section>
 
@@ -259,16 +213,16 @@
   <h2>Contact Us</h2>
 
   <div class="contact-links">
-    <a class="social-btn" href="https://instagram.com/midbn_timepieces" target="_blank">
-      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg">
+    <a class="social-btn" href="https://instagram.com/midbn_timepieces" target="_blank" rel="noopener">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram">
     </a>
 
-    <a class="social-btn" href="https://tiktok.com/@_midbn" target="_blank">
-      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg">
+    <a class="social-btn" href="https://tiktok.com/@_midbn" target="_blank" rel="noopener">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="TikTok">
     </a>
 
-    <a class="social-btn" href="https://wa.me/6738908960" target="_blank">
-      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg">
+    <a class="social-btn" href="https://wa.me/6738908960" target="_blank" rel="noopener">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp">
     </a>
   </div>
 
@@ -285,6 +239,5 @@
 </footer>
 
 <script src="script.js" defer></script>
-
 </body>
 </html>
