@@ -171,14 +171,14 @@ function computeDiscountPreview(subtotal, codeRaw){
   if(code === "RAMADHAN10") return subtotal * 0.10;
 
   // DELI3 is delivery discount (handled separately)
-  if(code === "DELI3") return 0;
+  if(code === "HK42") return 0;
 
   return 0;
 }
 
 function computeDeliveryDiscountPreview(subtotal, deliveryType, district, codeRaw){
   const code = String(codeRaw || "").trim().toUpperCase();
-  if(code !== "DELI3") return 0;
+  if(code !== "HK42") return 0;
   if(toNumber(subtotal) < 50) return 0;
   if(deliveryType !== "Delivery") return 0;
 
