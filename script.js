@@ -246,13 +246,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* =========================
-     PROMO STRIP
+     PROMO STRIP (HK42)
   ========================= */
   const PROMO = {
     enabled: true,
-    title: "Delivery Discount (min. purchase of $50)",
-    code: "deli3",
-    subtitle: "Use code {CODE} • $3 OFF",
+    title: "Delivery Discount for purchase $50 & above",
+    code: "HK42",
+    subtitle: "Use code {CODE} • $3 OFF delivery • Website orders only",
     storageKey: "midbn_promo_closed_v2"
   };
 
@@ -272,9 +272,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!PROMO.enabled) return;
       if (localStorage.getItem(PROMO.storageKey) === "1") return;
 
-      titleEl.textContent = PROMO.title;
-      codeEl.textContent = PROMO.code;
-      subEl.innerHTML = PROMO.subtitle.replace("{CODE}", `<b>${PROMO.code}</b>`);
+      if (titleEl) titleEl.textContent = PROMO.title;
+      if (codeEl)  codeEl.textContent  = PROMO.code;
+
+      // Keep HTML clean: don't inject another #promoCode id inside promoSub
+      if (subEl) subEl.innerHTML = PROMO.subtitle.replace("{CODE}", `<b>${PROMO.code}</b>`);
 
       wrap.style.display = "block";
       requestAnimationFrame(setupTicker);
@@ -319,8 +321,10 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.removeChild(t);
       }
 
-      copyBtn.textContent = "Copied ✅";
-      setTimeout(() => copyBtn.textContent = "Copy", 1200);
+      if (copyBtn) {
+        copyBtn.textContent = "Copied ✅";
+        setTimeout(() => copyBtn.textContent = "Copy", 1200);
+      }
     }
 
     copyBtn?.addEventListener("click", copyCode);
