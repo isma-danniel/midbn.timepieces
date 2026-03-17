@@ -234,7 +234,7 @@ window.products = [
 {id:202,name:"Submariner (Hulk)",brand:"Rolex",category:"mens",grade:"A",price:30,stock:30,label:"NEW",img:"images/rolex/rolex202.png",images:["images/rolex/rolex202.png"],details:"Quartz fashion watch"},
 {id:203,name:"Submariner (Cola)",brand:"Rolex",category:"mens",grade:"A",price:30,stock:1,label:"NEW",img:"images/rolex/rolex203.png",images:["images/rolex/rolex203.png"],details:"Quartz fashion watch"},
 {id:204,name:"Submariner (Starbucks)",brand:"Rolex",category:"mens",grade:"A",price:30,stock:1,label:"NEW",img:"images/rolex/rolex204.png",images:["images/mk/mk204.png"],details:"Quartz fashion watch"},
-{id:205,name:"Submariner (Black)",brand:"Rolex",category:"mens",grade:"A",price:30,stock:1,label:"NEW",img:"images/rolex/rolex205.png",images:["images/rolex/role205.png"],details:"Quartz fashion watch"},
+{id:205,name:"Submariner (Black)",brand:"Rolex",category:"mens",grade:"A",price:30,stock:1,label:"NEW",img:"images/rolex/rolex205.png",images:["images/rolex/rolex205.png"],details:"Quartz fashion watch"},
 {id:206,name:"GMT Master II (Cermit)",brand:"Rolex",category:"mens",grade:"A",price:25,stock:1,label:"NEW",img:"images/rolex/rolex206.png",images:["images/rolex/rolex206.png"],details:"Quartz fashion watch"},
 {id:207,name:"Daydate (Green)",brand:"Rolex",category:"mens",grade:"A",price:25,stock:1,label:"NEW",img:"images/rolex/rolex207.png",images:["images/rolex/rolex207.png"],details:"Quartz fashion watch"},
 {id:208,name:"Daydate (Ocean blue)",brand:"Rolex",category:"mens",grade:"A",price:25,stock:2,label:"NEW",img:"images/rolex/rolex208.png",images:["images/rolex/rolex208.png"],details:"Quartz fashion watch"},
