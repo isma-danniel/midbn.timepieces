@@ -254,7 +254,7 @@ window.products = [
 {id:222,name:"Skeleton (Green)",brand:"Richard Mille",category:"Mens",grade:"A",price:25,stock:1,label:"NEW",img:"images/rm/rm222.PNG",images:["images/rm/rm222.PNG"],details:"Quartz fashion watch"},
 {id:223,name:"Skeleton (Black)",brand:"Richard Mille",category:"Mens",grade:"A",price:25,stock:1,label:"NEW",img:"images/rm/rm223.PNG",images:["images/rm/rm223.PNG"],details:"Quartz fashion watch"},
 {id:224,name:"Machinery (Green)",brand:"Richard Mille",category:"Mens",grade:"A",price:25,stock:1,label:"NEW",img:"images/rm/rm224.PNG",images:["images/rm/rm224.PNG"],details:"Quartz fashion watch"},
-{id:225,name:"Machinery (Black)",brand:"Richard Mille",category:"Mens",grade:"A",price:25,stock:1,label:"NEW",img:"images/rm/rm225.PNG",images:["images/rm/rm225.PNG"],details:"Quartz fashion watch"} .
+{id:225,name:"Machinery (Black)",brand:"Richard Mille",category:"Mens",grade:"A",price:25,stock:1,label:"NEW",img:"images/rm/rm225.PNG",images:["images/rm/rm225.PNG"],details:"Quartz fashion watch"},
 ];
 
 window.products = products;
