@@ -256,6 +256,11 @@ window.products = [
 {id:224,name:"Skeleton (Black)",brand:"Richard Mille",category:"mens",grade:"A",price:25,stock:1,label:"NEW",img:"images/rm/rm224.jpeg",images:["images/rm/rm224.jpeg"],details:"Quartz fashion watch"},
 {id:225,name:"Machinery (Green)",brand:"Richard Mille",category:"mens",grade:"A",price:25,stock:1,label:"NEW",img:"images/rm/rm225.jpeg",images:["images/rm/rm225.jpeg"],details:"Quartz fashion watch"},
 {id:226,name:"Machinery (Black)",brand:"Richard Mille",category:"mens",grade:"A",price:25,stock:1,label:"NEW",img:"images/rm/rm226.jpeg",images:["images/rm/rm226.jpeg"],details:"Quartz fashion watch"},
+{id:227,name:"Nautilus (Black) - Mechanical",brand:"Patek Philippe",category:"mens",grade:"B",price:90,stock:2,label:"NEW",img:"images/patek/patek227.jpeg",images:["images/patek/patek227.jpeg"],details:"Mechanical Watches, Butterfly clip"},
+{id:228,name:"Nautilus (Green) - Automatic",brand:"Patek Philippe",category:"mens",grade:"B",price:65,stock:1,label:"NEW",img:"images/patek/patek228.jpeg",images:["images/patek/patek228.jpeg"],details:"Automatic, Butterfly clip"},
+{id:229,name:"Nautilus (White) - Automatic",brand:"Patek Philippe",category:"mens",grade:"B",price:65,stock:1,label:"NEW",img:"images/patek/patek229.jpeg",images:["images/patek/patek229.jpeg"],details:"Automatic, Butterfly clip"},
+{id:230,name:"Nautilus (Blue) - Automatic",brand:"Patek Philippe",category:"mens",grade:"B",price:65,stock:1,label:"NEW",img:"images/patek/patek230.jpeg",images:["images/patek/patek230.jpeg"],details:"Automatic, Butterfly clip"},
+{id:231,name:"Nautilus (Black) - Automatic",brand:"Patek Philippe",category:"mens",grade:"B",price:65,stock:1,label:"NEW",img:"images/patek/patek231.jpeg",images:["images/patek/patek231.jpeg"],details:"Automatic, Butterfly clip"},
 ];
 
 window.products = products;
