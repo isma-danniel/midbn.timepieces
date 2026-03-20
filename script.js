@@ -251,7 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const PROMO = {
     enabled: true,
     title: "Delivery Discount for purchase $50 & above",
-    code: "HK42",
+    code: "SHR",
     subtitle: "Use code {CODE} • $3 OFF delivery • Website orders only",
     storageKey: "midbn_promo_closed_v2"
   };
