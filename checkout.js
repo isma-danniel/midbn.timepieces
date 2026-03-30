@@ -10,7 +10,7 @@
 // ✅ Secure: server recalculates totals; client sends only cart + deliveryArea + discountCode
 // ==========================================
 
-const API = "https://script.google.com/macros/s/AKfycbzFyPlIK4mbeAVBG4bqrIUkA5Zov-UCo25QUmhyx_G8LPFZEOUpXV6cO51mwJC9u70e/exec";
+const API = "https://script.google.com/macros/s/AKfycbwASkZl9xY3LcP34qojwQYxKNUyZe00OIljAP7gdrlIkRJOqAg245pt4v0Kk1NIT42f/exec";
 
 const cartItemsContainer = document.getElementById("cartItems");
 const cartTotalEl = document.getElementById("cartTotal");
