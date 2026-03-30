@@ -1,7 +1,7 @@
 // ===============================
 // CONFIG
 // ===============================
-const API = "https://script.google.com/macros/s/AKfycbzLO0s0zhXDIAJ4oVyd0GNLoXqiP2lzohaIfsY9-kluiVBvljmY8G4KlbK_-aUqhApz9w/exec";
+const API = "https://script.google.com/macros/s/AKfycbwASkZl9xY3LcP34qojwQYxKNUyZe00OIljAP7gdrlIkRJOqAg245pt4v0Kk1NIT42f/exec";
 const ADMIN_TOKEN = "kirah1211"; // must match Code.gs
 
 // ===============================
