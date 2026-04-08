@@ -299,6 +299,19 @@ window.products = [
 {id:263,name:"Chrono (All Black)",brand:"Richard Mille",category:"mens",grade:"A",price:35,stock:0,label:"",img:"images/rm/rm263.jpeg",images:["images/rm/rm263.jpeg"],details:"Automatic, Skeleton design"},
 {id:264,name:"Horseshoe (Blue Silver)",brand:"Richard Mille",category:"mens",grade:"A",price:35,stock:1,label:"",img:"images/rm/rm264.jpeg",images:["images/rm/rm264.jpeg"],details:"Automatic, Skeleton design"},
 {id:265,name:"Horseshoe (Black Silver)",brand:"Richard Mille",category:"mens",grade:"A",price:35,stock:2,label:"",img:"images/rm/rm265.jpeg",images:["images/rm/rm265.jpeg"],details:"Automatic, Skeleton design"},
+
+{id:266,name:"Royal Oak (Black White)",brand:"Audemars Piguet",category:"mens",grade:"AA",price:70,stock:1,label:"",img:"images/ap/ap266.jpeg",images:["images/ap/ap266.jpeg"],details:"Grade AA, Auto movement, screen scratchproof, Butterfly clip, Bright Luminous, Engrave Crown & Backcase"},
+{id:267,name:"Prospex Heritage Diver (Pepsi)",brand:"Seiko",category:"mens",grade:"AA",price:60,stock:1,label:"",img:"images/seiko/seiko267.jpeg",images:["images/seiko/seiko267.jpeg"],details:"Grade 2A, Auto movement, screen scratchproof, Butterfly clip, rotation bezel, Transparent Backcase, Bright Luminous"},
+{id:268,name:"Prospex Heritage Diver (Black)",brand:"Seiko",category:"mens",grade:"AA",price:60,stock:1,label:"",img:"images/seiko/seiko268.jpeg",images:["images/seiko/seiko268.jpeg"],details:"Grade 2A, Auto movement, screen scratchproof, Butterfly clip, rotation bezel, Transparent Backcase, Bright Luminous"},
+{id:269,name:"Seamaster Diver 300M",brand:"Omega",category:"mens",grade:"AA",price:60,stock:1,label:"",img:"images/omega/omega269.jpeg",images:["images/omega/omega269.jpeg"],details:"Diver watch, men watch, Grade AA"},
+{id:270,name:"Aquanaut (White)",brand:"Patek Philippe",category:"mens",grade:"AA",price:50,stock:1,label:"",img:"images/patek/patek270.jpeg",images:["images/patek/patek270.jpeg"],details:"Grade 2A, Auto movement, screen scratchproof, Black Rubber Strap, Bright Luminous, engrave backcase & buckle"},
+{id:271,name:"GMT Master II (Black Gold Steel)",brand:"Rolex",category:"mens",grade:"AA",price:50,stock:1,label:"",img:"images/rolex/rolex271.jpeg",images:["images/rolex/rolex271.jpeg"],details:"GMT function style, men watch, Grade AA"},
+{id:272,name:"Submariner (All Black)",brand:"Rolex",category:"mens",grade:"AA",price:50,stock:1,label:"",img:"images/rolex/rolex272.jpeg",images:["images/rolex/rolex272.jpeg"],details:"Diver style, men watch, Grade AA"},
+{id:273,name:"Santos Blackout (Navy Blue)",brand:"Cartier",category:"mens",grade:"AA",price:50,stock:1,label:"",img:"images/cartier/cartier273.jpeg",images:["images/cartier/cartier273.jpeg"],details:"Classic square design, men watch, Grade AA"},
+{id:274,name:"Santos Blackout (Army Green)",brand:"Cartier",category:"mens",grade:"AA",price:50,stock:1,label:"",img:"images/cartier/cartier274.jpeg",images:["images/cartier/cartier274.jpeg"],details:"Classic square design, men watch, Grade AA"},
+{id:275,name:"Santos (Silver)",brand:"Cartier",category:"mens",grade:"AA",price:50,stock:1,label:"",img:"images/cartier/cartier275.jpeg",images:["images/cartier/cartier275.jpeg"],details:"Classic square design, men watch, Grade AA"},
+{id:276,name:"Spirit of Big Bang (Suede Brown)",brand:"Hublot",category:"mens",grade:"AA",price:70,stock:1,label:"",img:"images/hublot/hublot276.jpeg",images:["images/hublot/hublot276.jpeg"],details:"Skeleton style, men watch, Grade AA"},
+{id:277,name:"C5008",brand:"Pagani Gear",category:"mens",grade:"Original",price:90,stock:1,label:"",img:"images/pagani/pagani277.jpeg",images:["images/pagani/pagani277.jpeg"],details:"Original model, full function chronograph"},
 ];
 
 window.products = products;
