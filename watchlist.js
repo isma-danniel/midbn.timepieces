@@ -313,5 +313,3 @@ window.products = [
 {id:276,name:"Spirit of Big Bang (Suede Brown)",brand:"Hublot",category:"mens",grade:"C",price:70,stock:1,label:"",img:"images/hublot/hublot276.jpeg",images:["images/hublot/hublot276.jpeg","images/hublot/hublot276-2.jpeg","images/hublot/hublot276-3.jpeg","images/hublot/hublot276-4.jpeg"],details:"Skeleton style, men watch, Grade AA"},
 {id:277,name:"C5008",brand:"Pagani Gear",category:"mens",grade:"E",price:90,stock:1,label:"",img:"images/pagani/pagani277.jpeg",images:["images/pagani/pagani277.jpeg","images/pagani/pagani277-2.jpeg","images/pagani/pagani277-3.jpeg","images/pagani/pagani277-4.jpeg"],details:"Original model, full function chronograph"},
 ];
-
-window.products = products;
