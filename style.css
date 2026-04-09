@@ -1,8 +1,9 @@
 /* ==========================================
-   MIDBN STYLE.CSS (FULL) - Optimized + Smooth
+   MIDBN STYLE.CSS (FULL CLEANED)
    - Keeps your colors + glass concept
-   - New Arrivals: FIX last card scroll (padding + end spacer)
-   - Brands: no inner scroll + blur overlay (smoother)
+   - Brands section kept
+   - New Arrivals replaced by Shop by Category
+   - Duplicate conflicting arrival rules removed
    - Mobile performance tweaks
 ========================================== */
 
@@ -20,6 +21,7 @@
 
 * { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior: smooth; }
+
 body {
   background: var(--dark);
   color: var(--text);
@@ -35,20 +37,25 @@ body {
 .header {
   position: sticky;
   top:0;
-  z-index: 999; /* ✅ ADDED: keep header above promo so hamburger is clickable */
+  z-index: 999;
   background: rgba(13,15,16,0.5);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   box-shadow: 0 0 30px rgba(0,0,0,0.4);
   border-bottom: 1px solid rgba(220,251,255,0.2);
 }
-.header nav { position: relative; }
+
+.header nav {
+  position: relative;
+}
+
 .header nav ul {
   display:flex;
   justify-content:space-around;
   list-style:none;
   padding:10px 0;
 }
+
 .header nav ul li a {
   color: var(--primary);
   text-decoration:none;
@@ -59,7 +66,12 @@ body {
 /* =========================
    HERO
 ========================= */
-.hero { position:relative; height:100svh; overflow:hidden; }
+.hero {
+  position:relative;
+  height:100svh;
+  overflow:hidden;
+}
+
 .hero-video {
   position: absolute;
   top: 50%;
@@ -71,7 +83,13 @@ body {
   filter: brightness(0.6);
   will-change: transform;
 }
-.hero-overlay { position:absolute; inset:0; background: rgba(0,0,0,0.35); }
+
+.hero-overlay {
+  position:absolute;
+  inset:0;
+  background: rgba(0,0,0,0.35);
+}
+
 .hero-content {
   position:absolute;
   top:50%;
@@ -84,12 +102,14 @@ body {
   text-align:center;
   padding:20px;
 }
+
 .hero-quote {
   font-weight:700;
   color: var(--primary);
   line-height:1.2;
   margin-bottom:25px;
 }
+
 .hero-btn {
   padding:12px 28px;
   border:1px solid var(--primary);
@@ -101,6 +121,7 @@ body {
   transform:translateY(20px);
   transition: all 0.8s ease;
 }
+
 .hero-btn:hover{
   background: rgba(220,251,255,0.08);
   box-shadow: 0 0 16px rgba(220,251,255,0.18);
@@ -109,7 +130,10 @@ body {
 /* =========================
    INTRO
 ========================= */
-.intro { padding:60px 20px; }
+.intro {
+  padding:60px 20px;
+}
+
 .intro-content {
   position: relative;
   max-width: 600px;
@@ -123,72 +147,131 @@ body {
   border: 1px solid rgba(220,251,255,0.12);
   box-shadow: var(--shadow);
 }
-.intro-content h2 { color:var(--primary); text-align:center; }
-.intro-divider { border:0; border-top:2px solid var(--secondary); width:50px; margin:10px auto; opacity:.8; }
-.intro-content p { text-align: justify; line-height:1.7; }
-.highlight { color:var(--primary); font-weight:600; }
+
+.intro-content h2 {
+  color:var(--primary);
+  text-align:center;
+}
+
+.intro-divider {
+  border:0;
+  border-top:2px solid var(--secondary);
+  width:50px;
+  margin:10px auto;
+  opacity:.8;
+}
+
+.intro-content p {
+  text-align: justify;
+  line-height:1.7;
+}
+
+.highlight {
+  color:var(--primary);
+  font-weight:600;
+}
 
 /* =========================
-   NEW ARRIVALS (UPGRADED)
-   - FIX: last card not reachable
+   SHOP BY CATEGORY
 ========================= */
-.arrivals { padding:20px 20px; }
-.arrivals h2 { text-align:center; color:var(--primary); margin-bottom:20px; }
-
-.arrival-scroll {
-  display:flex;
-  overflow-x:auto;
-  gap:20px;
-
-  /* IMPORTANT: allow last item to fully scroll into view */
-  padding: 10px 20px;
-  scroll-padding: 0 20px;
-
-  cursor:grab;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  scroll-snap-type: x proximity;
-}
-.arrival-scroll::-webkit-scrollbar { display: none; }
-
-/* end spacer so last card can sit fully */
-.arrival-scroll::after{
-  content:"";
-  flex: 0 0 20px;
+.category-section{
+  padding: 20px 20px 10px;
 }
 
-.arrival-card {
-  flex: 0 0 auto;
-  width:150px;
-  height:180px;
-  background: rgba(255,255,255,0.1);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  border-radius:16px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  padding:0px;
-  transition: transform 0.3s ease, box-shadow .3s ease;
-  border: 1px solid rgba(220,251,255,0.10);
-  box-shadow: 0 10px 30px rgba(0,0,0,.35);
-  overflow:hidden;
-  scroll-snap-align: start;
+.category-section h2{
+  text-align: center;
+  color: var(--primary);
+  margin-bottom: 20px;
 }
-.arrival-card img { width:100%; height:100%; object-fit:cover; border-radius:16px; display:block; }
-.arrival-card:hover { transform:scale(1.05); box-shadow:0 14px 34px rgba(0,0,0,0.45); }
 
-.arrival-name{
-  text-align:center;
-  margin-top:10px;
-  color: rgba(230,230,230,.9);
-  font-size: .95rem;
+.category-list{
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.category-box{
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 105px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(220,251,255,0.12);
+  box-shadow: 0 10px 28px rgba(0,0,0,.35);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.category-box img{
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 68px;
+  height: 68px;
+  object-fit: cover;
+  border-radius: 14px;
+  z-index: 1;
+}
+
+.category-box::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.22);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+
+.category-box-name{
+  position: relative;
+  z-index: 2;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: .3px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+  max-width: 60%;
+  line-height: 1.3;
+}
+
+.category-box:hover{
+  transform: scale(1.03);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+}
+
+@media (max-width: 480px){
+  .category-box{
+    min-height: 95px;
+    padding: 12px 14px;
+  }
+
+  .category-box img{
+    width: 58px;
+    height: 58px;
+    right: 12px;
+  }
+
+  .category-box-name{
+    font-size: 0.95rem;
+    max-width: 62%;
+  }
 }
 
 /* =========================
    FAQ
 ========================= */
-.faq { padding:40px 20px; }
+.faq {
+  padding:40px 20px;
+}
+
 .faq-card {
   border:2px solid var(--secondary);
   border-radius:16px;
@@ -198,8 +281,16 @@ body {
   background: rgba(255,255,255,0.1);
   box-shadow: var(--shadow);
 }
-.faq h2 { margin-bottom:20px; color:var(--primary); }
-.faq-item { margin-bottom:15px; }
+
+.faq h2 {
+  margin-bottom:20px;
+  color:var(--primary);
+}
+
+.faq-item {
+  margin-bottom:15px;
+}
+
 .faq-question {
   width:100%;
   padding:15px;
@@ -211,9 +302,11 @@ body {
   cursor:pointer;
   border-radius:12px;
 }
+
 .faq-question:hover{
   background: rgba(255,255,255,0.04);
 }
+
 .faq-answer {
   display:none;
   padding:15px;
@@ -224,21 +317,46 @@ body {
   border: 1px solid rgba(220,251,255,0.08);
 }
 
+.faq-image {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.faq-image img {
+  width: 100%;
+  max-width: 600px;
+  border-radius: 18px;
+  border: 1px solid rgba(220,251,255,0.2);
+  box-shadow: 0 0 30px rgba(220,251,255,0.08);
+  transition: 0.3s ease;
+}
+
+.faq-image img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 40px rgba(220,251,255,0.15);
+}
+
 /* =========================
-   BRANDS (UPDATED)
+   BRANDS
 ========================= */
 .brands { 
   padding:30px 20px; 
   border-radius:20px; 
   margin:40px 15px;
 }
-.brands h2 { margin-bottom:20px; color:var(--primary); text-align:center; }
+
+.brands h2 {
+  margin-bottom:20px;
+  color:var(--primary);
+  text-align:center;
+}
 
 .brand-scroll {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 25px;
 }
+
 @media (min-width: 900px){
   .brand-scroll{
     grid-template-columns: repeat(4, 1fr);
@@ -259,6 +377,8 @@ body {
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(220,251,255,0.12);
   box-shadow: 0 10px 28px rgba(0,0,0,.35);
+  text-decoration: none;
+  color: inherit;
 }
 
 .brand-card img { 
@@ -283,7 +403,8 @@ body {
 
 .brand-card .brand-name {
   position: absolute;
-  top: 50%; left: 50%;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
   color: var(--primary);
   font-weight: 600;
@@ -299,11 +420,13 @@ body {
   transform: scale(1.05);
   box-shadow:0 16px 40px rgba(0,0,0,0.45);
 }
+
 .brand-card:hover::after{
   background: rgba(0,0,0,0.10);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
 }
+
 .brand-card:hover img{
   transform: scale(1.12);
 }
@@ -313,14 +436,24 @@ body {
     grid-template-columns: repeat(2, 1fr);
     gap: 18px;
   }
-  .brand-card{ height: 125px; }
+
+  .brand-card{
+    height: 125px;
+  }
 }
 
 /* =========================
    CATALOGUE
 ========================= */
-.catalog { padding:20px 30px; text-align:center; }
-.catalog-content h2 { color:var(--primary); }
+.catalog {
+  padding:20px 30px;
+  text-align:center;
+}
+
+.catalog-content h2 {
+  color:var(--primary);
+}
+
 .catalog-btn {
   padding:14px 32px;
   border:1px solid var(--primary);
@@ -330,6 +463,7 @@ body {
   display:inline-block;
   transition: .25s ease;
 }
+
 .catalog-btn:hover{
   background: rgba(220,251,255,0.08);
   box-shadow: 0 0 16px rgba(220,251,255,0.18);
@@ -350,6 +484,7 @@ body {
   border: 1px solid rgba(220,251,255,0.15);
   box-shadow: var(--shadow);
 }
+
 .contact-section h2 {
   color: var(--primary);
   font-size: 1.6rem;
@@ -382,11 +517,13 @@ body {
   transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
   text-decoration:none;
 }
+
 .social-btn:hover{
   transform: translateY(-2px);
   background: rgba(220,251,255,0.08);
   box-shadow: 0 0 18px rgba(220,251,255,0.22);
 }
+
 .social-btn img{
   width:30px;
   height:30px;
@@ -402,6 +539,7 @@ body {
   margin: 0 auto;
   gap: 12px;
 }
+
 .contact-form input,
 .contact-form textarea {
   padding: 10px 14px;
@@ -414,13 +552,17 @@ body {
   resize: none;
   transition: all 0.3s ease;
 }
+
 .contact-form input:focus,
 .contact-form textarea:focus {
   border-color: var(--primary);
   box-shadow: 0 0 8px rgba(220,251,255,0.5);
   background: rgba(255,255,255,0.1);
 }
-.contact-form textarea { min-height: 100px; }
+
+.contact-form textarea {
+  min-height: 100px;
+}
 
 .contact-form button {
   padding: 12px 24px;
@@ -432,6 +574,7 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
 }
+
 .contact-form button:hover {
   background: var(--primary);
   color: #000;
@@ -462,8 +605,9 @@ body {
   position: absolute;
   right: 20px;
   top: 60px;
-  z-index: 1000; /* ✅ ADDED: ensure button is on top */
+  z-index: 1000;
 }
+
 .hamburger span {
   display: block;
   height: 3px;
@@ -473,17 +617,30 @@ body {
   transition: 0.3s ease;
   box-shadow: 0 0 6px rgba(220,251,255,0.8);
 }
+
 .hamburger.active span:nth-child(1),
-.hamburger.active span:nth-child(3) { box-shadow: 0 0 12px rgba(220,251,255,1); }
-.hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
-.hamburger.active span:nth-child(2) { opacity: 0; }
-.hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+.hamburger.active span:nth-child(3) {
+  box-shadow: 0 0 12px rgba(220,251,255,1);
+}
+
+.hamburger.active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
 
 /* =========================
    MOBILE NAV
 ========================= */
 @media (max-width: 768px) {
   .hamburger { display: flex; }
+
   .header nav ul {
     flex-direction: column;
     max-height: 0;
@@ -501,7 +658,12 @@ body {
     transition: max-height 0.4s ease, opacity 0.3s ease, transform 0.3s ease;
     border-bottom: 1px solid rgba(220,251,255,0.18);
   }
-  .header nav ul.active { max-height: 500px; opacity: 1; transform: translateY(0); }
+
+  .header nav ul.active {
+    max-height: 500px;
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 768px){
@@ -516,53 +678,20 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce){
-  * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
-}
-
-.arrival-scroll {
-  scroll-snap-type: x proximity;
-  scroll-padding: 0 20px;
-  padding: 10px 20px;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
-}
-
-.arrival-scroll.is-dragging {
-  cursor: grabbing;
-  user-select: none;
-}
-
-.arrival-scroll::after{
-  content:"";
-  flex: 0 0 20px; /* end spacer so last card shows fully */
-}
-
-.faq-image {
-  margin-top: 20px;
-  text-align: center;
-}
-
-.faq-image img {
-  width: 100%;
-  max-width: 600px;
-  border-radius: 18px;
-  border: 1px solid rgba(220,251,255,0.2);
-  box-shadow: 0 0 30px rgba(220,251,255,0.08);
-  transition: 0.3s ease;
-}
-
-.faq-image img:hover {
-  transform: scale(1.02);
-  box-shadow: 0 0 40px rgba(220,251,255,0.15);
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* =========================
-   PROMO STRIP (1 LINE + MOVING ON PHONE)
+   PROMO STRIP
 ========================= */
 .promo-strip{
   width:100%;
-  position: relative; /* ✅ ADDED */
-  z-index: 50;        /* ✅ ADDED: below header */
+  position: relative;
+  z-index: 50;
   background: rgba(255,255,255,.03);
   border-bottom: 1px solid rgba(220,251,255,.18);
   backdrop-filter: blur(10px);
@@ -582,24 +711,21 @@ body {
   letter-spacing:.2px;
 }
 
-/* ticker wrapper */
 .promo-ticker{
   position:relative;
   overflow:hidden;
   flex:1 1 auto;
   min-width:0;
-
-  display:flex; /* ✅ ADDED: needed when JS clones track */
+  display:flex;
 }
 
-/* the moving line */
 .promo-track{
   display:inline-flex;
   align-items:center;
   gap:10px;
   white-space:nowrap;
   will-change: transform;
-  flex: 0 0 auto; /* ✅ ADDED */
+  flex: 0 0 auto;
 }
 
 #promoTitle{
@@ -611,7 +737,9 @@ body {
   opacity:.5;
 }
 
-.promo-strip .dot{ opacity:.6; }
+.promo-strip .dot{
+  opacity:.6;
+}
 
 .promo-actions{
   display:flex;
@@ -620,7 +748,8 @@ body {
   flex:0 0 auto;
 }
 
-.promo-btn,.promo-close{
+.promo-btn,
+.promo-close{
   background:transparent;
   border:1px solid rgba(220,251,255,.28);
   color:#DCFBFF;
@@ -630,12 +759,13 @@ body {
   cursor:pointer;
   transition:.25s;
 }
-.promo-btn:hover,.promo-close:hover{
+
+.promo-btn:hover,
+.promo-close:hover{
   background:#DCFBFF;
   color:#000;
 }
 
-/* Desktop: keep still */
 @media (min-width:521px){
   .promo-track{
     overflow:hidden;
@@ -643,146 +773,21 @@ body {
   }
 }
 
-/* Phone: auto move only if JS sets .is-moving */
 @media (max-width:520px){
-  .promo-strip-inner{ font-size:12px; }
-  .promo-btn{ padding:6px 8px; }
+  .promo-strip-inner{
+    font-size:12px;
+  }
+
+  .promo-btn{
+    padding:6px 8px;
+  }
 
   .promo-ticker.is-moving .promo-track{
     animation: promoMarquee var(--promoDur, 12s) linear infinite;
   }
+
   @keyframes promoMarquee{
     from{ transform: translateX(0); }
     to{ transform: translateX(-50%); }
-  }
-}
-
-/* =========================
-   NEW ARRIVALS - HORIZONTAL + SMOOTH + AUTO READY
-========================= */
-.arrival-scroll{
-  display:flex;
-  gap:20px;
-  overflow-x:auto;
-
-  padding: 10px 20px;
-  scroll-padding: 0 20px;
-
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
-
-  scroll-snap-type: x proximity;
-  scroll-behavior: smooth;
-
-  cursor: grab;
-  user-select: none;
-}
-
-/* hide scrollbar */
-.arrival-scroll::-webkit-scrollbar{ display:none; }
-.arrival-scroll{ scrollbar-width:none; }
-
-/* items */
-.arrival-item{
-  flex: 0 0 auto;
-  scroll-snap-align: start;
-}
-
-/* end spacer so last card fully visible */
-.arrival-scroll::after{
-  content:"";
-  flex: 0 0 30px;
-}
-
-/* dragging state */
-.arrival-scroll.is-dragging{
-  cursor: grabbing;
-}
-
-/* =========================
-   NEW ARRIVALS (HORIZONTAL + INFINITE LOOP)
-========================= */
-
-.arrival-scroll{
-  overflow: hidden;             /* hide the looping overflow */
-  padding: 10px 20px;
-}
-
-/* this is the moving row */
-.arrival-scroll-track{
-  display: flex;
-  gap: 20px;
-  width: max-content;
-  animation: arrivalsMarquee 18s linear infinite;
-}
-
-/* each item (your plain <div> wrappers) */
-.arrival-scroll-track > div{
-  flex: 0 0 auto;
-  width: 150px;                 /* match your card width */
-}
-
-/* optional: pause on hover (desktop) */
-@media (hover:hover){
-  .arrival-scroll:hover .arrival-scroll-track{
-    animation-play-state: paused;
-  }
-}
-
-/* the loop animation */
-@keyframes arrivalsMarquee{
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); } /* because you duplicated the set */
-}
-
-/* ✅ FIX: your new HTML uses .arrival-scroll-track */
-.arrival-scroll{
-  overflow: hidden;              /* because you want auto loop */
-}
-
-/* make the items horizontal */
-.arrival-scroll-track{
-  display: flex;
-  gap: 20px;
-  width: max-content;
-}
-
-/* each item block */
-.arrival-scroll-track > div{
-  flex: 0 0 auto;
-  width: 150px;
-}
-
-/* ✅ FIX for your NEW HTML structure */
-.arrival-scroll{
-  overflow: hidden; /* premium look for auto-loop */
-}
-
-/* make the inner track horizontal */
-.arrival-scroll-track{
-  display: flex;
-  gap: 20px;
-  width: max-content;
-  align-items: flex-start;
-}
-
-/* each item block (the wrapper that contains card + name) */
-.arrival-scroll-track > div{
-  flex: 0 0 auto;
-}
-
-.arrival-scroll-track{
-  animation: arrivalsMarquee 18s linear infinite;
-}
-
-@keyframes arrivalsMarquee{
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-
-/* pause on hover (desktop) */
-@media (hover:hover){
-  .arrival-scroll:hover .arrival-scroll-track{
-    animation-play-state: paused;
   }
 }
