@@ -10,8 +10,11 @@
 // ✅ Filters + sort
 // ✅ MULTI-IMAGE QUICK VIEW (uses product.images[])
 // ✅ PAGINATION (12 per page + prev/next)
-// ✅ BRAND URL FILTER (products.html?brand=Rolex)
-// ✅ CATEGORY URL FILTER (products.html?category=mens)
+// ✅ URL FILTER SUPPORT:
+//    - products.html?brand=Rolex
+//    - products.html?category=mens
+//    - products.html?search=gshock
+//    - combinations supported
 // ==========================================
 
 const API =
@@ -52,10 +55,8 @@ const closeModal = document.getElementById("closeModal");
 const modalAddCart = document.getElementById("modalAddCart");
 const goCheckoutBottom = document.getElementById("goCheckoutBottom");
 
-// ✅ thumbnails container (add in HTML: <div id="modalThumbs"></div>)
 const modalThumbs = document.getElementById("modalThumbs");
 
-// ✅ Header sync pill from your HTML
 const syncNotice = document.getElementById("stockSyncNotice");
 const syncTimer = document.getElementById("syncTimer");
 
@@ -69,16 +70,16 @@ let currentQuickProduct = null;
 const urlParams = new URLSearchParams(window.location.search);
 const brandFromUrl = urlParams.get("brand") || "";
 const categoryFromUrl = urlParams.get("category") || "";
+const searchFromUrl = urlParams.get("search") || "";
 
 // ==========================================
-// PAGINATION STATE (12 per page)
+// PAGINATION STATE
 // ==========================================
 const PAGE_SIZE = 12;
 let currentPage = 1;
 let __filteredCache = [];
 let __totalPages = 1;
 
-// Create pager under grid (auto) if not in HTML
 let pager = document.getElementById("pager");
 
 function ensurePager(){
@@ -88,19 +89,17 @@ function ensurePager(){
   pager = document.createElement("div");
   pager.id = "pager";
 
-  // lightweight inline style so you don't need CSS changes
   pager.style.position = "relative";
   pager.style.zIndex = "2";
   pager.style.display = "flex";
   pager.style.justifyContent = "center";
   pager.style.alignItems = "center";
   pager.style.gap = "10px";
-  pager.style.padding = "12px 14px 90px"; // extra bottom so it won't clash with checkout button
+  pager.style.padding = "12px 14px 90px";
   pager.style.userSelect = "none";
 
   productGrid.insertAdjacentElement("afterend", pager);
 
-  // bind pager clicks ONCE (event delegation)
   pager.addEventListener("click", (e) => {
     const t = e.target;
     if(!(t instanceof Element)) return;
@@ -116,7 +115,7 @@ function setPage(next){
   const n = Math.max(1, Math.min(__totalPages, next));
   if(n === currentPage) return;
   currentPage = n;
-  filterSortProducts(true); // keep page
+  filterSortProducts(true);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -126,7 +125,6 @@ function updatePager(){
 
   const total = __totalPages || 1;
 
-  // hide pager when no products / only 1 page
   if(!__filteredCache.length || total <= 1){
     p.innerHTML = "";
     p.style.display = "none";
@@ -174,7 +172,7 @@ function updatePager(){
 }
 
 // ==========================================
-// HEADER SYNC PILL (SAFE)
+// HEADER SYNC PILL
 // ==========================================
 let __syncInterval = null;
 let __syncFadeTimeout = null;
@@ -233,6 +231,7 @@ function finishHeaderSyncPill(success){
 function cartCount(){
   return cart.reduce((sum, it) => sum + Number(it.qty || 0), 0);
 }
+
 function updateCheckoutButton(){
   if(!goCheckoutBottom) return;
   const count = cartCount();
@@ -244,6 +243,7 @@ updateCheckoutButton();
 // HAMBURGER TOGGLE
 // ==========================================
 function toggleFilters(){ filters?.classList.toggle("active"); }
+
 if(hamburger && filters){
   hamburger.addEventListener("click", toggleFilters);
   hamburger.addEventListener("keydown", (e)=>{
@@ -255,8 +255,7 @@ if(hamburger && filters){
 }
 
 // ==========================================
-// RENDER (SOLD OUT SEPARATOR + BADGE)
-// (sold out is ALWAYS shown, no button)
+// RENDER
 // ==========================================
 function renderProducts(list){
   if(!productGrid) return;
@@ -320,7 +319,7 @@ function renderProducts(list){
 }
 
 // ==========================================
-// FILTER + SORT + PAGINATION SLICE
+// FILTER + SORT + PAGINATION
 // ==========================================
 function inStockFirstComparator(a, b){
   const aIn = toNumber(a.stock) > 0 ? 1 : 0;
@@ -332,7 +331,6 @@ function inStockFirstComparator(a, b){
 function filterSortProducts(keepPage = false){
   const list = Array.isArray(window.products) ? window.products : [];
 
-  // when filters change, reset to page 1
   if(!keepPage) currentPage = 1;
 
   let filtered = list.filter(p=>{
@@ -356,7 +354,6 @@ function filterSortProducts(keepPage = false){
     return searchMatch && brandMatch && categoryMatch && gradeMatch && minMatch && maxMatch;
   });
 
-  // default: in stock first
   filtered.sort(inStockFirstComparator);
 
   if(sortSelect?.value === "az"){
@@ -379,7 +376,6 @@ function filterSortProducts(keepPage = false){
     filtered.sort(inStockFirstComparator);
   }
 
-  // Pagination: cache + compute pages + slice
   __filteredCache = filtered;
   __totalPages = Math.max(1, Math.ceil(__filteredCache.length / PAGE_SIZE));
   currentPage = Math.max(1, Math.min(currentPage, __totalPages));
@@ -400,7 +396,7 @@ minPrice?.addEventListener("input", ()=>filterSortProducts(false));
 maxPrice?.addEventListener("input", ()=>filterSortProducts(false));
 
 // ==========================================
-// QUICK VIEW MODAL (MULTI-IMAGE)
+// QUICK VIEW MODAL
 // ==========================================
 function openQuickView(product){
   currentQuickProduct = product;
@@ -557,7 +553,7 @@ goCheckoutBottom?.addEventListener("click", ()=>{
 });
 
 // ==========================================
-// WATERFALL PARTICLES (delay + fewer on mobile + throttle)
+// WATERFALL PARTICLES
 // ==========================================
 const particleContainer = document.getElementById("particleContainer");
 
@@ -598,12 +594,17 @@ window.addEventListener("resize", () => {
   window.__pt = setTimeout(spawnParticles, 200);
 });
 
-// ✅ AUTO-SELECT DROPDOWNS FROM URL
+// ==========================================
+// AUTO-SELECT FROM URL
+// ==========================================
 if (brandFilter && brandFromUrl) {
   brandFilter.value = brandFromUrl;
 }
 if (categoryFilter && categoryFromUrl) {
   categoryFilter.value = categoryFromUrl;
+}
+if (searchInput && searchFromUrl) {
+  searchInput.value = searchFromUrl;
 }
 
 // ==========================================
@@ -616,7 +617,7 @@ function safeInitialRender(){
   hasRenderedOnce = true;
 
   startHeaderSyncPill();
-  filterSortProducts(false); // first render page 1
+  filterSortProducts(false);
 }
 safeInitialRender();
 
@@ -643,7 +644,6 @@ function buildLiveMap(liveArr){
   return map;
 }
 
-// fetch AFTER first paint
 requestAnimationFrame(() => {
   requestAnimationFrame(async () => {
     const live = await getLiveProductsSafe();
@@ -666,7 +666,6 @@ requestAnimationFrame(() => {
       if(toNumber(p.price) !== newPrice){ p.price = newPrice; changed = true; }
     });
 
-    // keep current page after live sync
     if(changed) filterSortProducts(true);
 
     finishHeaderSyncPill(true);
