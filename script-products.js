@@ -10,6 +10,7 @@
 // ✅ Filters + sort
 // ✅ MULTI-IMAGE QUICK VIEW (uses product.images[])
 // ✅ PAGINATION (12 per page + prev/next)
+// ✅ BRAND URL FILTER (products.html?brand=Rolex)
 // ==========================================
 
 const API =
@@ -62,6 +63,10 @@ const syncTimer = document.getElementById("syncTimer");
 // ==========================================
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let currentQuickProduct = null;
+
+// ✅ BRAND FROM URL
+const urlParams = new URLSearchParams(window.location.search);
+const brandFromUrl = urlParams.get("brand") || "";
 
 // ==========================================
 // PAGINATION STATE (12 per page)
@@ -332,7 +337,10 @@ function filterSortProducts(keepPage = false){
     const q = (searchInput?.value || "").toLowerCase().trim();
     const searchMatch = !q || ((p.name + " " + p.brand).toLowerCase().includes(q));
 
-    const brandMatch = !brandFilter?.value || p.brand === brandFilter.value;
+    // ✅ BRAND FILTER SUPPORTS URL PARAM
+    const activeBrand = brandFilter?.value || brandFromUrl;
+    const brandMatch = !activeBrand || p.brand === activeBrand;
+
     const categoryMatch = !categoryFilter?.value || p.category === categoryFilter.value;
     const gradeMatch = !gradeFilter?.value || p.grade === gradeFilter.value;
 
@@ -586,6 +594,11 @@ window.addEventListener("resize", () => {
   clearTimeout(window.__pt);
   window.__pt = setTimeout(spawnParticles, 200);
 });
+
+// ✅ AUTO-SELECT BRAND DROPDOWN FROM URL
+if (brandFilter && brandFromUrl) {
+  brandFilter.value = brandFromUrl;
+}
 
 // ==========================================
 // FAST FIRST RENDER + LIVE STOCK SYNC
