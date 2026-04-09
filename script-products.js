@@ -11,6 +11,7 @@
 // ✅ MULTI-IMAGE QUICK VIEW (uses product.images[])
 // ✅ PAGINATION (12 per page + prev/next)
 // ✅ BRAND URL FILTER (products.html?brand=Rolex)
+// ✅ CATEGORY URL FILTER (products.html?category=mens)
 // ==========================================
 
 const API =
@@ -64,9 +65,10 @@ const syncTimer = document.getElementById("syncTimer");
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let currentQuickProduct = null;
 
-// ✅ BRAND FROM URL
+// ✅ URL FILTERS
 const urlParams = new URLSearchParams(window.location.search);
 const brandFromUrl = urlParams.get("brand") || "";
+const categoryFromUrl = urlParams.get("category") || "";
 
 // ==========================================
 // PAGINATION STATE (12 per page)
@@ -337,11 +339,12 @@ function filterSortProducts(keepPage = false){
     const q = (searchInput?.value || "").toLowerCase().trim();
     const searchMatch = !q || ((p.name + " " + p.brand).toLowerCase().includes(q));
 
-    // ✅ BRAND FILTER SUPPORTS URL PARAM
     const activeBrand = brandFilter?.value || brandFromUrl;
     const brandMatch = !activeBrand || p.brand === activeBrand;
 
-    const categoryMatch = !categoryFilter?.value || p.category === categoryFilter.value;
+    const activeCategory = categoryFilter?.value || categoryFromUrl;
+    const categoryMatch = !activeCategory || p.category === activeCategory;
+
     const gradeMatch = !gradeFilter?.value || p.grade === gradeFilter.value;
 
     const min = (minPrice?.value ?? "") === "" ? null : Number(minPrice.value);
@@ -595,9 +598,12 @@ window.addEventListener("resize", () => {
   window.__pt = setTimeout(spawnParticles, 200);
 });
 
-// ✅ AUTO-SELECT BRAND DROPDOWN FROM URL
+// ✅ AUTO-SELECT DROPDOWNS FROM URL
 if (brandFilter && brandFromUrl) {
   brandFilter.value = brandFromUrl;
+}
+if (categoryFilter && categoryFromUrl) {
+  categoryFilter.value = categoryFromUrl;
 }
 
 // ==========================================
