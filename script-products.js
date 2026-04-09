@@ -1,7 +1,8 @@
 // ==========================================
 // MIDBN script-products.js
 // ✅ Requires watchlist.js loaded FIRST (window.products)
-// ✅ Fast first render, live stock sync after first paint
+// ✅ One-render mode: wait for live stock first
+// ✅ Fallback to local products if sync fails
 // ✅ Particles delayed + fewer on mobile + resize throttle
 // ✅ Image fetchpriority=low
 // ✅ Header stock syncing pill (3s timer + success/fail + auto hide)
@@ -608,7 +609,7 @@ if (searchInput && searchFromUrl) {
 }
 
 // ==========================================
-// FAST FIRST RENDER + LIVE STOCK SYNC
+// ONE-RENDER MODE + LIVE STOCK SYNC
 // ==========================================
 let hasRenderedOnce = false;
 
@@ -617,7 +618,6 @@ function safeInitialRender(){
   hasRenderedOnce = true;
 
   startHeaderSyncPill();
-  filterSortProducts(false);
 }
 safeInitialRender();
 
@@ -647,13 +647,14 @@ function buildLiveMap(liveArr){
 requestAnimationFrame(() => {
   requestAnimationFrame(async () => {
     const live = await getLiveProductsSafe();
+
     if(!live || !Array.isArray(window.products)) {
+      filterSortProducts(false); // fallback to local products
       finishHeaderSyncPill(false);
       return;
     }
 
     const map = buildLiveMap(live);
-    let changed = false;
 
     window.products.forEach(p=>{
       const lp = map[normId(p.id)];
@@ -662,12 +663,11 @@ requestAnimationFrame(() => {
       const newStock = (lp.stock != null) ? toNumber(lp.stock) : toNumber(p.stock);
       const newPrice = (lp.price != null) ? toNumber(lp.price) : toNumber(p.price);
 
-      if(toNumber(p.stock) !== newStock){ p.stock = newStock; changed = true; }
-      if(toNumber(p.price) !== newPrice){ p.price = newPrice; changed = true; }
+      p.stock = newStock;
+      p.price = newPrice;
     });
 
-    if(changed) filterSortProducts(true);
-
+    filterSortProducts(false); // render once only
     finishHeaderSyncPill(true);
   });
 });
