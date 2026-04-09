@@ -853,3 +853,36 @@ body {
   font-weight: 600;
   z-index: 2;
 }
+
+/* =========================
+   FIX CATEGORY OVERFLOW BUG
+========================= */
+
+.category-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.category-card {
+  display: block;
+  width: 100%;
+  height: 110px;   /* control height */
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+/* VERY IMPORTANT FIX */
+.category-card img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  display: block;
+}
+
+/* stop it from becoming full screen */
+.category-card,
+.category-card * {
+  max-width: 100%;
+}
