@@ -3,9 +3,9 @@
 // ✅ Requires watchlist.js loaded FIRST (window.products)
 // ✅ One-render mode: wait for live stock first
 // ✅ Fallback to local products if sync fails
+// ✅ Sync pill only appears if sync is slow
 // ✅ Particles delayed + fewer on mobile + resize throttle
 // ✅ Image fetchpriority=low
-// ✅ Header stock syncing pill (3s timer + success/fail + auto hide)
 // ✅ Sold out separator + badge (always shown)
 // ✅ Cart count bottom button
 // ✅ Filters + sort
@@ -177,6 +177,8 @@ function updatePager(){
 // ==========================================
 let __syncInterval = null;
 let __syncFadeTimeout = null;
+let __syncShowTimeout = null;
+let __syncStartedAt = 0;
 
 function setSyncText(text){
   if(!syncNotice) return;
@@ -185,37 +187,39 @@ function setSyncText(text){
 }
 
 function startHeaderSyncPill(){
-  if(!syncNotice || !syncTimer) return;
+  if(!syncNotice) return;
 
-  syncNotice.style.opacity = "1";
-  syncNotice.style.transform = "none";
-  syncNotice.classList.remove("done");
-  setSyncText("Syncing latest stock");
+  __syncStartedAt = Date.now();
 
-  let count = 3;
-  syncTimer.textContent = String(count);
+  clearTimeout(__syncShowTimeout);
+  __syncShowTimeout = setTimeout(() => {
+    syncNotice.style.opacity = "1";
+    syncNotice.style.transform = "none";
+    syncNotice.classList.remove("done");
 
-  clearInterval(__syncInterval);
-  clearTimeout(__syncFadeTimeout);
-
-  __syncInterval = setInterval(() => {
-    count -= 1;
-    syncTimer.textContent = String(Math.max(0, count));
-    if(count <= 0){
-      clearInterval(__syncInterval);
-    }
-  }, 1000);
+    setSyncText("Syncing latest stock...");
+    if(syncTimer) syncTimer.textContent = "";
+  }, 800);
 }
 
 function finishHeaderSyncPill(success){
-  if(!syncNotice || !syncTimer) return;
+  if(!syncNotice) return;
 
   clearInterval(__syncInterval);
   clearTimeout(__syncFadeTimeout);
+  clearTimeout(__syncShowTimeout);
+
+  const elapsed = Date.now() - __syncStartedAt;
+
+  if(elapsed < 800){
+    syncNotice.style.opacity = "0";
+    syncNotice.style.transform = "translateY(-6px)";
+    return;
+  }
 
   if(success){
     syncNotice.classList.add("done");
-    setSyncText("Stock synced");
+    setSyncText("Stock updated");
   }else{
     setSyncText("Sync failed");
   }
@@ -223,7 +227,7 @@ function finishHeaderSyncPill(success){
   __syncFadeTimeout = setTimeout(() => {
     syncNotice.style.opacity = "0";
     syncNotice.style.transform = "translateY(-6px)";
-  }, 900);
+  }, 500);
 }
 
 // ==========================================
