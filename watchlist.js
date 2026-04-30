@@ -339,7 +339,7 @@ window.products = [
 {id:300,name:"Santos (Crystal Bronze)",brand:"Cartier",category:"womens",grade:"A",price:25,stock:1,label:"",img:"images/cartier/cartier300.jpeg",images:["images/cartier/cartier300.jpeg"],details:"Quartz fashion watch"},
 {id:301,name:"Emery (Gold)",brand:"Michael Kors",category:"womens",grade:"A",price:25,stock:1,label:"",img:"images/mk/mk301.jpeg",images:["images/mk/mk301.jpeg"],details:"Quartz fashion watch"},
 {id:353,name:"Emery (Gold/Black)",brand:"Michael Kors",category:"womens",grade:"A",price:25,stock:1,label:"",img:"images/mk/mk353.jpeg",images:["images/mk/mk353.jpeg"],details:"Quartz fashion watch"},
-{id:302,name:"Emery (Gold/White)",brand:"Michael Kors",category:"womens",grade:"A",price:25,stock:1,label:"",img:"images/mk/coach302.jpeg",images:["images/coach/coach302.jpeg"],details:"Quartz fashion watch"},
+{id:302,name:"Emery (Gold/White)",brand:"Michael Kors",category:"womens",grade:"A",price:25,stock:1,label:"",img:"images/mk/mk302.jpeg",images:["images/mk/mk302.jpeg"],details:"Quartz fashion watch"},
 {id:303,name:"Twenty-4 (Silver/White)",brand:"Patek Philippe",category:"womens",grade:"A",price:25,stock:1,label:"",img:"images/patek/patek303.jpeg",images:["images/patek/patek303.jpeg"],details:"Quartz luxury style"},
 {id:304,name:"Twenty-4 (Silver/Black)",brand:"Patek Philippe",category:"womens",grade:"A",price:25,stock:1,label:"",img:"images/patek/patek304.jpeg",images:["images/patek/patek304.jpeg"],details:"Quartz luxury style"},
 {id:305,name:"Royal Oak Lady (Black)",brand:"Audemars Piguet",category:"womens",grade:"A",price:25,stock:0,label:"",img:"images/ap/ap305.jpeg",images:["images/ap/ap305.jpeg"],details:"Luxury quartz style"},
